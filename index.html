@@ -3,202 +3,328 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  
-  <!-- PWA Meta Tags -->
-  <title>Ai-Snack Opname</title>
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Opname Pro">
-  <meta name="theme-color" content="#4f46e5">
-  
-  <!-- Tailwind CSS & Font Awesome -->
+  <title>Enterprise Superapp Opname</title>
+  <meta name="theme-color" content="#1e1b4b">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
   <style>
-    body { background-color: #f3f4f6; -webkit-tap-highlight-color: transparent; }
-    .glass-card {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
+    body { background-color: #f1f5f9; -webkit-tap-highlight-color: transparent; }
+    .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
+    .pin-dot { transition: all 0.2s ease; }
     ::-webkit-scrollbar { display: none; }
   </style>
-
-  <!-- PWA Manifest Injection -->
-  <link rel="manifest" id="manifest-link">
-  <script>
-    const manifest = {
-      "name": "Ai-Snack Opname Super App",
-      "short_name": "Opname",
-      "display": "standalone",
-      "background_color": "#f3f4f6",
-      "theme_color": "#4f46e5",
-      "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/2890/2890580.png", "sizes": "512x512", "type": "image/png"}]
-    };
-    const manifestURL = URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type: 'application/json'}));
-    document.getElementById('manifest-link').setAttribute('href', manifestURL);
-  </script>
 </head>
-<body class="text-gray-800 pb-20">
+<body class="text-slate-800 h-screen flex flex-col overflow-hidden">
 
-  <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-5 rounded-b-3xl shadow-lg relative z-10">
-    <div class="flex justify-between items-center mb-4">
-      <div>
-        <h1 class="text-2xl font-bold tracking-tight">Opname Pro</h1>
-        <p class="text-sm text-blue-100 opacity-80" id="networkStatus">Sistem Kendali Stok</p>
+  <!-- ================= PIN LOGIN SCREEN ================= -->
+  <div id="loginScreen" class="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center transition-opacity duration-300">
+    <div class="text-center mb-10">
+      <div class="h-16 w-16 bg-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/50">
+        <i class="fa-solid fa-boxes-stacked text-3xl text-white"></i>
       </div>
-      <div id="statusIcon" class="h-12 w-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm text-green-300">
-        <i class="fa-solid fa-wifi text-xl"></i>
-      </div>
+      <h1 class="text-2xl font-bold text-white tracking-wide">Enterprise Auth</h1>
+      <p class="text-slate-400 text-sm mt-1" id="loginStatus">Menghubungkan ke server...</p>
+    </div>
+
+    <!-- PIN Indicators -->
+    <div class="flex space-x-4 mb-12" id="pinIndicators">
+      <div class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
+      <div class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
+      <div class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
+      <div class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
+    </div>
+
+    <!-- Numpad -->
+    <div class="grid grid-cols-3 gap-6 max-w-[280px] w-full pointer-events-none opacity-50" id="numpad">
+      <button class="num-btn h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('1')">1</button>
+      <button class="num-btn h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('2')">2</button>
+      <button class="num-btn h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('3')">3</button>
+      <button class="num-btn h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('4')">4</button>
+      <button class="num-btn h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('5')">5</button>
+      <button class="num-btn h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('6')">6</button>
+      <button class="num-btn h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('7')">7</button>
+      <button class="num-btn h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('8')">8</button>
+      <button class="num-btn h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('9')">9</button>
+      <div></div>
+      <button class="num-btn h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('0')">0</button>
+      <button class="num-btn h-16 w-16 rounded-full text-slate-400 text-xl hover:text-white transition" onclick="deletePin()"><i class="fa-solid fa-delete-left"></i></button>
     </div>
   </div>
 
-  <div class="px-5 -mt-6 relative z-20">
-    <div class="glass-card rounded-2xl p-4 mb-6 flex justify-between items-center">
-      <div class="flex items-center space-x-3 w-full">
-        <div class="bg-indigo-100 text-indigo-600 p-2 rounded-lg">
-          <i class="fa-solid fa-user-tie"></i>
+  <!-- ================= MAIN DASHBOARD ================= -->
+  <div id="mainApp" class="hidden h-full flex flex-col relative">
+    
+    <!-- Header -->
+    <div class="bg-indigo-900 text-white px-6 pt-8 pb-16 rounded-b-[2.5rem] relative z-10 shrink-0 shadow-lg">
+      <div class="flex justify-between items-center mb-2">
+        <div>
+          <p class="text-indigo-200 text-xs font-semibold uppercase tracking-wider mb-1" id="roleLabel">STAFF OPERASIONAL</p>
+          <h1 class="text-2xl font-bold" id="userGreeting">Halo, -</h1>
         </div>
-        <input type="text" id="userInput" placeholder="Nama Petugas" class="w-full bg-transparent border-b border-gray-300 focus:border-indigo-500 outline-none py-1 text-sm font-medium" required>
-      </div>
-      <button id="btnSync" onclick="syncOfflineData()" class="hidden ml-3 bg-yellow-500 text-white p-2 rounded-lg text-xs font-bold whitespace-nowrap shadow-md">
-        <i class="fa-solid fa-rotate mr-1"></i> Sync (<span id="queueCount">0</span>)
-      </button>
-    </div>
-
-    <div class="glass-card rounded-2xl p-5">
-      <h2 class="text-lg font-bold mb-4 flex items-center text-gray-700">
-        <i class="fa-solid fa-clipboard-check text-green-500 mr-2"></i> Input Data Fisik
-      </h2>
-      <form id="opnameForm" onsubmit="submitData(event)">
-        <div class="mb-4">
-          <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Pilih Outlet</label>
-          <div class="relative">
-            <select id="outletSelect" class="w-full bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 rounded-xl appearance-none" required>
-              <option value="" disabled selected>Memuat...</option>
-            </select>
-          </div>
-        </div>
-        <div class="mb-4">
-          <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Item Barang</label>
-          <div class="relative">
-            <select id="barangSelect" class="w-full bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 rounded-xl appearance-none" required>
-              <option value="" disabled selected>Memuat...</option>
-            </select>
-          </div>
-        </div>
-        <div class="mb-6">
-          <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Stok Aktual</label>
-          <input type="number" id="stokInput" class="w-full bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 rounded-xl font-bold text-lg" placeholder="0" required min="0">
-        </div>
-        <button type="submit" id="btnSubmit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg flex items-center justify-center transition">
-          <i class="fa-solid fa-paper-plane mr-2"></i> Simpan & Laporan
+        <button onclick="logout()" class="h-10 w-10 bg-white/10 rounded-full flex items-center justify-center backdrop-blur text-indigo-200 hover:text-white transition">
+          <i class="fa-solid fa-power-off"></i>
         </button>
-      </form>
+      </div>
+      <div class="absolute top-4 right-4 flex items-center bg-white/10 px-3 py-1 rounded-full text-xs font-medium" id="networkBadge">
+        <div class="w-2 h-2 rounded-full bg-green-400 mr-2 animate-pulse" id="networkDot"></div>
+        <span id="networkText">Online</span>
+      </div>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="px-5 -mt-10 relative z-20 flex-1 overflow-y-auto pb-24">
+      
+      <!-- Outlet Selector -->
+      <div class="glass-card rounded-2xl p-5 mb-5 flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase">Lokasi Tugas</p>
+          <select id="outletSelect" class="bg-transparent font-bold text-slate-700 text-lg outline-none cursor-pointer appearance-none">
+            <option value="" disabled selected>Memuat outlet...</option>
+          </select>
+        </div>
+        <div class="h-10 w-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-500">
+          <i class="fa-solid fa-store"></i>
+        </div>
+      </div>
+
+      <!-- Offline Sync Badge -->
+      <div id="syncBadge" class="hidden mb-5 bg-yellow-100 border border-yellow-200 rounded-xl p-3 flex justify-between items-center shadow-sm">
+        <span class="text-xs font-bold text-yellow-700"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> <span id="queueCount">0</span> antrean lokal</span>
+        <button onclick="syncOfflineData()" class="bg-yellow-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow transition active:scale-95">Sync</button>
+      </div>
+
+      <!-- Input Card -->
+      <div class="glass-card rounded-2xl p-6 mb-5">
+        <h2 class="text-sm font-bold text-slate-800 mb-5 flex items-center border-b border-slate-100 pb-3">
+          <i class="fa-solid fa-barcode text-indigo-500 mr-2"></i> Input Stok Aktual
+        </h2>
+        
+        <form id="opnameForm" onsubmit="submitData(event)">
+          <div class="mb-5">
+            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Item Barang</label>
+            <div class="relative">
+              <select id="barangSelect" class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-xl appearance-none focus:ring-2 focus:ring-indigo-500 font-medium" required>
+                <option value="" disabled selected>Pilih Item...</option>
+              </select>
+              <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-sm pointer-events-none"></i>
+            </div>
+          </div>
+          
+          <div class="mb-6">
+            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Jumlah Fisik (Numerik)</label>
+            <input type="number" id="stokInput" class="w-full bg-slate-50 border border-slate-200 text-indigo-600 py-4 px-4 rounded-xl font-bold text-2xl text-center focus:ring-2 focus:ring-indigo-500 transition shadow-inner" placeholder="0" required min="0">
+          </div>
+          
+          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-200 flex items-center justify-center transition">
+            <i class="fa-solid fa-check-circle mr-2"></i> Simpan ke Database
+          </button>
+        </form>
+      </div>
+
+      <!-- Pelaporan Section -->
+      <div class="glass-card rounded-2xl p-5 border border-indigo-100 bg-gradient-to-br from-white to-indigo-50">
+        <div class="flex items-start justify-between">
+          <div class="pr-4">
+            <h3 class="text-sm font-bold text-indigo-900 mb-1">Akhiri Shift & Lapor</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">Kirim rekapitulasi data opname yang telah diinput hari ini langsung ke WhatsApp Owner.</p>
+          </div>
+          <div class="h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 shrink-0">
+            <i class="fa-brands fa-whatsapp text-xl"></i>
+          </div>
+        </div>
+        <button onclick="kirimLaporanWA()" class="mt-4 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-green-200 transition flex items-center justify-center">
+          <i class="fa-solid fa-paper-plane mr-2"></i> Kirim Laporan Harian WA
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Bottom Navbar -->
+    <div class="absolute bottom-0 w-full bg-white border-t border-slate-200 flex justify-around items-center py-4 px-6 z-30 pb-safe shrink-0 shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
+      <div class="flex flex-col items-center text-indigo-600 cursor-pointer">
+        <i class="fa-solid fa-pen-to-square text-xl mb-1"></i>
+      </div>
+      <div class="flex flex-col items-center text-slate-300 cursor-pointer">
+        <div class="bg-indigo-600 h-1.5 w-1.5 rounded-full absolute -top-2"></div>
+        <i class="fa-solid fa-clock-rotate-left text-xl mb-1"></i>
+      </div>
+      <div class="flex flex-col items-center text-slate-300 cursor-pointer">
+        <i class="fa-solid fa-chart-pie text-xl mb-1"></i>
+      </div>
     </div>
   </div>
 
-  <div class="fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around items-center py-3 pb-safe z-50">
-    <div class="flex flex-col items-center text-indigo-600 cursor-pointer">
-      <i class="fa-solid fa-pen-to-square text-xl mb-1"></i>
-      <span class="text-[10px] font-bold">Input</span>
-    </div>
-    <div class="flex flex-col items-center text-gray-400 cursor-pointer">
-      <i class="fa-solid fa-chart-pie text-xl mb-1"></i>
-      <span class="text-[10px] font-bold">Laporan</span>
-    </div>
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/60 z-[110] hidden flex-col items-center justify-center backdrop-blur-sm">
+    <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-400 border-opacity-50 mb-4"></div>
   </div>
-
-  <div id="loadingOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[60] hidden flex-col items-center justify-center backdrop-blur-sm">
-    <div class="animate-spin rounded-full h-14 w-14 border-t-4 border-b-4 border-white mb-4"></div>
-    <p class="text-white font-bold tracking-wider animate-pulse">Memproses Data...</p>
-  </div>
-  <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 text-white px-6 py-3 rounded-full shadow-2xl z-[70] transition-all duration-300 opacity-0 pointer-events-none flex items-center">
+  
+  <!-- Toast -->
+  <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 text-white px-6 py-3.5 rounded-full shadow-2xl z-[120] transition-all duration-300 opacity-0 pointer-events-none flex items-center w-max max-w-[90%] font-medium text-sm">
     <i id="toastIcon" class="fa-solid mr-2 text-lg"></i>
-    <span id="toastMsg" class="font-medium text-sm"></span>
+    <span id="toastMsg"></span>
   </div>
 
   <script>
-    // MASUKKAN URL WEB APP ANDA DI BAWAH INI:
+    // MASUKKAN URL WEB APP ANDA DI BAWAH INI
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbw_nV2vbN7x3vmR_IIoGljgggI7CxFrUpvpevNe90gv7BBb0wSAXZDgStDjolRb0237Cw/exec";
 
+    let globalData = { users: [], outlets: [], barangs: [] };
     let opnameQueue = JSON.parse(localStorage.getItem('opnameQueue')) || [];
+    let activeUser = JSON.parse(localStorage.getItem('activeSession')) || null;
+    let currentPin = "";
 
     document.addEventListener("DOMContentLoaded", () => {
-      fetchInitialData();
+      initApp();
+      window.addEventListener('online', updateNetworkStatus);
+      window.addEventListener('offline', updateNetworkStatus);
+    });
+
+    async function initApp() {
       updateNetworkStatus();
       updateQueueUI();
       
-      window.addEventListener('online', () => { updateNetworkStatus(); syncOfflineData(); });
-      window.addEventListener('offline', updateNetworkStatus);
-      
-      if(localStorage.getItem('savedUser')) document.getElementById('userInput').value = localStorage.getItem('savedUser');
-    });
-
-    async function fetchInitialData() {
-      if(!navigator.onLine && localStorage.getItem('dropdownData')){
-        renderDropdowns(JSON.parse(localStorage.getItem('dropdownData')));
-        return;
+      // Load data offline fallback jika ada
+      if(localStorage.getItem('sysData')) {
+        globalData = JSON.parse(localStorage.getItem('sysData'));
+        enableLogin();
       }
 
+      // Fetch fresh data
       try {
-        const response = await fetch(GAS_API_URL, {
-          method: "POST",
-          body: JSON.stringify({ action: "getInitialData" })
-        });
+        const response = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData" }) });
         const result = await response.json();
-        
         if(result.status === "success") {
-          localStorage.setItem('dropdownData', JSON.stringify(result.data));
-          renderDropdowns(result.data);
+          globalData = result.data;
+          localStorage.setItem('sysData', JSON.stringify(globalData));
+          enableLogin();
         }
-      } catch (error) {
-        console.error("Gagal memuat data dari server", error);
+      } catch (e) {
+        if(!globalData.users.length) {
+          document.getElementById('loginStatus').textContent = "Gagal memuat sistem. Cek koneksi.";
+          document.getElementById('loginStatus').classList.add('text-red-400');
+        }
       }
     }
 
-    function renderDropdowns(data) {
+    function enableLogin() {
+      if(activeUser) {
+        showMainApp();
+      } else {
+        document.getElementById('loginStatus').textContent = "Silakan masukkan PIN 4 digit Anda";
+        document.getElementById('numpad').classList.remove('pointer-events-none', 'opacity-50');
+      }
+    }
+
+    // ================= PIN LOGIC =================
+    function enterPin(num) {
+      if(currentPin.length < 4) {
+        currentPin += num;
+        updatePinUI();
+        if(currentPin.length === 4) validatePin();
+      }
+    }
+
+    function deletePin() {
+      if(currentPin.length > 0) {
+        currentPin = currentPin.slice(0, -1);
+        updatePinUI();
+      }
+    }
+
+    function updatePinUI() {
+      const dots = document.querySelectorAll('.pin-dot');
+      dots.forEach((dot, index) => {
+        if(index < currentPin.length) {
+          dot.classList.remove('border-slate-600');
+          dot.classList.add('bg-white', 'border-white');
+        } else {
+          dot.classList.remove('bg-white', 'border-white');
+          dot.classList.add('border-slate-600');
+        }
+      });
+    }
+
+    function validatePin() {
+      const user = globalData.users.find(u => u.pin === currentPin);
+      if(user) {
+        activeUser = user;
+        localStorage.setItem('activeSession', JSON.stringify(user));
+        showToast("Login Berhasil", "bg-green-500", "fa-check-circle");
+        setTimeout(showMainApp, 500);
+      } else {
+        showToast("PIN Salah!", "bg-red-500", "fa-circle-xmark");
+        const pinContainer = document.getElementById('pinIndicators');
+        pinContainer.classList.add('animate-bounce');
+        setTimeout(() => {
+          currentPin = "";
+          updatePinUI();
+          pinContainer.classList.remove('animate-bounce');
+        }, 500);
+      }
+    }
+
+    function logout() {
+      activeUser = null;
+      currentPin = "";
+      localStorage.removeItem('activeSession');
+      updatePinUI();
+      document.getElementById('mainApp').classList.add('hidden');
+      document.getElementById('loginScreen').classList.remove('hidden');
+    }
+
+    // ================= MAIN APP LOGIC =================
+    function showMainApp() {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+      
+      document.getElementById('userGreeting').textContent = activeUser.username;
+      document.getElementById('roleLabel').textContent = activeUser.role;
+
+      populateDropdowns();
+      
+      // Auto-lock Outlet
+      const outletSelect = document.getElementById('outletSelect');
+      if(activeUser.role !== "Owner" && activeUser.idOutlet !== "ALL") {
+        outletSelect.value = activeUser.idOutlet;
+        outletSelect.disabled = true;
+      } else {
+        outletSelect.disabled = false;
+        outletSelect.value = "";
+      }
+    }
+
+    function populateDropdowns() {
       const outletSelect = document.getElementById('outletSelect');
       const barangSelect = document.getElementById('barangSelect');
       
       outletSelect.innerHTML = '<option value="" disabled selected>Pilih Outlet...</option>';
       barangSelect.innerHTML = '<option value="" disabled selected>Pilih Item...</option>';
 
-      data.outlets.forEach(o => { outletSelect.add(new Option(o.nama, o.id)); });
-      data.barangs.forEach(b => { barangSelect.add(new Option(`${b.nama} (${b.satuan})`, b.id)); });
+      globalData.outlets.forEach(o => outletSelect.add(new Option(o.nama, o.id)));
+      globalData.barangs.forEach(b => barangSelect.add(new Option(`${b.nama} (${b.satuan})`, b.id)));
     }
 
     async function submitData(e) {
       e.preventDefault();
-      
       const payload = {
-        user: document.getElementById('userInput').value,
+        user: activeUser.username,
         outletId: document.getElementById('outletSelect').value,
         barangId: document.getElementById('barangSelect').value,
         stok: document.getElementById('stokInput').value,
         timestamp: new Date().toISOString()
       };
 
-      if(!payload.user || !payload.outletId || !payload.barangId || !payload.stok) return;
-      
-      localStorage.setItem('savedUser', payload.user);
+      if(!payload.outletId || !payload.barangId || !payload.stok) return;
       document.getElementById('stokInput').value = '';
 
       if (navigator.onLine) {
         showLoading(true);
         try {
-          const response = await fetch(GAS_API_URL, {
-            method: "POST",
-            body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] })
-          });
-          const result = await response.json();
-          
+          const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) });
+          const result = await res.json();
           showLoading(false);
-          if(result.status === "success" && result.data.status === "success") {
-            showToast("Berhasil tersimpan di Database!", "bg-green-500", "fa-circle-check");
-          }
+          if(result.status === "success") showToast("Tersimpan di DB", "bg-indigo-600", "fa-check");
         } catch (err) {
           showLoading(false);
           simpanKeQueue(payload); 
@@ -208,77 +334,92 @@
       }
     }
 
+    // ================= LAPORAN WA MANUAL =================
+    async function kirimLaporanWA() {
+      const outletId = document.getElementById('outletSelect').value;
+      if(!outletId) { showToast("Pilih outlet terlebih dahulu!", "bg-red-500", "fa-circle-xmark"); return; }
+      
+      if(opnameQueue.length > 0) {
+        showToast("Sync antrean offline terlebih dahulu!", "bg-yellow-500", "fa-triangle-exclamation");
+        return;
+      }
+
+      if(!confirm("Kirim rekap opname hari ini ke Owner?")) return;
+
+      showLoading(true);
+      try {
+        const res = await fetch(GAS_API_URL, { 
+          method: "POST", 
+          body: JSON.stringify({ action: "sendReportWA", data: { outletId: outletId, user: activeUser.username } }) 
+        });
+        const result = await res.json();
+        showLoading(false);
+        if(result.data.status === "success") {
+          showToast(result.data.message, "bg-green-500", "fa-whatsapp");
+        } else {
+          showToast(result.data.message, "bg-red-500", "fa-circle-xmark");
+        }
+      } catch(err) {
+        showLoading(false);
+        showToast("Gagal mengirim WA. Cek jaringan.", "bg-red-500", "fa-wifi");
+      }
+    }
+
+    // ================= OFFLINE & UTILS =================
     function simpanKeQueue(payload) {
       opnameQueue.push(payload);
       localStorage.setItem('opnameQueue', JSON.stringify(opnameQueue));
       updateQueueUI();
-      showToast("Offline! Tersimpan di antrean.", "bg-yellow-500", "fa-database");
+      showToast("Tersimpan di antrean offline", "bg-yellow-500", "fa-database");
     }
 
     async function syncOfflineData() {
       if (!navigator.onLine || opnameQueue.length === 0) return;
-      
       showLoading(true);
-      const dataToSync = [...opnameQueue];
-      
       try {
-        const response = await fetch(GAS_API_URL, {
-          method: "POST",
-          body: JSON.stringify({ action: "submitOpnameBatch", data: dataToSync })
-        });
-        const result = await response.json();
-
+        const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [...opnameQueue] }) });
+        const result = await res.json();
         showLoading(false);
-        if (result.status === "success" && result.data.status === "success") {
+        if (result.status === "success") {
           opnameQueue = []; 
           localStorage.setItem('opnameQueue', JSON.stringify([]));
           updateQueueUI();
-          showToast("Sinkronisasi Selesai!", "bg-blue-500", "fa-cloud-arrow-up");
+          showToast("Sync Berhasil!", "bg-blue-500", "fa-cloud-arrow-up");
         }
       } catch (error) {
         showLoading(false);
-        showToast("Gagal menyinkronkan ke server.", "bg-red-500", "fa-circle-xmark");
+        showToast("Gagal sync data", "bg-red-500", "fa-times");
       }
     }
 
     function updateNetworkStatus() {
       const isOnline = navigator.onLine;
-      const statusText = document.getElementById('networkStatus');
-      const icon = document.getElementById('statusIcon');
-      
+      const dot = document.getElementById('networkDot');
+      const text = document.getElementById('networkText');
       if (isOnline) {
-        statusText.textContent = "Sistem Online";
-        icon.className = "h-12 w-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm text-green-300";
-        icon.innerHTML = '<i class="fa-solid fa-wifi text-xl"></i>';
+        text.textContent = "Online";
+        dot.className = "w-2 h-2 rounded-full bg-green-400 mr-2 animate-pulse";
+        if(opnameQueue.length > 0) syncOfflineData();
       } else {
-        statusText.textContent = "Mode Offline (Data Disimpan)";
-        icon.className = "h-12 w-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm text-yellow-300";
-        icon.innerHTML = '<i class="fa-solid fa-plane text-xl"></i>';
+        text.textContent = "Offline Mode";
+        dot.className = "w-2 h-2 rounded-full bg-yellow-400 mr-2";
       }
     }
 
     function updateQueueUI() {
-      const btnSync = document.getElementById('btnSync');
+      const badge = document.getElementById('syncBadge');
       document.getElementById('queueCount').textContent = opnameQueue.length;
-      if (opnameQueue.length > 0) {
-        btnSync.classList.remove('hidden');
-      } else {
-        btnSync.classList.add('hidden');
-      }
+      badge.style.display = opnameQueue.length > 0 ? 'flex' : 'none';
     }
 
-    function showLoading(show) {
-      document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
-    }
-
-    function showToast(message, bgColor, iconClass) {
-      const toast = document.getElementById('toast');
-      toast.className = `fixed top-5 left-1/2 transform -translate-x-1/2 text-white px-6 py-3 rounded-full shadow-2xl z-[70] transition-all duration-300 flex items-center ${bgColor}`;
-      document.getElementById('toastIcon').className = `fa-solid ${iconClass} mr-2 text-lg`;
-      document.getElementById('toastMsg').textContent = message;
-      
-      toast.style.opacity = '1'; toast.style.top = '20px';
-      setTimeout(() => { toast.style.opacity = '0'; toast.style.top = '-50px'; }, 3500);
+    function showLoading(show) { document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none'; }
+    function showToast(msg, bg, icon) {
+      const t = document.getElementById('toast');
+      t.className = `fixed top-5 left-1/2 transform -translate-x-1/2 text-white px-6 py-3.5 rounded-full shadow-2xl z-[120] transition-all duration-300 flex items-center w-max max-w-[90%] font-medium text-sm ${bg}`;
+      document.getElementById('toastIcon').className = `fa-solid ${icon} mr-2 text-lg`;
+      document.getElementById('toastMsg').textContent = msg;
+      t.style.opacity = '1'; t.style.top = '20px';
+      setTimeout(() => { t.style.opacity = '0'; t.style.top = '-50px'; }, 3500);
     }
   </script>
 </body>
