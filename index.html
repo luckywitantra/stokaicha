@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  <!-- PWA Meta Tags -->
+  <title>Ai-Snack Opname</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Opname Pro">
+  <meta name="theme-color" content="#4f46e5">
+  
+  <!-- Tailwind CSS & Font Awesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    body { background-color: #f3f4f6; -webkit-tap-highlight-color: transparent; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+
+  <!-- PWA Manifest Injection -->
+  <link rel="manifest" id="manifest-link">
+  <script>
+    const manifest = {
+      "name": "Ai-Snack Opname Super App",
+      "short_name": "Opname",
+      "display": "standalone",
+      "background_color": "#f3f4f6",
+      "theme_color": "#4f46e5",
+      "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/2890/2890580.png", "sizes": "512x512", "type": "image/png"}]
+    };
+    const manifestURL = URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type: 'application/json'}));
+    document.getElementById('manifest-link').setAttribute('href', manifestURL);
+  </script>
+</head>
+<body class="text-gray-800 pb-20">
+
+  <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-5 rounded-b-3xl shadow-lg relative z-10">
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight">Opname Pro</h1>
+        <p class="text-sm text-blue-100 opacity-80" id="networkStatus">Sistem Kendali Stok</p>
+      </div>
+      <div id="statusIcon" class="h-12 w-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm text-green-300">
+        <i class="fa-solid fa-wifi text-xl"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-5 -mt-6 relative z-20">
+    <div class="glass-card rounded-2xl p-4 mb-6 flex justify-between items-center">
+      <div class="flex items-center space-x-3 w-full">
+        <div class="bg-indigo-100 text-indigo-600 p-2 rounded-lg">
+          <i class="fa-solid fa-user-tie"></i>
+        </div>
+        <input type="text" id="userInput" placeholder="Nama Petugas" class="w-full bg-transparent border-b border-gray-300 focus:border-indigo-500 outline-none py-1 text-sm font-medium" required>
+      </div>
+      <button id="btnSync" onclick="syncOfflineData()" class="hidden ml-3 bg-yellow-500 text-white p-2 rounded-lg text-xs font-bold whitespace-nowrap shadow-md">
+        <i class="fa-solid fa-rotate mr-1"></i> Sync (<span id="queueCount">0</span>)
+      </button>
+    </div>
+
+    <div class="glass-card rounded-2xl p-5">
+      <h2 class="text-lg font-bold mb-4 flex items-center text-gray-700">
+        <i class="fa-solid fa-clipboard-check text-green-500 mr-2"></i> Input Data Fisik
+      </h2>
+      <form id="opnameForm" onsubmit="submitData(event)">
+        <div class="mb-4">
+          <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Pilih Outlet</label>
+          <div class="relative">
+            <select id="outletSelect" class="w-full bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 rounded-xl appearance-none" required>
+              <option value="" disabled selected>Memuat...</option>
+            </select>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Item Barang</label>
+          <div class="relative">
+            <select id="barangSelect" class="w-full bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 rounded-xl appearance-none" required>
+              <option value="" disabled selected>Memuat...</option>
+            </select>
+          </div>
+        </div>
+        <div class="mb-6">
+          <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Stok Aktual</label>
+          <input type="number" id="stokInput" class="w-full bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 rounded-xl font-bold text-lg" placeholder="0" required min="0">
+        </div>
+        <button type="submit" id="btnSubmit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg flex items-center justify-center transition">
+          <i class="fa-solid fa-paper-plane mr-2"></i> Simpan & Laporan
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around items-center py-3 pb-safe z-50">
+    <div class="flex flex-col items-center text-indigo-600 cursor-pointer">
+      <i class="fa-solid fa-pen-to-square text-xl mb-1"></i>
+      <span class="text-[10px] font-bold">Input</span>
+    </div>
+    <div class="flex flex-col items-center text-gray-400 cursor-pointer">
+      <i class="fa-solid fa-chart-pie text-xl mb-1"></i>
+      <span class="text-[10px] font-bold">Laporan</span>
+    </div>
+  </div>
+
+  <div id="loadingOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-[60] hidden flex-col items-center justify-center backdrop-blur-sm">
+    <div class="animate-spin rounded-full h-14 w-14 border-t-4 border-b-4 border-white mb-4"></div>
+    <p class="text-white font-bold tracking-wider animate-pulse">Memproses Data...</p>
+  </div>
+  <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 text-white px-6 py-3 rounded-full shadow-2xl z-[70] transition-all duration-300 opacity-0 pointer-events-none flex items-center">
+    <i id="toastIcon" class="fa-solid mr-2 text-lg"></i>
+    <span id="toastMsg" class="font-medium text-sm"></span>
+  </div>
+
+  <script>
+    // MASUKKAN URL WEB APP ANDA DI BAWAH INI:
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbw_nV2vbN7x3vmR_IIoGljgggI7CxFrUpvpevNe90gv7BBb0wSAXZDgStDjolRb0237Cw/exec";
+
+    let opnameQueue = JSON.parse(localStorage.getItem('opnameQueue')) || [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchInitialData();
+      updateNetworkStatus();
+      updateQueueUI();
+      
+      window.addEventListener('online', () => { updateNetworkStatus(); syncOfflineData(); });
+      window.addEventListener('offline', updateNetworkStatus);
+      
+      if(localStorage.getItem('savedUser')) document.getElementById('userInput').value = localStorage.getItem('savedUser');
+    });
+
+    async function fetchInitialData() {
+      if(!navigator.onLine && localStorage.getItem('dropdownData')){
+        renderDropdowns(JSON.parse(localStorage.getItem('dropdownData')));
+        return;
+      }
+
+      try {
+        const response = await fetch(GAS_API_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "getInitialData" })
+        });
+        const result = await response.json();
+        
+        if(result.status === "success") {
+          localStorage.setItem('dropdownData', JSON.stringify(result.data));
+          renderDropdowns(result.data);
+        }
+      } catch (error) {
+        console.error("Gagal memuat data dari server", error);
+      }
+    }
+
+    function renderDropdowns(data) {
+      const outletSelect = document.getElementById('outletSelect');
+      const barangSelect = document.getElementById('barangSelect');
+      
+      outletSelect.innerHTML = '<option value="" disabled selected>Pilih Outlet...</option>';
+      barangSelect.innerHTML = '<option value="" disabled selected>Pilih Item...</option>';
+
+      data.outlets.forEach(o => { outletSelect.add(new Option(o.nama, o.id)); });
+      data.barangs.forEach(b => { barangSelect.add(new Option(`${b.nama} (${b.satuan})`, b.id)); });
+    }
+
+    async function submitData(e) {
+      e.preventDefault();
+      
+      const payload = {
+        user: document.getElementById('userInput').value,
+        outletId: document.getElementById('outletSelect').value,
+        barangId: document.getElementById('barangSelect').value,
+        stok: document.getElementById('stokInput').value,
+        timestamp: new Date().toISOString()
+      };
+
+      if(!payload.user || !payload.outletId || !payload.barangId || !payload.stok) return;
+      
+      localStorage.setItem('savedUser', payload.user);
+      document.getElementById('stokInput').value = '';
+
+      if (navigator.onLine) {
+        showLoading(true);
+        try {
+          const response = await fetch(GAS_API_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] })
+          });
+          const result = await response.json();
+          
+          showLoading(false);
+          if(result.status === "success" && result.data.status === "success") {
+            showToast("Berhasil tersimpan di Database!", "bg-green-500", "fa-circle-check");
+          }
+        } catch (err) {
+          showLoading(false);
+          simpanKeQueue(payload); 
+        }
+      } else {
+        simpanKeQueue(payload);
+      }
+    }
+
+    function simpanKeQueue(payload) {
+      opnameQueue.push(payload);
+      localStorage.setItem('opnameQueue', JSON.stringify(opnameQueue));
+      updateQueueUI();
+      showToast("Offline! Tersimpan di antrean.", "bg-yellow-500", "fa-database");
+    }
+
+    async function syncOfflineData() {
+      if (!navigator.onLine || opnameQueue.length === 0) return;
+      
+      showLoading(true);
+      const dataToSync = [...opnameQueue];
+      
+      try {
+        const response = await fetch(GAS_API_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "submitOpnameBatch", data: dataToSync })
+        });
+        const result = await response.json();
+
+        showLoading(false);
+        if (result.status === "success" && result.data.status === "success") {
+          opnameQueue = []; 
+          localStorage.setItem('opnameQueue', JSON.stringify([]));
+          updateQueueUI();
+          showToast("Sinkronisasi Selesai!", "bg-blue-500", "fa-cloud-arrow-up");
+        }
+      } catch (error) {
+        showLoading(false);
+        showToast("Gagal menyinkronkan ke server.", "bg-red-500", "fa-circle-xmark");
+      }
+    }
+
+    function updateNetworkStatus() {
+      const isOnline = navigator.onLine;
+      const statusText = document.getElementById('networkStatus');
+      const icon = document.getElementById('statusIcon');
+      
+      if (isOnline) {
+        statusText.textContent = "Sistem Online";
+        icon.className = "h-12 w-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm text-green-300";
+        icon.innerHTML = '<i class="fa-solid fa-wifi text-xl"></i>';
+      } else {
+        statusText.textContent = "Mode Offline (Data Disimpan)";
+        icon.className = "h-12 w-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm text-yellow-300";
+        icon.innerHTML = '<i class="fa-solid fa-plane text-xl"></i>';
+      }
+    }
+
+    function updateQueueUI() {
+      const btnSync = document.getElementById('btnSync');
+      document.getElementById('queueCount').textContent = opnameQueue.length;
+      if (opnameQueue.length > 0) {
+        btnSync.classList.remove('hidden');
+      } else {
+        btnSync.classList.add('hidden');
+      }
+    }
+
+    function showLoading(show) {
+      document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+    }
+
+    function showToast(message, bgColor, iconClass) {
+      const toast = document.getElementById('toast');
+      toast.className = `fixed top-5 left-1/2 transform -translate-x-1/2 text-white px-6 py-3 rounded-full shadow-2xl z-[70] transition-all duration-300 flex items-center ${bgColor}`;
+      document.getElementById('toastIcon').className = `fa-solid ${iconClass} mr-2 text-lg`;
+      document.getElementById('toastMsg').textContent = message;
+      
+      toast.style.opacity = '1'; toast.style.top = '20px';
+      setTimeout(() => { toast.style.opacity = '0'; toast.style.top = '-50px'; }, 3500);
+    }
+  </script>
+</body>
+</html>
