@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Ai-CHA Precision V16.5</title>
+  <title>Ai-CHA Precision V18.0</title>
   <meta name="theme-color" content="#FF2E2E">
   <meta name="apple-mobile-web-app-capable" content="yes">
   
@@ -11,18 +11,19 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-material-ui/material-ui.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.18.0/clusterize.min.css" rel="stylesheet">
   
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.18.0/clusterize.min.js"></script>
 
   <link rel="manifest" id="manifest-link">
   <script>
     const manifest = {
-      "name": "Ai-CHA Precision Enterprise",
-      "short_name": "Ai-CHA",
-      "display": "standalone",
-      "background_color": "#F8F9FD",
-      "theme_color": "#FF2E2E",
+      "name": "Ai-CHA Precision Enterprise", "short_name": "Ai-CHA", "display": "standalone",
+      "background_color": "#F8F9FD", "theme_color": "#FF2E2E",
       "icons": [{"src": "https://cdn-icons-png.flaticon.com/512/2890/2890580.png", "sizes": "512x512", "type": "image/png"}]
     };
     const manifestURL = URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type: 'application/json'}));
@@ -31,7 +32,7 @@
 
   <style>
     :root { --primary: #FF2E2E; --bg: #F8F9FD; --text: #1E293B; --gray: #64748B; --radius: 20px; }
-    body { font-family: 'Urbanist', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 90px; overflow-x: hidden; }
+    body { font-family: 'Urbanist', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 90px; overflow-x: hidden; overflow-y: hidden; }
     
     .glass-header { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 15px 20px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
     .brand { font-weight: 800; font-size: 1.3rem; color: var(--primary); }
@@ -40,7 +41,7 @@
     .outlet-sel { width: 100%; border: none; background: white; font-weight: 800; font-size: 1rem; outline: none; padding: 12px 15px; border-radius: 12px; margin: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
     .outlet-wrap { padding: 0 20px; }
 
-    .card-box { border-radius: var(--radius); padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: 0.2s; cursor:pointer; position: relative; content-visibility: auto; contain-intrinsic-size: 120px; }
+    .card-box { border-radius: var(--radius); padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: 0.2s; cursor:pointer; position: relative; }
     .card-box:active { transform: scale(0.97); }
     
     .dual-input { display: flex; gap: 10px; margin-bottom: 15px; }
@@ -72,8 +73,10 @@
     .num-btn { width: 70px; height: 70px; border-radius: 50%; background: #1F2937; color: white; font-size: 1.5rem; border: none; font-family: 'Urbanist'; transition: 0.1s; }
     .num-btn:active { background: #374151; transform: scale(0.95); }
     .sync-badge { background: #FFFBEB; border: 1px solid #FDE68A; padding: 10px 15px; border-radius: 12px; margin: 0 20px 15px; display: flex; justify-content: space-between; align-items: center; }
-    
     .po-input { width:60px; padding:4px; text-align:center; font-weight:bold; border:1px solid #ccc; border-radius:8px; }
+
+    /* VIRTUAL DOM CONTAINER */
+    #scrollArea { max-height: calc(100vh - 280px); overflow-y: auto; padding-bottom: 20px; }
   </style>
 </head>
 <body>
@@ -86,14 +89,12 @@
   <div id="loginScreen">
     <div class="text-center mb-5">
       <div style="height:80px; width:80px; background:var(--primary); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; box-shadow: 0 10px 25px rgba(255,46,46,0.4);">
-        <i class="bi bi-shield-lock-fill text-white fs-1"></i>
+        <i class="bi bi-rocket-takeoff-fill text-white fs-1"></i>
       </div>
-      <h1 class="text-white fw-bolder" style="letter-spacing:1px;">AI-CHA<span style="color:var(--primary)">V16</span></h1>
-      <p id="loginStatus" class="text-secondary small mt-1">Sistem Keamanan & Eksekutif Aktif</p>
+      <h1 class="text-white fw-bolder" style="letter-spacing:1px;">AI-CHA<span style="color:var(--primary)">V18</span></h1>
+      <p id="loginStatus" class="text-secondary small mt-1">Mengambil Data (IndexedDB)...</p>
     </div>
-    <div class="d-flex gap-3 mb-5" id="pinIndicators">
-      <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
-    </div>
+    <div class="d-flex gap-3 mb-5" id="pinIndicators"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
     <div class="row g-4" style="max-width: 280px; margin: 0 auto; opacity: 0.5; pointer-events: none;" id="numpad">
       <div class="col-4 d-flex justify-content-center"><button class="num-btn" onclick="enterPin('1')">1</button></div>
       <div class="col-4 d-flex justify-content-center"><button class="num-btn" onclick="enterPin('2')">2</button></div>
@@ -114,7 +115,7 @@
 
   <div class="glass-header">
     <div class="brand"><i class="bi bi-grid-fill me-2"></i>Ai-CHA</div>
-    <div class="role-btn" id="roleLabel" onclick="logout()"><i class="bi bi-power text-danger me-1"></i>Logout</div>
+    <div class="role-btn" id="roleLabel" onclick="doLogout()"><i class="bi bi-power text-danger me-1"></i>Logout</div>
   </div>
 
   <div class="outlet-wrap"><select id="outlet" class="outlet-sel" onchange="fetchData()"></select></div>
@@ -139,10 +140,14 @@
           <input type="text" id="searchInput" class="inp-field ps-5" placeholder="Cari barang..." onkeyup="debounceSearch()">
       </div>
 
-      <div id="liveBody"></div>
+      <div id="scrollArea" class="clusterize-scroll">
+         <div id="liveBody" class="clusterize-content">
+            <div class="text-center py-5 text-muted small"><div class="spinner-border text-danger mb-2"></div><br>Memuat Data Virtual...</div>
+         </div>
+      </div>
     </div>
 
-    <div class="px-3" id="page-transfer" style="display:none;">
+    <div class="px-3" id="page-transfer" style="display:none; height:calc(100vh - 220px); overflow-y:auto;">
       <div class="card-box bg-wht" style="border-top: 4px solid var(--primary);">
         <h6 class="fw-bold mb-4 text-danger"><i class="bi bi-send-fill me-2"></i>KIRIM BARANG</h6>
         <div class="mb-3"><label class="inp-lbl">TUJUAN</label><select id="trfDest" class="inp-field"></select></div>
@@ -159,7 +164,7 @@
       </div>
     </div>
     
-    <div class="px-3" id="page-master" style="display:none;">
+    <div class="px-3" id="page-master" style="display:none; height:calc(100vh - 220px); overflow-y:auto;">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h6 class="fw-bold m-0"><i class="bi bi-database me-2"></i>Master Barang</h6>
         <button class="btn btn-sm btn-dark rounded-pill fw-bold px-3" onclick="openMasterModal()"><i class="bi bi-plus"></i> Baru</button>
@@ -170,18 +175,8 @@
 
   <div id="ownerView" style="display:none;" class="px-3">
     <div class="row g-2 mb-3">
-        <div class="col-6">
-            <div class="card-box bg-danger text-white text-center py-3 mb-0 border-0 h-100 d-flex flex-column justify-content-center">
-                <small style="opacity:0.9; font-weight:700; font-size:0.6rem;">NILAI ASET</small>
-                <h5 id="assetVal" style="margin:2px 0 0 0; font-weight:800; font-size:1.1rem;">Rp 0</h5>
-            </div>
-        </div>
-        <div class="col-6">
-            <div class="card-box bg-dark text-white text-center py-3 mb-0 border-0 h-100 d-flex flex-column justify-content-center">
-                <small style="opacity:0.9; font-weight:700; font-size:0.6rem;">EST. RUGI EXPIRED</small>
-                <h5 id="lossVal" style="margin:2px 0 0 0; font-weight:800; font-size:1.1rem; color:#FCA5A5;">Rp 0</h5>
-            </div>
-        </div>
+        <div class="col-6"><div class="card-box bg-danger text-white text-center py-3 mb-0 border-0 h-100 d-flex flex-column justify-content-center"><small style="opacity:0.9; font-weight:700; font-size:0.6rem;">NILAI ASET</small><h5 id="assetVal" style="margin:2px 0 0 0; font-weight:800; font-size:1.1rem;">Rp 0</h5></div></div>
+        <div class="col-6"><div class="card-box bg-dark text-white text-center py-3 mb-0 border-0 h-100 d-flex flex-column justify-content-center"><small style="opacity:0.9; font-weight:700; font-size:0.6rem;">EST. RUGI EXPIRED</small><h5 id="lossVal" style="margin:2px 0 0 0; font-weight:800; font-size:1.1rem; color:#FCA5A5;">Rp 0</h5></div></div>
     </div>
 
     <div class="d-flex gap-2 mb-3">
@@ -190,28 +185,16 @@
        <button class="btn btn-outline-dark w-33 fw-bold" style="font-size:0.8rem;" onclick="showOwnerTab('po')">PO Calc</button>
     </div>
 
-    <div id="owner-aset">
+    <div id="owner-aset" style="height:calc(100vh - 350px); overflow-y:auto;">
       <div class="card-box bg-wht mb-3" style="height:250px;"><canvas id="assetChart"></canvas></div>
       <div id="assetList"></div>
     </div>
-
-    <div id="owner-perform" style="display:none;">
-      <h6 class="fw-bold text-dark mt-2"><i class="bi bi-shuffle text-primary"></i> Rekomendasi Distribusi</h6>
-      <div id="mutationList" class="mb-4"></div>
-      <h6 class="fw-bold text-dark"><i class="bi bi-exclamation-triangle text-warning"></i> Analitik Outlet & Pemakaian</h6>
-      <div id="performanceList"></div>
+    <div id="owner-perform" style="display:none; height:calc(100vh - 350px); overflow-y:auto;">
+      <h6 class="fw-bold text-dark mt-2"><i class="bi bi-shuffle text-primary"></i> Rekomendasi Distribusi</h6><div id="mutationList" class="mb-4"></div>
+      <h6 class="fw-bold text-dark"><i class="bi bi-exclamation-triangle text-warning"></i> Analitik Outlet & Pemakaian</h6><div id="performanceList"></div>
     </div>
-
-    <div id="owner-po" style="display:none;">
-      <div class="card-box bg-wht">
-         <h6 class="fw-bold text-dark mb-3"><i class="bi bi-calculator text-primary"></i> Kalkulator Purchase Order</h6>
-         <div id="poList"></div>
-         <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
-            <span class="fw-bold text-secondary">Estimasi Tagihan:</span>
-            <span class="fw-bold text-danger fs-5" id="poGrandTotal">Rp 0</span>
-         </div>
-         <button class="btn-act mt-3" onclick="copyPOWA()"><i class="bi bi-whatsapp"></i> Copy Format PO</button>
-      </div>
+    <div id="owner-po" style="display:none; height:calc(100vh - 350px); overflow-y:auto;">
+      <div class="card-box bg-wht"><h6 class="fw-bold text-dark mb-3"><i class="bi bi-calculator text-primary"></i> Kalkulator Purchase Order</h6><div id="poList"></div><div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center"><span class="fw-bold text-secondary">Estimasi Tagihan:</span><span class="fw-bold text-danger fs-5" id="poGrandTotal">Rp 0</span></div><button class="btn-act mt-3" onclick="copyPOWA()"><i class="bi bi-whatsapp"></i> Copy Format PO</button></div>
     </div>
   </div>
 
@@ -226,13 +209,12 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzUYyLJeUchPyusCbVJU8fGl-uzYY2mhg5T9AB5YNtYE8itnLiH_pWw_6IFT-vUGnzIFw/exec";
+    // MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwSQbYmtjOKWbszlcbuGZ6Bf907wkaGoaPS24xCtjGs4SNcDmWlRtZuBs-E4mGLU40/exec";
 
     let globalData = { users: [], outlets: [], products: [], liveStock: [], inventoryStats: {}, assetPerOutlet: {}, expiredAsset: 0 };
-    let opnameQueue = JSON.parse(localStorage.getItem('qAicha165')) || [];
-    let activeUser = JSON.parse(localStorage.getItem('uAicha165')) || null;
-    let currentPin = ""; let chartInstance = null; let activePO = {}; let searchTimeout;
-    let deferredPrompt; 
+    let opnameQueue = []; let activeUser = null; let currentPin = ""; let chartInstance = null; let activePO = {}; let searchTimeout;
+    let deferredPrompt; let clusterizeInstance = null; 
     const toIDR=(n)=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n);
 
     // --- PWA INSTALL LISTENER ---
@@ -242,37 +224,53 @@
     });
     function installPWA() { if(!deferredPrompt) return; document.getElementById('installPrompt').classList.add('d-none'); deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; }); }
 
-    // --- SESSION TIMEOUT LOGIC ---
+    // --- SESSION TIMEOUT & INITIALIZATION (INDEXEDDB) ---
+    localforage.config({ name: 'AiCHA_DB', storeName: 'aicha_store' });
+
     function setupSessionTimeout() {
-        let time; const TIMEOUT_MS = 2 * 60 * 60 * 1000; // 2 Jam
+        let time; const TIMEOUT_MS = 2 * 60 * 60 * 1000; 
         window.onload = resetTimer; document.onmousemove = resetTimer; document.onkeypress = resetTimer; document.ontouchstart = resetTimer;
-        function doLogout() { if(activeUser) { logout(); Swal.fire({toast:true, position:'top', icon:'info', title:'Sesi Berakhir', text:'Logout otomatis karena idle.', showConfirmButton:false, timer:3000}); } }
-        function resetTimer() { clearTimeout(time); time = setTimeout(doLogout, TIMEOUT_MS); }
+        function logoutTimer() { if(activeUser) { doLogout(); Swal.fire({toast:true, position:'top', icon:'info', title:'Sesi Berakhir', text:'Logout otomatis karena idle.', showConfirmButton:false, timer:3000}); } }
+        function resetTimer() { clearTimeout(time); time = setTimeout(logoutTimer, TIMEOUT_MS); }
     }
 
-    document.addEventListener("DOMContentLoaded", () => { initApp(); window.addEventListener('online', syncOfflineData); setupSessionTimeout(); });
+    document.addEventListener("DOMContentLoaded", async () => { 
+        // Load fast from IndexedDB
+        opnameQueue = (await localforage.getItem('qAicha18')) || [];
+        activeUser = (await localforage.getItem('uAicha18')) || null;
+        let cachedData = await localforage.getItem('dAicha18');
+        
+        updateQueueUI();
+        if(cachedData) { globalData = cachedData; enableLogin(); }
+        
+        // Fetch fresh from server
+        try {
+          const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: "ALL" }) });
+          const result = await res.json();
+          if(result.status === "success") { 
+              globalData = result.data; 
+              await localforage.setItem('dAicha18', globalData); 
+              enableLogin(); 
+              if(activeUser) showMainApp();
+          }
+        } catch (e) { if(!globalData.users.length) document.getElementById('loginStatus').textContent = "Offline. Cek Internet."; }
 
-    async function initApp() {
-      updateQueueUI();
-      if(localStorage.getItem('dAicha165')) { globalData = JSON.parse(localStorage.getItem('dAicha165')); enableLogin(); }
-      try {
-        const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: "ALL" }) });
-        const result = await res.json();
-        if(result.status === "success") { globalData = result.data; localStorage.setItem('dAicha165', JSON.stringify(globalData)); enableLogin(); }
-      } catch (e) { if(!globalData.users.length) document.getElementById('loginStatus').textContent = "Offline. Cek Internet."; }
-    }
+        window.addEventListener('online', syncOfflineData); 
+        setupSessionTimeout(); 
+    });
 
+    // --- AUTH ---
     function enableLogin() { if(activeUser) showMainApp(); else { document.getElementById('loginStatus').textContent = "Masukkan PIN Akses"; document.getElementById('numpad').style.opacity = 1; document.getElementById('numpad').style.pointerEvents = 'auto'; } }
     function enterPin(n) { if(currentPin.length < 4) { currentPin += n; updatePinUI(); if(currentPin.length === 4) validatePin(); } }
     function deletePin() { if(currentPin.length > 0) { currentPin = currentPin.slice(0, -1); updatePinUI(); } }
     function updatePinUI() { document.querySelectorAll('.pin-dot').forEach((d, i) => { if(i < currentPin.length) d.classList.add('filled'); else d.classList.remove('filled'); }); }
 
-    function validatePin() {
+    async function validatePin() {
       const u = globalData.users.find(u => u.pin === currentPin);
-      if(u) { activeUser = u; localStorage.setItem('uAicha165', JSON.stringify(u)); setTimeout(showMainApp, 300); } 
+      if(u) { activeUser = u; await localforage.setItem('uAicha18', u); setTimeout(showMainApp, 300); } 
       else { Swal.fire({toast:true, position:'top', icon:'error', title:'PIN Salah', showConfirmButton:false, timer:1500}); setTimeout(() => { currentPin = ""; updatePinUI(); }, 500); }
     }
-    function logout() { activeUser = null; currentPin = ""; localStorage.removeItem('uAicha165'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
+    async function doLogout() { activeUser = null; currentPin = ""; await localforage.removeItem('uAicha18'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
 
     function showMainApp() {
       document.getElementById('loginScreen').style.display = 'none';
@@ -290,12 +288,11 @@
 
     async function fetchData() {
       const out = document.getElementById('outlet').value; if(!out) return;
-      document.getElementById('liveBody').innerHTML='<div class="text-center py-5 spinner-border text-danger"></div>';
       try {
         let qOutlet = activeUser.role === "Owner" ? "ALL" : out;
         const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: qOutlet }) });
         const result = await res.json();
-        if(result.status === "success") { globalData = result.data; localStorage.setItem('dAicha165', JSON.stringify(globalData)); renderStockList(); renderOwner(); renderMasterList(); renderPO(); }
+        if(result.status === "success") { globalData = result.data; await localforage.setItem('dAicha18', globalData); renderStockList(); renderOwner(); renderMasterList(); renderPO(); }
       } catch (e) { renderStockList(); renderOwner(); renderMasterList(); renderPO(); } 
     }
 
@@ -321,17 +318,17 @@
         });
     }
 
-    // --- DEBOUNCED SEARCH ---
     function debounceSearch() { clearTimeout(searchTimeout); searchTimeout = setTimeout(renderStockList, 300); }
 
-    // --- RENDER VIEWS ---
+    // --- VIRTUAL DOM RENDERING ---
     function renderStockList() {
       let trf=document.getElementById('trfItem'); trf.innerHTML='<option disabled selected>Pilih Item...</option>'; 
-      let html=''; let todayStr = new Date().toLocaleDateString('id-ID');
+      let todayStr = new Date().toLocaleDateString('id-ID');
       let out = document.getElementById('outlet').value;
       
       if(out === "ALL") {
           document.getElementById('liveBody').innerHTML = '<div class="text-center py-5 text-muted small"><i class="bi bi-info-circle fs-3 d-block mb-2"></i>Pilih outlet spesifik di atas untuk memulai opname.</div>';
+          if(clusterizeInstance) { clusterizeInstance.destroy(); clusterizeInstance = null; }
           return;
       }
 
@@ -339,18 +336,19 @@
       let targetProducts = globalData.products;
       if(q !== "") targetProducts = targetProducts.filter(p => p.name.toLowerCase().includes(q));
 
-      if(targetProducts.length === 0) html = '<div class="text-center py-5 text-muted small">Barang tidak ditemukan.</div>';
+      let rowsHTML = [];
+      if(targetProducts.length === 0) rowsHTML.push('<div class="text-center py-5 text-muted small">Barang tidak ditemukan.</div>');
 
       targetProducts.forEach(p => {
         let key = `${out}_${p.name}`;
         let lItem = globalData.liveStock.find(x => x.name === p.name && x.outlet === out);
-        let currentQty = `0 ${p.uMain}`; let daysLeft = "-"; let adu = "-"; let isUpdatedToday = false; 
+        let currentQty = `0 ${p.uMain}`; let daysLeft = "-"; let adu = "-"; let isUpdatedToday = false; let rowIndex = null;
 
         let stats = globalData.inventoryStats[key];
         if(stats) { adu = stats.adu; if(new Date(stats.lastDate).toLocaleDateString('id-ID') === todayStr) isUpdatedToday = true; }
         
         if(lItem) {
-           currentQty = lItem.displayQty; daysLeft = lItem.daysLeft;
+           currentQty = lItem.displayQty; daysLeft = lItem.daysLeft; rowIndex = lItem.rowIndex;
            trf.add(new Option(`${p.name} (Stok: ${currentQty})`, p.name));
            if(lItem.totalBase <= 0) currentQty = `<span class="text-danger">KOSONG</span>`;
         }
@@ -367,6 +365,12 @@
         let bgClass = isUpdatedToday ? 'bg-grn' : (lItem && lItem.totalBase <= 0 ? 'bg-danger-soft' : 'bg-wht');
         let checkIcon = isUpdatedToday ? '<i class="bi bi-check-circle-fill text-success fs-5"></i>' : '<i class="bi bi-circle text-muted fs-5"></i>';
         
+        let undoBtn = '';
+        if(isUpdatedToday) {
+            if(inQueue) undoBtn = `<button class="btn btn-sm btn-outline-warning border-0 ms-2" onclick="event.stopPropagation(); undoLocal('${p.name}', '${out}')" title="Batal Antrean Offline"><i class="bi bi-arrow-counterclockwise fs-5"></i></button>`;
+            else if (rowIndex) undoBtn = `<button class="btn btn-sm btn-outline-danger border-0 ms-2" onclick="event.stopPropagation(); delStock(${rowIndex})" title="Batal Input Server"><i class="bi bi-arrow-counterclockwise fs-5"></i></button>`;
+        }
+        
         let batchInfo = "";
         if(lItem && lItem.batches && lItem.batches.length > 1) {
             batchInfo = `<div class="mt-1 mb-2 pt-1 border-top" style="font-size:0.65rem; color:#666;">`;
@@ -374,19 +378,28 @@
             batchInfo = batchInfo.slice(0, -2) + `</div>`;
         }
 
-        html += `
+        // PUSH KE ARRAY (Bukan innerHTML)
+        rowsHTML.push(`
         <div class="card-box ${bgClass}" onclick="openInputModal('${p.name}')">
           <button class="history-btn" onclick="event.stopPropagation(); showHistory('${p.name}')"><i class="bi bi-clock-history"></i></button>
-          <div class="d-flex justify-content-between align-items-center mb-1"><div class="fw-bold text-dark w-75" style="font-size:0.95rem;">${p.name}</div><div>${checkIcon}</div></div>
+          <div class="d-flex justify-content-between align-items-center mb-1"><div class="fw-bold text-dark w-75" style="font-size:0.95rem;">${p.name}</div><div class="d-flex align-items-center">${checkIcon} ${undoBtn}</div></div>
           <div class="text-danger fw-bold fs-4 my-1">${currentQty}</div>
           ${batchInfo}
           <div class="d-flex justify-content-between small text-secondary"><div><i class="bi bi-graph-up-arrow"></i> ADU: ${adu}/hr</div><div class="fw-bold">Est Habis: ${daysLeft} Hr</div></div>
-        </div>`;
+        </div>`);
       });
-      document.getElementById('liveBody').innerHTML = html;
+      
+      // INISIALISASI CLUSTERIZE UNTUK PERFORMA EKSTREM
+      if(!clusterizeInstance) {
+         document.getElementById('liveBody').innerHTML = ''; // Bersihkan loading
+         clusterizeInstance = new Clusterize({ rows: rowsHTML, scrollId: 'scrollArea', contentId: 'liveBody' });
+      } else {
+         clusterizeInstance.update(rowsHTML);
+      }
     }
 
-    function showHistory(itemName) {
+    // --- OTHER UI LOGICS ---
+    window.showHistory = function(itemName) {
       let out = document.getElementById('outlet').value;
       let lItem = globalData.liveStock.find(x => x.name === itemName && x.outlet === out);
       if(!lItem || !lItem.history || lItem.history.length === 0) return Swal.fire({toast:true, position:'top', icon:'info', title:'Belum ada riwayat transaksi.', showConfirmButton:false, timer:2000});
@@ -404,17 +417,13 @@
          let undoHtml = "";
          if(h.type === "Opname Rutin") undoHtml = `<span class="text-danger ms-2" style="cursor:pointer;" onclick="delStock(${h.rowIndex})"><i class="bi bi-trash"></i></span>`;
 
-         histHTML += `<div class="border-bottom py-2">
-                        <div class="d-flex justify-content-between fw-bold text-dark"><span>${dateStr}</span><span class="${color}">${sign}${qtyStr} ${undoHtml}</span></div>
-                        <div class="text-muted d-flex justify-content-between"><span>${h.type}</span><span>${h.user}</span></div>
-                      </div>`;
+         histHTML += `<div class="border-bottom py-2"><div class="d-flex justify-content-between fw-bold text-dark"><span>${dateStr}</span><span class="${color}">${sign}${qtyStr} ${undoHtml}</span></div><div class="text-muted d-flex justify-content-between"><span>${h.type}</span><span>${h.user}</span></div></div>`;
       });
       histHTML += `</div>`;
       Swal.fire({ title: `<div style="font-size:1.1rem; color:#E31E24; font-weight:bold;">Riwayat ${itemName}</div>`, html: histHTML, confirmButtonColor: '#1E293B', confirmButtonText: 'Tutup' });
     }
 
-    // --- SMART OPTIONAL EXPIRY INPUT MODAL ---
-    function openInputModal(itemName) {
+    window.openInputModal = function(itemName) {
       let p = globalData.products.find(x => x.name === itemName); if(!p) return;
       let out = document.getElementById('outlet').value;
       let lItem = globalData.liveStock.find(x => x.name === p.name && x.outlet === out);
@@ -427,20 +436,27 @@
           });
       }
 
+      let expUI = "";
+      if(p.hasExpiry === false || p.hasExpiry === "FALSE") {
+          expUI = `<div class="inp-grp"><label class="inp-lbl">KEDALUWARSA</label><input id="swal-exp" type="text" class="inp-field bg-light text-secondary" value="Non-Expiry" disabled></div>`;
+          batchOptions = `<option value="Non-Expiry" selected>Non-Expiry Item</option>`;
+      } else {
+          expUI = `<div class="inp-grp"><label class="inp-lbl">TGL EXPIRED <span class="text-muted text-lowercase" style="font-weight:600;">(Opsional)</span></label><input id="swal-exp" type="date" class="inp-field"></div>`;
+      }
+
       Swal.fire({
-        html: `<div style="text-align:left;">
-            <div style="font-size:1.1rem; font-weight:800; color:#1E293B; margin-bottom:15px; border-bottom:2px solid #f0f0f0; padding-bottom:10px;">${p.name}</div>
+        html: `<div style="text-align:left;"><div style="font-size:1.1rem; font-weight:800; color:#1E293B; margin-bottom:15px; border-bottom:2px solid #f0f0f0; padding-bottom:10px;">${p.name}</div>
             <label class="inp-lbl">PILIH BATCH / EXPIRED</label><select id="swal-batch" class="inp-field mb-3" onchange="changeBatch()">${batchOptions}</select>
             <div class="dual-input"><div class="inp-grp"><label class="inp-lbl text-danger">QTY (${p.uMain})</label><input id="swal-q1" type="number" class="inp-field fw-bold text-center" placeholder="0"></div>
               <div class="inp-grp"><label class="inp-lbl text-primary">QTY (${p.uSub})</label><input id="swal-q2" type="number" class="inp-field fw-bold text-center" placeholder="0"></div></div>
-            <div class="dual-input"><div class="inp-grp"><label class="inp-lbl">TGL EXPIRED <span class="text-muted text-lowercase" style="font-weight:600;">(Opsional)</span></label><input id="swal-exp" type="date" class="inp-field"></div>
+            <div class="dual-input">${expUI}
                <div class="inp-grp"><label class="inp-lbl">KETERANGAN</label><select id="swal-ket" class="inp-field"><option>Opname Rutin</option><option>Barang Masuk</option><option>Barang Rusak</option></select></div></div></div>`,
         confirmButtonColor: '#FF2E2E', confirmButtonText: 'Simpan', showCancelButton: true, cancelButtonText: 'Batal',
         didOpen: () => { window.changeBatch(); },
         preConfirm: () => {
           let bSel = document.getElementById('swal-batch').value;
           let expVal = bSel === "NEW" ? document.getElementById('swal-exp').value : bSel;
-          if(!expVal) expVal = "NoDate"; // Make Expiry Optional
+          if(!expVal) expVal = "NoDate";
 
           let q1 = document.getElementById('swal-q1').value, q2 = document.getElementById('swal-q2').value; 
           if(q1==="" && q2==="") return Swal.showValidationMessage('Isi kuantitas!');
@@ -457,51 +473,43 @@
 
     window.changeBatch = function() {
         let sel = document.getElementById('swal-batch'); let opt = sel.options[sel.selectedIndex]; let expInput = document.getElementById('swal-exp');
-        if(sel.value === "NEW") { document.getElementById('swal-q1').value = ""; document.getElementById('swal-q2').value = ""; expInput.value = ""; expInput.disabled = false; } 
-        else { document.getElementById('swal-q1').value = opt.dataset.qm; document.getElementById('swal-q2').value = opt.dataset.qs; expInput.value = sel.value !== "NoDate" ? sel.value : ""; expInput.disabled = true; }
+        if(sel.value === "NEW") { document.getElementById('swal-q1').value = ""; document.getElementById('swal-q2').value = ""; if(expInput) { expInput.value = ""; expInput.disabled = false; } } 
+        else if (sel.value === "Non-Expiry") { document.getElementById('swal-q1').value = opt.dataset.qm||""; document.getElementById('swal-q2').value = opt.dataset.qs||""; }
+        else { document.getElementById('swal-q1').value = opt.dataset.qm; document.getElementById('swal-q2').value = opt.dataset.qs; if(expInput) { expInput.value = sel.value !== "NoDate" ? sel.value : ""; expInput.disabled = true; } }
     }
 
     function reqItem() { Swal.fire({title:'Request Barang', input:'text', inputPlaceholder:'Misal: Sedotan Besar', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>{ if(r.isConfirmed&&r.value) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "requestBarang", data: { outlet: document.getElementById('outlet').value, item: r.value, user: activeUser.username } }) }).then(()=>Swal.fire({toast:true,position:'top',icon:'success',title:'Terkirim',showConfirmButton:false,timer:1500})).finally(()=>document.getElementById('loading').style.display='none'); } }); }
-    
+    function openMasterModal(nm="", uM="", pM="", isi="", uS="", pS="", hasExp=true) { let chk = hasExp ? "checked" : ""; Swal.fire({ title: nm?'Edit Barang':'Barang Baru', html:`<div style="text-align:left;"><label class="inp-lbl">Nama Barang</label><input id="mNama" class="inp-field mb-2" value="${nm}"><div class="dual-input"><div class="inp-grp"><label class="inp-lbl">Satuan Besar</label><input id="muMain" class="inp-field" value="${uM}"></div><div class="inp-grp"><label class="inp-lbl">Harga (Besar)</label><input id="mpMain" type="number" class="inp-field" value="${pM}"></div></div><div class="inp-grp mb-2"><label class="inp-lbl text-primary">Konversi (Isi per Sat. Besar)</label><input id="mIsi" type="number" class="inp-field" value="${isi}"></div><div class="dual-input"><div class="inp-grp"><label class="inp-lbl">Satuan Kecil</label><input id="muSub" class="inp-field" value="${uS}"></div><div class="inp-grp"><label class="inp-lbl">Harga (Kecil)</label><input id="mpSub" type="number" class="inp-field" value="${pS}"></div></div><div class="form-check form-switch mt-2"><input class="form-check-input" type="checkbox" id="mExp" ${chk}><label class="form-check-label fw-bold text-dark small" for="mExp">Barang Punya Kadaluwarsa</label></div></div>`, confirmButtonColor:'#FF2E2E', showCancelButton:true, preConfirm:()=>{ return { namaLama: nm, nama: document.getElementById('mNama').value, uMain: document.getElementById('muMain').value, pMain: document.getElementById('mpMain').value, isi: document.getElementById('mIsi').value, uSub: document.getElementById('muSub').value, pSub: document.getElementById('mpSub').value, hasExpiry: document.getElementById('mExp').checked, user: activeUser.username } } }).then(r=>{ if(r.isConfirmed) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "saveMasterBarang", data: r.value }) }).then(()=>fetchData()).finally(()=>document.getElementById('loading').style.display='none'); } }); }
     function updTrfLbl() { let s=document.getElementById('trfItem').value; let out=document.getElementById('outlet').value; let i=globalData.liveStock.find(x=>x.name===s && x.outlet===out); if(i) { document.getElementById('trfMax').innerText=i.displayQty; document.getElementById('lbl-trf-1').innerText=`QTY (${i.uMain})`; document.getElementById('lbl-trf-2').innerText=`QTY (${i.uSub})`; } }
     async function processTransfer() { let d={ from: document.getElementById('outlet').value, to: document.getElementById('trfDest').value, item: document.getElementById('trfItem').value, q1: document.getElementById('trf-q1').value, q2: document.getElementById('trf-q2').value, user: activeUser.username }; if(!d.from||!d.to||!d.item||(!d.q1&&!d.q2)) return Swal.fire({icon:'error', title:'Lengkapi Data!'}); document.getElementById('loading').style.display='flex'; try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "processTransfer", data: d }) }); Swal.fire({toast:true, position:'top', icon:'success', title:'Transfer Sukses', showConfirmButton:false, timer:1500}); document.getElementById('trf-q1').value=''; document.getElementById('trf-q2').value=''; fetchData(); showStok(); } catch(e){} finally { document.getElementById('loading').style.display='none'; } }
-    async function delStock(id) { if(await Swal.fire({title:'Batalkan Input?', text:'Tindakan ini akan direkam.', icon:'warning', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>r.isConfirmed)) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteStock", data: {rowIndex: id, user: activeUser.username} }) }).then(()=>fetchData()).finally(()=>document.getElementById('loading').style.display='none'); } }
+    
+    // --- OFFLINE UNDO ---
+    window.undoLocal = async function(barang, outlet) {
+      if(await Swal.fire({title:'Batalkan Input?', text:'Hapus dari antrean offline.', icon:'warning', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>r.isConfirmed)) {
+         opnameQueue = opnameQueue.filter(q => !(q.barangId === barang && q.outletId === outlet));
+         await localforage.setItem('qAicha18', opnameQueue); updateQueueUI(); renderStockList();
+         Swal.fire({toast:true, position:'top', icon:'success', title:'Dibatalkan', showConfirmButton:false, timer:1500});
+      }
+    }
 
-    function simpanKeQueue(payload) { opnameQueue.push(payload); localStorage.setItem('qAicha165', JSON.stringify(opnameQueue)); updateQueueUI(); renderStockList(); Swal.fire({toast:true, position:'top', icon:'warning', title:'Tersimpan Offline', showConfirmButton:false, timer:1500}); }
-    async function syncOfflineData() { if(!navigator.onLine || opnameQueue.length === 0) return; document.getElementById('loading').style.display='flex'; try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [...opnameQueue] }) }); opnameQueue = []; localStorage.setItem('qAicha165', JSON.stringify([])); updateQueueUI(); fetchData(); Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500}); } catch(e) {} finally { document.getElementById('loading').style.display='none'; } }
+    // --- ONLINE UNDO (SOFT DELETE) ---
+    window.delStock = async function(id) { 
+      if(await Swal.fire({title:'Batalkan Input?', text:'Tindakan ini akan direkam (Soft Delete).', icon:'warning', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>r.isConfirmed)) { 
+        document.getElementById('loading').style.display='flex'; 
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteStock", data: {rowIndex: id, user: activeUser.username} }) }).then(()=>fetchData()).finally(()=>document.getElementById('loading').style.display='none'); 
+      } 
+    }
+
+    // --- PWA SYNC ---
+    async function simpanKeQueue(payload) { opnameQueue.push(payload); await localforage.setItem('qAicha18', opnameQueue); updateQueueUI(); renderStockList(); Swal.fire({toast:true, position:'top', icon:'warning', title:'Tersimpan Offline', showConfirmButton:false, timer:1500}); }
+    async function syncOfflineData() { if(!navigator.onLine || opnameQueue.length === 0) return; document.getElementById('loading').style.display='flex'; try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [...opnameQueue] }) }); opnameQueue = []; await localforage.setItem('qAicha18', []); updateQueueUI(); fetchData(); Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500}); } catch(e) {} finally { document.getElementById('loading').style.display='none'; } }
     function updateQueueUI() { document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none'; document.getElementById('queueCount').innerText = `${opnameQueue.length} Antrean`; }
 
     // --- OWNER TABS & REPORT ---
-    function renderOwner() { 
-      document.getElementById('assetVal').innerText = toIDR(globalData.totalAsset || 0); 
-      document.getElementById('lossVal').innerText = toIDR(globalData.expiredAsset || 0); 
-      let h=''; let outFilter = document.getElementById('outlet').value; 
-      let filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter); 
-      
-      filteredStock.forEach(x => { 
-        h+=`<div class="card-box bg-wht"><div class="d-flex justify-content-between mb-1"><div class="fw-bold" style="font-size:0.9rem;">[${x.outlet}] ${x.name}</div><div class="text-success fw-bold">${toIDR(x.assetVal)}</div></div><div class="small text-muted mb-2">Stok: <b class="text-dark">${x.displayQty}</b></div><div class="bg-light p-2 rounded small text-secondary d-flex justify-content-between"><span>PO Target: ${x.poNeed} ${x.uMain}</span><span class="fw-bold text-primary"><i class="bi bi-graph-up-arrow"></i> ADU: ${globalData.inventoryStats[x.outlet+'_'+x.name]?.adu || '-'}</span></div></div>`; 
-      }); 
-      document.getElementById('assetList').innerHTML = h; 
-    }
-    
+    function renderOwner() { document.getElementById('assetVal').innerText = toIDR(globalData.totalAsset || 0); document.getElementById('lossVal').innerText = toIDR(globalData.expiredAsset || 0); let h=''; let outFilter = document.getElementById('outlet').value; let filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter); filteredStock.forEach(x => { h+=`<div class="card-box bg-wht"><div class="d-flex justify-content-between mb-1"><div class="fw-bold" style="font-size:0.9rem;">[${x.outlet}] ${x.name}</div><div class="text-success fw-bold">${toIDR(x.assetVal)}</div></div><div class="small text-muted mb-2">Stok: <b class="text-dark">${x.displayQty}</b></div><div class="bg-light p-2 rounded small text-secondary d-flex justify-content-between"><span>PO Target: ${x.poNeed} ${x.uMain}</span><span class="fw-bold text-primary"><i class="bi bi-graph-up-arrow"></i> ADU: ${globalData.inventoryStats[x.outlet+'_'+x.name]?.adu || '-'}</span></div></div>`; }); document.getElementById('assetList').innerHTML = h; }
     function renderChart() { if(chartInstance) chartInstance.destroy(); const ctx = document.getElementById('assetChart').getContext('2d'); chartInstance = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(globalData.assetPerOutlet), datasets: [{ label: 'Nilai Aset (Rp)', data: Object.values(globalData.assetPerOutlet), backgroundColor: '#FF2E2E', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
-    
-    function renderAnalytics() { 
-      let outFilter = document.getElementById('outlet').value; 
-      let filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter);
-      
-      let overstock = []; let kritikal = []; 
-      filteredStock.forEach(x => { if(x.stockStatus === "OVERSTOK") overstock.push(x); if(x.stockStatus === "HABIS" || x.stockStatus === "KRITIS") kritikal.push(x); }); 
-      let mutH = ''; kritikal.forEach(k => { let helper = overstock.find(o => o.name === k.name); if(helper) { mutH += `<div class="bg-light p-3 rounded-xl border border-primary mb-2"><div class="fw-bold text-dark small mb-1">${k.name}</div><div class="small d-flex justify-content-between align-items-center"><span class="text-danger fw-bold"><i class="bi bi-shop"></i> ${k.outlet} (Habis)</span><i class="bi bi-arrow-right text-muted"></i><span class="text-success fw-bold"><i class="bi bi-shop"></i> ${helper.outlet} (Sisa ${helper.daysLeft} hr)</span></div></div>`; } }); 
-      document.getElementById('mutationList').innerHTML = mutH || `<div class="text-muted small">Tidak ada saran mutasi.</div>`; 
-      
-      let phtml = ''; filteredStock.forEach(x => { let stats = globalData.inventoryStats[x.outlet+'_'+x.name]; let badges = []; if(stats && stats.performa === "BOROS") badges.push(`<span class="badge-soft bg-red me-1">PEMAKAIAN BOROS</span>`); x.batches.forEach(b => { if(b.status === "EXPIRED" && !badges.includes("EXP")) badges.push(`<span class="badge-soft bg-red me-1">EXPIRED (${b.displayExp})</span>`); else if (b.status === "WARNING" && !badges.includes("WARN")) badges.push(`<span class="badge-soft bg-yel me-1">MENDEKATI EXP</span>`); }); if(badges.length > 0) { phtml += `<div class="bg-white p-3 rounded-xl border mb-2 shadow-sm"><div class="d-flex justify-content-between align-items-center mb-1"><div class="fw-bold text-dark small">[${x.outlet}] ${x.name}</div></div><div class="mt-1">${badges.join('')}</div></div>`; } }); 
-      document.getElementById('performanceList').innerHTML = phtml || `<div class="text-muted small">Semua performa wajar.</div>`; 
-    }
-    
+    function renderAnalytics() { let outFilter = document.getElementById('outlet').value; let filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter); let overstock = []; let kritikal = []; filteredStock.forEach(x => { if(x.stockStatus === "OVERSTOK") overstock.push(x); if(x.stockStatus === "HABIS" || x.stockStatus === "KRITIS") kritikal.push(x); }); let mutH = ''; kritikal.forEach(k => { let helper = overstock.find(o => o.name === k.name); if(helper) { mutH += `<div class="bg-light p-3 rounded-xl border border-primary mb-2"><div class="fw-bold text-dark small mb-1">${k.name}</div><div class="small d-flex justify-content-between align-items-center"><span class="text-danger fw-bold"><i class="bi bi-shop"></i> ${k.outlet} (Habis)</span><i class="bi bi-arrow-right text-muted"></i><span class="text-success fw-bold"><i class="bi bi-shop"></i> ${helper.outlet} (Sisa ${helper.daysLeft} hr)</span></div></div>`; } }); document.getElementById('mutationList').innerHTML = mutH || `<div class="text-muted small">Tidak ada saran mutasi.</div>`; let phtml = ''; filteredStock.forEach(x => { let stats = globalData.inventoryStats[x.outlet+'_'+x.name]; let badges = []; if(stats && stats.performa === "BOROS") badges.push(`<span class="badge-soft bg-red me-1">PEMAKAIAN BOROS</span>`); x.batches.forEach(b => { if(b.status === "EXPIRED" && !badges.includes("EXP")) badges.push(`<span class="badge-soft bg-red me-1">EXPIRED (${b.displayExp})</span>`); else if (b.status === "WARNING" && !badges.includes("WARN")) badges.push(`<span class="badge-soft bg-yel me-1">MENDEKATI EXP</span>`); }); if(badges.length > 0) { phtml += `<div class="bg-white p-3 rounded-xl border mb-2 shadow-sm"><div class="d-flex justify-content-between align-items-center mb-1"><div class="fw-bold text-dark small">[${x.outlet}] ${x.name}</div></div><div class="mt-1">${badges.join('')}</div></div>`; } }); document.getElementById('performanceList').innerHTML = phtml || `<div class="text-muted small">Semua performa wajar.</div>`; }
     function renderMasterList() { let h=''; globalData.products.forEach(b => { h+=`<div class="card-box p-3 bg-wht"><div class="d-flex justify-content-between align-items-center"><div><div class="fw-bold text-dark" style="font-size:0.9rem;">${b.name}</div><div class="small text-secondary mt-1">1 ${b.uMain} = ${b.isi} ${b.uSub}</div></div><button onclick="openMasterModal('${b.name}', '${b.uMain}', '${b.pMain}', '${b.isi}', '${b.uSub}', '${b.pSub}')" class="btn btn-sm btn-light border"><i class="bi bi-pencil-fill text-primary"></i></button></div></div>`; }); document.getElementById('masterList').innerHTML = h; }
-    function openMasterModal(nm="", uM="", pM="", isi="", uS="", pS="") { Swal.fire({ title: nm?'Edit Barang':'Barang Baru', html:`<div style="text-align:left;"><label class="inp-lbl">Nama Barang</label><input id="mNama" class="inp-field mb-2" value="${nm}"><div class="dual-input"><div class="inp-grp"><label class="inp-lbl">Satuan Besar</label><input id="muMain" class="inp-field" value="${uM}"></div><div class="inp-grp"><label class="inp-lbl">Harga (Besar)</label><input id="mpMain" type="number" class="inp-field" value="${pM}"></div></div><div class="inp-grp mb-2"><label class="inp-lbl text-primary">Konversi (Isi per Sat. Besar)</label><input id="mIsi" type="number" class="inp-field" value="${isi}"></div><div class="dual-input"><div class="inp-grp"><label class="inp-lbl">Satuan Kecil</label><input id="muSub" class="inp-field" value="${uS}"></div><div class="inp-grp"><label class="inp-lbl">Harga (Kecil)</label><input id="mpSub" type="number" class="inp-field" value="${pS}"></div></div></div>`, confirmButtonColor:'#FF2E2E', showCancelButton:true, preConfirm:()=>{ return { namaLama: nm, nama: document.getElementById('mNama').value, uMain: document.getElementById('muMain').value, pMain: document.getElementById('mpMain').value, isi: document.getElementById('mIsi').value, uSub: document.getElementById('muSub').value, pSub: document.getElementById('mpSub').value, user: activeUser.username } } }).then(r=>{ if(r.isConfirmed) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "saveMasterBarang", data: r.value }) }).then(()=>fetchData()).finally(()=>document.getElementById('loading').style.display='none'); } }); }
-    
     function renderPO() { let poMap = {}; activePO = {}; let grandTotal = 0; let outFilter = document.getElementById('outlet').value; let filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter); filteredStock.forEach(x => { if(x.poNeed > 0) { if(!poMap[x.name]) poMap[x.name] = { name: x.name, uMain: x.uMain, pMain: x.pMain, qty: 0 }; poMap[x.name].qty += x.poNeed; } }); let h = ''; for(let key in poMap) { let item = poMap[key]; activePO[item.name] = { qty: item.qty, price: item.pMain, uMain: item.uMain }; let sub = item.qty * item.pMain; grandTotal += sub; h += `<div class="d-flex justify-content-between align-items-center border-bottom py-2"><div style="width:50%"><div class="fw-bold text-dark small">${item.name}</div><div class="text-muted" style="font-size:0.6rem;">${toIDR(item.pMain)} / ${item.uMain}</div></div><div><input type="number" class="po-input" value="${item.qty}" onchange="updatePO('${item.name}', this.value)"></div><div class="text-end fw-bold text-success" style="font-size:0.8rem; width:30%;" id="po_sub_${item.name.replace(/[^a-zA-Z0-9]/g, '')}">${toIDR(sub)}</div></div>`; } document.getElementById('poList').innerHTML = h || `<div class="text-muted text-center small py-3">Tidak ada rekomendasi order. Stok aman.</div>`; document.getElementById('poGrandTotal').innerText = toIDR(grandTotal); }
     window.updatePO = function(name, newQty) { let qty = Number(newQty) || 0; activePO[name].qty = qty; let sub = qty * activePO[name].price; document.getElementById('po_sub_'+name.replace(/[^a-zA-Z0-9]/g, '')).innerText = toIDR(sub); let grand = 0; for(let k in activePO) grand += activePO[k].qty * activePO[k].price; document.getElementById('poGrandTotal').innerText = toIDR(grand); }
     window.copyPOWA = function() { let out = document.getElementById('outlet').value; let txt = `🛒 *FORM PURCHASE ORDER (PO) AI-CHA*\n🏢 Target: ${out==='ALL'?'SELURUH OUTLET':out}\n📅 ${new Date().toLocaleDateString('id-ID')}\n\n*Rincian Order:*\n`; let hasPO = false; let gTot = 0; for(let k in activePO) { if(activePO[k].qty > 0) { let sub = activePO[k].qty * activePO[k].price; gTot += sub; txt += `➖ ${k} : *${activePO[k].qty} ${activePO[k].uMain}*\n`; hasPO = true; } } if(!hasPO) return Swal.fire({icon:'warning', title:'Order Kosong'}); txt += `\n💰 *Total Estimasi Tagihan: ${toIDR(gTot)}*\n\nMohon diproses, terima kasih.`; navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Format PO Tersalin!', showConfirmButton:false, timer:2000})); }
@@ -520,7 +528,7 @@
         } 
         else { txt += `➖ *${p.name}*\n   └ Stok: *0 ${p.uMain} 0 ${p.uSub}* (KOSONG)\n`; }
       });
-      txt += `\n_Dikirim via Ai-CHA Enterprise V16.5_`;
+      txt += `\n_Dikirim via Ai-CHA Enterprise V18.0_`;
       navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Teks WA Tersalin!', showConfirmButton:false, timer:2000})).catch(() => Swal.fire({icon:'error', title:'Gagal Copy'}));
     }
   </script>
