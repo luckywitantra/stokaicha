@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Aicha Superapp Opname</title>
-  <meta name="theme-color" content="#b91c1c">
+  <title>Aicha Precision System V8.2</title>
+  <meta name="theme-color" content="#E31E24">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -18,11 +18,11 @@
 
   <div id="loginScreen" class="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center transition-opacity duration-300">
     <div class="text-center mb-10">
-      <div class="h-20 w-20 bg-red-600 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-red-600/40">
+      <div class="h-20 w-20 bg-[#E31E24] rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-red-600/40">
         <i class="fa-solid fa-ice-cream text-4xl text-white"></i>
       </div>
-      <h1 class="text-3xl font-black text-white tracking-wide">AICHA<span class="text-red-500">PRO</span></h1>
-      <p class="text-slate-400 text-sm mt-2" id="loginStatus">Menyinkronkan Database...</p>
+      <h1 class="text-3xl font-black text-white tracking-wide">AICHA<span class="text-[#E31E24]">PRO</span></h1>
+      <p class="text-slate-400 text-sm mt-2" id="loginStatus">V8.2 - Menyinkronkan Data...</p>
     </div>
     <div class="flex space-x-4 mb-12" id="pinIndicators">
       <div class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div><div class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div><div class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div><div class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
@@ -45,15 +45,13 @@
 
   <div id="mainApp" class="hidden h-full flex flex-col relative">
     
-    <div class="bg-gradient-to-br from-red-700 to-red-900 text-white px-6 pt-8 pb-16 rounded-b-[2.5rem] relative z-10 shrink-0 shadow-lg">
+    <div class="bg-gradient-to-br from-[#E31E24] to-red-900 text-white px-6 pt-8 pb-16 rounded-b-[2.5rem] relative z-10 shrink-0 shadow-lg">
       <div class="flex justify-between items-center">
         <div>
           <p class="text-red-200 text-xs font-semibold uppercase tracking-wider mb-1" id="roleLabel">STAFF OPERASIONAL</p>
           <h1 class="text-2xl font-bold" id="userGreeting">Halo, -</h1>
         </div>
-        <button onclick="logout()" class="h-10 w-10 bg-white/10 rounded-full flex items-center justify-center text-red-100 hover:text-white transition">
-          <i class="fa-solid fa-power-off"></i>
-        </button>
+        <button onclick="logout()" class="h-10 w-10 bg-white/10 rounded-full flex items-center justify-center text-red-100 hover:text-white transition"><i class="fa-solid fa-power-off"></i></button>
       </div>
     </div>
 
@@ -63,11 +61,11 @@
         <div class="glass-card rounded-2xl p-5 mb-5 flex items-center justify-between">
           <div class="w-full">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Lokasi Outlet</p>
-            <select id="outletSelect" onchange="checkAnalytics()" class="bg-transparent font-bold text-slate-700 text-lg outline-none w-full appearance-none">
+            <select id="outletSelect" onchange="changeBarangLabel()" class="bg-transparent font-bold text-slate-700 text-lg outline-none w-full appearance-none">
               <option value="" disabled selected>Memuat...</option>
             </select>
           </div>
-          <div class="h-10 w-10 bg-red-50 rounded-xl flex items-center justify-center text-red-600 shrink-0 shadow-sm"><i class="fa-solid fa-store"></i></div>
+          <div class="h-10 w-10 bg-red-50 rounded-xl flex items-center justify-center text-[#E31E24] shrink-0 shadow-sm"><i class="fa-solid fa-store"></i></div>
         </div>
 
         <div id="syncBadge" class="hidden mb-5 bg-yellow-100 border border-yellow-200 rounded-xl p-3 flex justify-between items-center">
@@ -76,37 +74,36 @@
         </div>
 
         <div class="glass-card rounded-2xl p-6 mb-5">
-          <h2 class="text-sm font-bold text-slate-800 mb-4 border-b border-slate-100 pb-3 flex items-center"><i class="fa-solid fa-barcode text-red-600 mr-2"></i> Input Stok Aktual</h2>
+          <h2 class="text-sm font-bold text-slate-800 mb-4 border-b border-slate-100 pb-3 flex items-center"><i class="fa-solid fa-barcode text-[#E31E24] mr-2"></i> Presisi Stok & Kedaluwarsa</h2>
           
           <form onsubmit="submitData(event)">
             <div class="mb-4 relative">
-              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Item Barang</label>
-              <select id="barangSelect" onchange="checkAnalytics()" class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-xl appearance-none font-medium" required>
-                <option value="" disabled selected>Pilih Item Aicha...</option>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Item Barang Aicha</label>
+              <select id="barangSelect" onchange="changeBarangLabel()" class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-xl appearance-none font-medium" required>
+                <option value="" disabled selected>Pilih Item...</option>
               </select>
               <i class="fa-solid fa-chevron-down absolute right-4 top-10 text-slate-400 text-sm pointer-events-none"></i>
             </div>
 
             <div id="analyticBox" class="hidden mb-4 bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 rounded-xl p-3 flex items-center justify-between">
-              <div>
-                <p class="text-[10px] font-bold text-indigo-400 uppercase">Laju Pakai (ADU)</p>
-                <p class="text-sm font-bold text-indigo-800"><span id="txtAdu">0</span> <span class="text-xs font-medium">/ hari</span></p>
-              </div>
-              <div class="text-right">
-                <p class="text-[10px] font-bold text-blue-400 uppercase">Est. Habis</p>
-                <p class="text-sm font-bold text-blue-800"><span id="txtHabis">0</span> <span class="text-xs font-medium">hari lagi</span></p>
-              </div>
+              <div><p class="text-[10px] font-bold text-indigo-400 uppercase">ADU (Terkecil)</p><p class="text-sm font-bold text-indigo-800"><span id="txtAdu">0</span> <span class="text-xs font-medium">/ hr</span></p></div>
+              <div class="text-right"><p class="text-[10px] font-bold text-blue-400 uppercase">Est. Habis</p><p class="text-sm font-bold text-blue-800"><span id="txtHabis">0</span> <span class="text-xs font-medium">hari</span></p></div>
             </div>
             
             <div class="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Qty (Fisik)</label>
-                <input type="number" id="stokInput" class="w-full bg-slate-50 border border-slate-200 text-red-700 py-3.5 px-4 rounded-xl font-bold text-xl text-center shadow-inner" placeholder="0" required min="0" step="any">
+                <label id="lblQtyMain" class="block text-[10px] font-bold text-[#E31E24] uppercase mb-2">Qty Besar (CTN)</label>
+                <input type="number" id="stokMain" class="w-full bg-slate-50 border border-slate-200 text-[#E31E24] py-3.5 px-4 rounded-xl font-bold text-xl text-center shadow-inner" placeholder="0" min="0" step="any">
               </div>
               <div>
-                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Expired Date</label>
-                <input type="date" id="expDateInput" class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-3 rounded-xl font-semibold text-sm">
+                <label id="lblQtySub" class="block text-[10px] font-bold text-blue-600 uppercase mb-2">Qty Kecil (Pcs)</label>
+                <input type="number" id="stokSub" class="w-full bg-slate-50 border border-slate-200 text-blue-700 py-3.5 px-4 rounded-xl font-bold text-xl text-center shadow-inner" placeholder="0" min="0" step="any">
               </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Expired Date</label>
+              <input type="date" id="expDateInput" class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-xl font-semibold text-sm">
             </div>
 
             <div class="mb-6 relative">
@@ -119,8 +116,8 @@
               <i class="fa-solid fa-chevron-down absolute right-4 top-10 text-slate-400 text-sm pointer-events-none"></i>
             </div>
             
-            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-200 flex items-center justify-center transition active:scale-[0.98]">
-              <i class="fa-solid fa-check-circle mr-2"></i> Simpan Data
+            <button type="submit" class="w-full bg-[#E31E24] hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-200 flex items-center justify-center transition active:scale-[0.98]">
+              <i class="fa-solid fa-check-circle mr-2"></i> Simpan Data Rinci
             </button>
           </form>
         </div>
@@ -128,10 +125,10 @@
         <div class="glass-card rounded-2xl p-5 border border-red-100 bg-red-50/50">
           <div class="flex items-start justify-between">
             <div class="pr-4">
-              <h3 class="text-sm font-bold text-red-900 mb-1">Laporan LSI</h3>
-              <p class="text-xs text-slate-500">Kirim rekap opname hari ini ke WA Owner.</p>
+              <h3 class="text-sm font-bold text-red-900 mb-1">Laporan Enterprise</h3>
+              <p class="text-[11px] text-slate-500">Kirim rekap opname rinci ke WA Owner.</p>
             </div>
-            <div class="h-10 w-10 bg-red-100 rounded-full flex items-center justify-center text-red-600 shrink-0"><i class="fa-brands fa-whatsapp text-xl"></i></div>
+            <div class="h-10 w-10 bg-red-100 rounded-full flex items-center justify-center text-[#E31E24] shrink-0"><i class="fa-brands fa-whatsapp text-xl"></i></div>
           </div>
           <button onclick="kirimLaporanWA()" class="mt-4 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-green-200 transition">
             <i class="fa-solid fa-paper-plane mr-2"></i> Kirim WA Owner
@@ -141,317 +138,244 @@
 
       <div id="viewMaster" class="hidden">
         <div class="glass-card rounded-2xl p-5 mb-5 flex justify-between items-center">
-          <div>
-            <h2 class="text-lg font-black text-slate-800">Master Data</h2>
-            <p class="text-xs text-slate-500">Kelola harga dan item Aicha.</p>
-          </div>
-          <button onclick="openMasterModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md shadow-indigo-200"><i class="fa-solid fa-plus mr-1"></i> Baru</button>
+          <div><h2 class="text-lg font-black text-slate-800">Master Item</h2><p class="text-xs text-slate-500">Kelola Satuan & Konversi.</p></div>
+          <button onclick="openMasterModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md"><i class="fa-solid fa-plus mr-1"></i> Baru</button>
         </div>
-
-        <div class="glass-card rounded-2xl p-2 max-h-[60vh] overflow-y-auto" id="masterListContainer">
-          </div>
+        <div class="glass-card rounded-2xl p-2 max-h-[60vh] overflow-y-auto" id="masterListContainer"></div>
       </div>
-
     </div>
 
     <div class="absolute bottom-0 w-full bg-white border-t border-slate-200 flex justify-around items-center py-4 px-6 z-30 pb-safe shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
-      <div onclick="switchView('opname')" id="navOpname" class="flex flex-col items-center text-red-600 cursor-pointer transition">
-        <i class="fa-solid fa-pen-to-square text-xl mb-1"></i>
-        <span class="text-[9px] font-bold">Input</span>
-      </div>
-      <div onclick="switchView('master')" id="navMaster" class="hidden flex-col items-center text-slate-300 cursor-pointer transition">
-        <i class="fa-solid fa-boxes-stacked text-xl mb-1"></i>
-        <span class="text-[9px] font-bold">Master</span>
-      </div>
+      <div onclick="switchView('opname')" id="navOpname" class="flex flex-col items-center text-[#E31E24] cursor-pointer transition"><i class="fa-solid fa-pen-to-square text-xl mb-1"></i><span class="text-[9px] font-bold">Input Rinci</span></div>
+      <div onclick="switchView('master')" id="navMaster" class="hidden flex-col items-center text-slate-300 cursor-pointer transition"><i class="fa-solid fa-boxes-stacked text-xl mb-1"></i><span class="text-[9px] font-bold">Master</span></div>
     </div>
   </div>
 
   <div id="masterModal" class="fixed inset-0 bg-slate-900/60 z-[150] hidden items-center justify-center backdrop-blur-sm px-4">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative">
-      <h2 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2" id="modalTitle">Tambah Item</h2>
+    <div class="bg-white rounded-3xl p-5 w-full max-w-sm shadow-2xl relative overflow-y-auto max-h-[90vh]">
+      <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2" id="modalTitle">Konfigurasi Item</h2>
       <form onsubmit="saveMasterData(event)">
         <input type="hidden" id="mNamaLama">
         <div class="mb-3">
           <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nama Barang</label>
-          <input type="text" id="mNama" class="w-full bg-slate-50 border border-slate-200 py-3 px-4 rounded-xl font-medium text-sm" required>
+          <input type="text" id="mNama" class="w-full bg-slate-50 border border-slate-200 py-2.5 px-3 rounded-lg text-sm font-bold" required>
         </div>
-        <div class="flex space-x-3 mb-5">
-          <div class="w-1/3">
-            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Satuan</label>
-            <input type="text" id="mSatuan" class="w-full bg-slate-50 border border-slate-200 py-3 px-3 rounded-xl font-medium text-sm text-center" required placeholder="CTN">
-          </div>
-          <div class="w-2/3">
-            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Harga (Rp)</label>
-            <input type="number" id="mHarga" class="w-full bg-slate-50 border border-slate-200 py-3 px-4 rounded-xl font-bold text-indigo-600 text-sm" required min="0" step="any">
+        
+        <div class="bg-indigo-50 p-3 rounded-xl mb-3 border border-indigo-100">
+          <p class="text-[10px] font-bold text-indigo-500 uppercase mb-2">Satuan Besar (Utama)</p>
+          <div class="flex space-x-2">
+            <input type="text" id="muMain" class="w-1/3 bg-white border border-slate-200 py-2 px-2 rounded-lg text-sm text-center" required placeholder="CTN">
+            <input type="number" id="mpMain" class="w-2/3 bg-white border border-slate-200 py-2 px-2 rounded-lg text-sm font-bold text-indigo-700" required placeholder="Harga CTN" step="any">
           </div>
         </div>
+
+        <div class="mb-3 text-center"><span class="bg-slate-200 text-slate-500 text-[10px] font-bold px-3 py-1 rounded-full"><i class="fa-solid fa-arrow-down mr-1"></i>Terdiri dari<i class="fa-solid fa-arrow-down ml-1"></i></span></div>
+
+        <div class="bg-blue-50 p-3 rounded-xl mb-4 border border-blue-100">
+          <div class="flex space-x-2 mb-2">
+            <div class="w-1/3"><label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">Isi/Konversi</label><input type="number" id="mIsi" class="w-full bg-white border border-slate-200 py-2 px-2 rounded-lg text-sm text-center font-bold" required placeholder="20"></div>
+            <div class="w-2/3"><label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">Satuan Kecil</label><input type="text" id="muSub" class="w-full bg-white border border-slate-200 py-2 px-2 rounded-lg text-sm text-center" required placeholder="Bags"></div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">Harga Satuan Kecil</label>
+            <input type="number" id="mpSub" class="w-full bg-white border border-slate-200 py-2 px-2 rounded-lg text-sm font-bold text-blue-700" required placeholder="Harga per Bag" step="any">
+          </div>
+        </div>
+
         <div class="flex space-x-3">
           <button type="button" onclick="closeMasterModal()" class="w-1/2 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl">Batal</button>
-          <button type="submit" class="w-1/2 bg-indigo-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-200">Simpan</button>
+          <button type="submit" class="w-1/2 bg-indigo-600 text-white font-bold py-3 rounded-xl shadow-lg">Simpan</button>
         </div>
       </form>
     </div>
   </div>
 
-  <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/60 z-[200] hidden flex-col items-center justify-center backdrop-blur-sm"><div class="animate-spin rounded-full h-12 w-12 border-t-4 border-red-500 mb-4"></div></div>
+  <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/60 z-[200] hidden flex-col items-center justify-center backdrop-blur-sm"><div class="animate-spin rounded-full h-12 w-12 border-t-4 border-[#E31E24] mb-4"></div></div>
   <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 text-white px-6 py-3.5 rounded-full shadow-2xl z-[250] transition-all duration-300 opacity-0 flex items-center w-max max-w-[90%] font-medium text-sm"><i id="toastIcon" class="fa-solid mr-2 text-lg"></i><span id="toastMsg"></span></div>
 
   <script>
-    // MASUKKAN URL WEB APP ANDA DI BAWAH INI
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzUYyLJeUchPyusCbVJU8fGl-uzYY2mhg5T9AB5YNtYE8itnLiH_pWw_6IFT-vUGnzIFw/exec";
 
     let globalData = { users: [], outlets: [], barangs: [], inventoryStats: {} };
-    let opnameQueue = JSON.parse(localStorage.getItem('opnameQueue')) || [];
-    let activeUser = JSON.parse(localStorage.getItem('activeSession')) || null;
+    let opnameQueue = JSON.parse(localStorage.getItem('opnameQueueV8')) || [];
+    let activeUser = JSON.parse(localStorage.getItem('activeSessionV8')) || null;
     let currentPin = "";
+    let selectedItemConf = null;
 
-    document.addEventListener("DOMContentLoaded", () => {
-      initApp();
-      window.addEventListener('online', syncOfflineData);
-    });
+    document.addEventListener("DOMContentLoaded", () => { initApp(); window.addEventListener('online', syncOfflineData); });
 
     async function initApp() {
       updateQueueUI();
-      if(localStorage.getItem('sysDataV4')) {
-        globalData = JSON.parse(localStorage.getItem('sysDataV4'));
-        enableLogin();
-      }
+      if(localStorage.getItem('sysDataV8')) { globalData = JSON.parse(localStorage.getItem('sysDataV8')); enableLogin(); }
       try {
-        const response = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData" }) });
-        const result = await response.json();
+        const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData" }) });
+        const result = await res.json();
         if(result.status === "success") {
-          globalData = result.data;
-          localStorage.setItem('sysDataV4', JSON.stringify(globalData));
-          enableLogin();
+          globalData = result.data; localStorage.setItem('sysDataV8', JSON.stringify(globalData)); enableLogin();
         }
-      } catch (e) {
-        if(!globalData.users.length) {
-          document.getElementById('loginStatus').textContent = "Server Offline. Cek Internet.";
-          document.getElementById('loginStatus').classList.add('text-red-400');
-        }
-      }
+      } catch (e) { if(!globalData.users.length) document.getElementById('loginStatus').textContent = "Offline. Cek Internet."; }
     }
 
-    function enableLogin() {
-      if(activeUser) showMainApp();
-      else {
-        document.getElementById('loginStatus').textContent = "Masukkan PIN 4 digit";
-        document.getElementById('numpad').classList.remove('pointer-events-none', 'opacity-50');
-      }
-    }
-
+    function enableLogin() { if(activeUser) showMainApp(); else { document.getElementById('loginStatus').textContent = "Masukkan PIN 4 digit"; document.getElementById('numpad').classList.remove('pointer-events-none', 'opacity-50'); } }
     function enterPin(n) { if(currentPin.length < 4) { currentPin += n; updatePinUI(); if(currentPin.length === 4) validatePin(); } }
     function deletePin() { if(currentPin.length > 0) { currentPin = currentPin.slice(0, -1); updatePinUI(); } }
-    function updatePinUI() {
-      document.querySelectorAll('.pin-dot').forEach((d, i) => {
-        d.className = `w-4 h-4 rounded-full border-2 ${i < currentPin.length ? 'bg-white border-white' : 'border-slate-600'} pin-dot`;
-      });
-    }
+    function updatePinUI() { document.querySelectorAll('.pin-dot').forEach((d, i) => d.className = `w-4 h-4 rounded-full border-2 ${i < currentPin.length ? 'bg-white border-white' : 'border-slate-600'} pin-dot`); }
 
     function validatePin() {
-      const user = globalData.users.find(u => u.pin === currentPin);
-      if(user) {
-        activeUser = user;
-        localStorage.setItem('activeSession', JSON.stringify(user));
-        setTimeout(showMainApp, 300);
-      } else {
-        showToast("PIN Salah!", "bg-red-500", "fa-xmark");
-        document.getElementById('pinIndicators').classList.add('animate-bounce');
-        setTimeout(() => { currentPin = ""; updatePinUI(); document.getElementById('pinIndicators').classList.remove('animate-bounce'); }, 500);
-      }
+      const u = globalData.users.find(u => u.pin === currentPin);
+      if(u) { activeUser = u; localStorage.setItem('activeSessionV8', JSON.stringify(u)); setTimeout(showMainApp, 300); } 
+      else { showToast("PIN Salah!", "bg-red-500", "fa-xmark"); document.getElementById('pinIndicators').classList.add('animate-bounce'); setTimeout(() => { currentPin = ""; updatePinUI(); document.getElementById('pinIndicators').classList.remove('animate-bounce'); }, 500); }
     }
 
-    function logout() {
-      activeUser = null; currentPin = ""; localStorage.removeItem('activeSession'); updatePinUI();
-      document.getElementById('mainApp').classList.add('hidden');
-      document.getElementById('loginScreen').classList.remove('hidden');
-    }
+    function logout() { activeUser = null; currentPin = ""; localStorage.removeItem('activeSessionV8'); updatePinUI(); document.getElementById('mainApp').classList.add('hidden'); document.getElementById('loginScreen').classList.remove('hidden'); }
 
     function showMainApp() {
-      document.getElementById('loginScreen').classList.add('hidden');
-      document.getElementById('mainApp').classList.remove('hidden');
-      document.getElementById('userGreeting').textContent = activeUser.username;
-      document.getElementById('roleLabel').textContent = activeUser.role;
-
+      document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('mainApp').classList.remove('hidden');
+      document.getElementById('userGreeting').textContent = activeUser.username; document.getElementById('roleLabel').textContent = activeUser.role;
       populateDropdowns();
       
-      const outletSelect = document.getElementById('outletSelect');
-      if(activeUser.role !== "Owner" && activeUser.idOutlet !== "ALL") {
-        outletSelect.value = activeUser.idOutlet; outletSelect.disabled = true;
-      } else {
-        outletSelect.disabled = false; outletSelect.value = "";
-      }
+      const out = document.getElementById('outletSelect');
+      if(activeUser.role !== "Owner" && activeUser.idOutlet !== "ALL") { out.value = activeUser.idOutlet; out.disabled = true; } 
+      else { out.disabled = false; out.value = ""; }
 
-      // Akses Menu Owner
-      const navMaster = document.getElementById('navMaster');
-      if(activeUser.role === "Owner") {
-        navMaster.classList.remove('hidden'); navMaster.classList.add('flex');
-        renderMasterList();
-      } else {
-        navMaster.classList.add('hidden'); navMaster.classList.remove('flex');
-      }
-      switchView('opname');
+      const nv = document.getElementById('navMaster');
+      if(activeUser.role === "Owner") { nv.classList.remove('hidden'); nv.classList.add('flex'); renderMasterList(); } 
+      else { nv.classList.add('hidden'); nv.classList.remove('flex'); }
+      switchView('opname'); changeBarangLabel();
     }
 
     function populateDropdowns() {
-      const outletSelect = document.getElementById('outletSelect');
-      const barangSelect = document.getElementById('barangSelect');
-      outletSelect.innerHTML = '<option value="" disabled selected>Pilih Outlet...</option>';
-      barangSelect.innerHTML = '<option value="" disabled selected>Pilih Item Aicha...</option>';
-
-      globalData.outlets.forEach(o => outletSelect.add(new Option(o.nama, o.id)));
-      
-      const sortedBarang = globalData.barangs.sort((a, b) => String(a.nama).localeCompare(String(b.nama)));
-      sortedBarang.forEach(b => barangSelect.add(new Option(`${b.nama} (${b.satuan})`, b.id)));
+      const out = document.getElementById('outletSelect'); const brg = document.getElementById('barangSelect');
+      out.innerHTML = '<option value="" disabled selected>Pilih Outlet...</option>'; brg.innerHTML = '<option value="" disabled selected>Pilih Item...</option>';
+      globalData.outlets.forEach(o => out.add(new Option(o.nama, o.id)));
+      const s = globalData.barangs.sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+      s.forEach(b => brg.add(new Option(`${b.name} (${b.uMain}/${b.uSub})`, b.name)));
     }
 
-    // TAMPILKAN ANALITIK SAAT PILIH BARANG
-    function checkAnalytics() {
-      const outlet = document.getElementById('outletSelect').value;
-      const barang = document.getElementById('barangSelect').value;
+    // DYNAMIC DUAL-UNIT LABEL & ANALYTICS
+    function changeBarangLabel() {
+      const val = document.getElementById('barangSelect').value;
+      const out = document.getElementById('outletSelect').value;
+      const lblMain = document.getElementById('lblQtyMain'); const lblSub = document.getElementById('lblQtySub');
       const box = document.getElementById('analyticBox');
       
-      if(outlet && barang) {
-        let key = `${outlet}_${barang}`;
-        let stats = globalData.inventoryStats[key];
-        if(stats) {
-          document.getElementById('txtAdu').textContent = stats.adu;
-          document.getElementById('txtHabis').textContent = stats.sisaHari;
-          box.classList.remove('hidden');
-        } else {
-          document.getElementById('txtAdu').textContent = "-";
-          document.getElementById('txtHabis').textContent = "-";
+      if(val) {
+        selectedItemConf = globalData.barangs.find(b => b.name === val);
+        if(selectedItemConf) {
+          lblMain.innerText = `Qty Besar (${selectedItemConf.uMain})`;
+          lblSub.innerText = `Qty Kecil (${selectedItemConf.uSub})`;
+          document.getElementById('stokMain').placeholder = `0 ${selectedItemConf.uMain}`;
+          document.getElementById('stokSub').placeholder = `0 ${selectedItemConf.uSub}`;
+        }
+        
+        if(out) {
+          let key = `${out}_${val}`; let stats = globalData.inventoryStats[key];
+          if(stats) { document.getElementById('txtAdu').textContent = stats.adu; document.getElementById('txtHabis').textContent = stats.sisaHari; } 
+          else { document.getElementById('txtAdu').textContent = "-"; document.getElementById('txtHabis').textContent = "-"; }
           box.classList.remove('hidden');
         }
       } else {
-        box.classList.add('hidden');
+        lblMain.innerText = `Qty Besar`; lblSub.innerText = `Qty Kecil`; box.classList.add('hidden');
       }
     }
 
     async function submitData(e) {
       e.preventDefault();
+      if(!selectedItemConf) return;
+      const qM = document.getElementById('stokMain').value; const qS = document.getElementById('stokSub').value;
+      if(qM === "" && qS === "") { showToast("Isi minimal satu Qty!", "bg-red-500", "fa-xmark"); return; }
+
       const payload = {
         user: activeUser.username, outletId: document.getElementById('outletSelect').value,
-        barangId: document.getElementById('barangSelect').value, stok: document.getElementById('stokInput').value,
+        barangId: selectedItemConf.name, qtyMain: qM, qtySub: qS, conversion: selectedItemConf.isi,
         expiredDate: document.getElementById('expDateInput').value, keterangan: document.getElementById('keteranganInput').value,
         timestamp: new Date().toISOString()
       };
-      if(!payload.outletId || !payload.barangId || !payload.stok) return;
-      document.getElementById('stokInput').value = ''; document.getElementById('expDateInput').value = '';
+      
+      document.getElementById('stokMain').value = ''; document.getElementById('stokSub').value = ''; document.getElementById('expDateInput').value = '';
       
       if (navigator.onLine) {
         showLoading(true);
         try {
-          const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) });
-          await res.json();
-          showLoading(false);
-          showToast("Tersimpan di DB", "bg-green-600", "fa-check");
-          initApp(); // Refresh data analytics di background
+          await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) });
+          showLoading(false); showToast("Data Rinci Tersimpan", "bg-green-600", "fa-check"); initApp();
         } catch (err) { showLoading(false); simpanKeQueue(payload); }
       } else simpanKeQueue(payload);
     }
 
-    // ================ FITUR MASTER DATA (OWNER) ================
-    function switchView(view) {
-      document.getElementById('viewOpname').style.display = view === 'opname' ? 'block' : 'none';
-      document.getElementById('viewMaster').style.display = view === 'master' ? 'block' : 'none';
-      
-      document.getElementById('navOpname').className = `flex flex-col items-center cursor-pointer transition ${view==='opname' ? 'text-red-600':'text-slate-300'}`;
-      document.getElementById('navMaster').className = `flex flex-col items-center cursor-pointer transition ${view==='master' ? 'text-indigo-600':'text-slate-300'}`;
+    // MASTER DATA LOGIC
+    function switchView(v) {
+      document.getElementById('viewOpname').style.display = v==='opname'?'block':'none'; document.getElementById('viewMaster').style.display = v==='master'?'block':'none';
+      document.getElementById('navOpname').className = `flex flex-col items-center cursor-pointer transition ${v==='opname'?'text-[#E31E24]':'text-slate-300'}`;
+      document.getElementById('navMaster').className = `flex flex-col items-center cursor-pointer transition ${v==='master'?'text-indigo-600':'text-slate-300'}`;
     }
 
     function renderMasterList() {
-      const container = document.getElementById('masterListContainer');
-      container.innerHTML = "";
-      const sorted = globalData.barangs.sort((a,b)=>String(a.nama).localeCompare(String(b.nama)));
-      sorted.forEach(b => {
-        container.innerHTML += `
+      const c = document.getElementById('masterListContainer'); c.innerHTML = "";
+      const s = globalData.barangs.sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+      s.forEach(b => {
+        c.innerHTML += `
           <div class="flex justify-between items-center p-4 border-b border-slate-100 last:border-0 hover:bg-slate-50 rounded-xl transition">
             <div>
-              <p class="font-bold text-slate-700 text-sm">${b.nama}</p>
-              <p class="text-[10px] font-bold text-slate-400 mt-0.5">${b.satuan} • Rp ${parseInt(b.harga).toLocaleString('id-ID')}</p>
+              <p class="font-bold text-slate-700 text-sm">${b.name}</p>
+              <p class="text-[10px] font-bold text-slate-400 mt-0.5">1 ${b.uMain} = ${b.isi} ${b.uSub}</p>
             </div>
-            <button onclick="openMasterModal('${b.nama}', '${b.satuan}', '${b.harga}')" class="h-8 w-8 bg-indigo-50 text-indigo-500 rounded-lg flex items-center justify-center"><i class="fa-solid fa-pen"></i></button>
+            <button onclick="openMasterModal('${b.name}', '${b.uMain}', '${b.pMain}', '${b.isi}', '${b.uSub}', '${b.pSub}')" class="h-8 w-8 bg-indigo-50 text-indigo-500 rounded-lg flex items-center justify-center"><i class="fa-solid fa-pen"></i></button>
           </div>`;
       });
     }
 
-    function openMasterModal(nama = "", satuan = "", harga = "") {
-      document.getElementById('modalTitle').textContent = nama ? "Edit Item" : "Tambah Item Baru";
-      document.getElementById('mNamaLama').value = nama;
-      document.getElementById('mNama').value = nama;
-      document.getElementById('mSatuan').value = satuan;
-      document.getElementById('mHarga').value = harga;
-      document.getElementById('masterModal').classList.remove('hidden');
-      document.getElementById('masterModal').classList.add('flex');
+    function openMasterModal(nm="", uM="", pM="", isi="", uS="", pS="") {
+      document.getElementById('modalTitle').textContent = nm ? "Konfigurasi Item" : "Item Baru";
+      document.getElementById('mNamaLama').value = nm; document.getElementById('mNama').value = nm;
+      document.getElementById('muMain').value = uM; document.getElementById('mpMain').value = pM;
+      document.getElementById('mIsi').value = isi; document.getElementById('muSub').value = uS; document.getElementById('mpSub').value = pS;
+      document.getElementById('masterModal').classList.remove('hidden'); document.getElementById('masterModal').classList.add('flex');
     }
-
-    function closeMasterModal() {
-      document.getElementById('masterModal').classList.add('hidden');
-      document.getElementById('masterModal').classList.remove('flex');
-    }
+    function closeMasterModal() { document.getElementById('masterModal').classList.add('hidden'); document.getElementById('masterModal').classList.remove('flex'); }
 
     async function saveMasterData(e) {
       e.preventDefault();
       const payload = {
-        namaLama: document.getElementById('mNamaLama').value,
-        nama: document.getElementById('mNama').value,
-        satuan: document.getElementById('mSatuan').value,
-        harga: document.getElementById('mHarga').value
+        namaLama: document.getElementById('mNamaLama').value, nama: document.getElementById('mNama').value,
+        uMain: document.getElementById('muMain').value, pMain: document.getElementById('mpMain').value,
+        isi: document.getElementById('mIsi').value, uSub: document.getElementById('muSub').value, pSub: document.getElementById('mpSub').value
       };
-      
       closeMasterModal(); showLoading(true);
       try {
-        const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "saveMasterBarang", data: payload }) });
-        const result = await res.json();
-        showLoading(false);
-        if(result.status === "success") {
-          showToast("Master Barang Diperbarui!", "bg-indigo-600", "fa-check");
-          initApp(); // reload data list terbaru
-        }
-      } catch(err) {
-        showLoading(false); showToast("Gagal simpan master", "bg-red-500", "fa-xmark");
-      }
+        await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "saveMasterBarang", data: payload }) });
+        showLoading(false); showToast("Master Diperbarui!", "bg-indigo-600", "fa-check"); initApp();
+      } catch(err) { showLoading(false); showToast("Gagal simpan master", "bg-red-500", "fa-xmark"); }
     }
 
-    // ================ FUNGSI LAINNYA ================
     async function kirimLaporanWA() {
-      const outletId = document.getElementById('outletSelect').value;
-      if(!outletId) { showToast("Pilih outlet terlebih dahulu!", "bg-red-500", "fa-xmark"); return; }
-      if(opnameQueue.length > 0) { showToast("Sync offline dulu!", "bg-yellow-500", "fa-triangle-exclamation"); return; }
-      if(!confirm("Kirim rekap opname hari ini ke Owner?")) return;
-
+      const out = document.getElementById('outletSelect').value;
+      if(!out) { showToast("Pilih outlet!", "bg-red-500", "fa-xmark"); return; }
+      if(opnameQueue.length>0) { showToast("Sync offline dulu!", "bg-yellow-500", "fa-triangle-exclamation"); return; }
+      if(!confirm("Kirim rekap opname rinci ke WA Owner?")) return;
       showLoading(true);
       try {
-        const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "sendReportWA", data: { outletId: outletId, user: activeUser.username } }) });
-        const result = await res.json();
-        showLoading(false);
+        const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "sendReportWA", data: { outletId: out, user: activeUser.username } }) });
+        const result = await res.json(); showLoading(false);
         showToast(result.data.message, result.data.status==="success"?"bg-green-500":"bg-red-500", "fa-whatsapp");
       } catch(err) { showLoading(false); showToast("Gagal kirim WA", "bg-red-500", "fa-wifi"); }
     }
 
     function simpanKeQueue(payload) {
-      opnameQueue.push(payload); localStorage.setItem('opnameQueue', JSON.stringify(opnameQueue));
+      opnameQueue.push(payload); localStorage.setItem('opnameQueueV8', JSON.stringify(opnameQueue));
       updateQueueUI(); showToast("Tersimpan offline", "bg-yellow-500", "fa-database");
     }
 
     async function syncOfflineData() {
-      if (!navigator.onLine || opnameQueue.length === 0) return;
-      showLoading(true);
+      if (!navigator.onLine || opnameQueue.length === 0) return; showLoading(true);
       try {
-        const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [...opnameQueue] }) });
-        await res.json();
-        showLoading(false); opnameQueue = []; localStorage.setItem('opnameQueue', JSON.stringify([])); updateQueueUI();
-        showToast("Sync Berhasil!", "bg-blue-500", "fa-cloud-arrow-up");
-        initApp();
+        await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [...opnameQueue] }) });
+        showLoading(false); opnameQueue = []; localStorage.setItem('opnameQueueV8', JSON.stringify([])); updateQueueUI();
+        showToast("Sync Berhasil!", "bg-blue-500", "fa-cloud-arrow-up"); initApp();
       } catch (error) { showLoading(false); showToast("Gagal sync data", "bg-red-500", "fa-times"); }
     }
 
-    function updateQueueUI() {
-      document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none';
-      document.getElementById('queueCount').textContent = opnameQueue.length;
-    }
-
+    function updateQueueUI() { document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none'; document.getElementById('queueCount').textContent = opnameQueue.length; }
     function showLoading(s) { document.getElementById('loadingOverlay').style.display = s ? 'flex' : 'none'; }
     function showToast(m, bg, ic) {
       const t = document.getElementById('toast');
