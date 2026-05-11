@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Ai-CHA Precision V12.0</title>
+  <title>Ai-CHA Precision V13.0</title>
   <meta name="theme-color" content="#FF2E2E">
   
   <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;800&display=swap" rel="stylesheet">
@@ -24,7 +24,7 @@
     .outlet-sel { width: 100%; border: none; background: white; font-weight: 800; font-size: 1rem; outline: none; padding: 12px 15px; border-radius: 12px; margin: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
     .outlet-wrap { padding: 0 20px; }
 
-    .card-box { border-radius: var(--radius); padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: 0.2s; cursor:pointer; }
+    .card-box { border-radius: var(--radius); padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: 0.2s; cursor:pointer; position: relative; }
     .card-box:active { transform: scale(0.97); }
     
     .dual-input { display: flex; gap: 10px; margin-bottom: 15px; }
@@ -46,6 +46,8 @@
     .bg-grn { background: #ECFDF5; border: 2px solid #10B981; }
     .bg-wht { background: white; border: 2px solid white; }
     .bg-danger-soft { background: #FEF2F2; border: 2px solid #EF4444; }
+    
+    .history-btn { position: absolute; top: 15px; right: 15px; background: #f1f5f9; color: #64748b; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; z-index: 10; border: none; }
 
     #loading { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(5px); }
     #loginScreen { position: fixed; inset: 0; background: #111827; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -65,7 +67,7 @@
       <div style="height:80px; width:80px; background:var(--primary); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; box-shadow: 0 10px 25px rgba(255,46,46,0.4);">
         <i class="bi bi-shield-lock-fill text-white fs-1"></i>
       </div>
-      <h1 class="text-white fw-bolder" style="letter-spacing:1px;">AI-CHA<span style="color:var(--primary)">V12</span></h1>
+      <h1 class="text-white fw-bolder" style="letter-spacing:1px;">AI-CHA<span style="color:var(--primary)">V13</span></h1>
       <p id="loginStatus" class="text-secondary small mt-1">Mengambil Data Server...</p>
     </div>
     <div class="d-flex gap-3 mb-5" id="pinIndicators">
@@ -190,8 +192,8 @@
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzUYyLJeUchPyusCbVJU8fGl-uzYY2mhg5T9AB5YNtYE8itnLiH_pWw_6IFT-vUGnzIFw/exec";
 
     let globalData = { users: [], outlets: [], products: [], liveStock: [], inventoryStats: {}, assetPerOutlet: {} };
-    let opnameQueue = JSON.parse(localStorage.getItem('qAicha12')) || [];
-    let activeUser = JSON.parse(localStorage.getItem('uAicha12')) || null;
+    let opnameQueue = JSON.parse(localStorage.getItem('qAicha13')) || [];
+    let activeUser = JSON.parse(localStorage.getItem('uAicha13')) || null;
     let currentPin = ""; let chartInstance = null; let activePO = {};
     const toIDR=(n)=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n);
 
@@ -199,11 +201,11 @@
 
     async function initApp() {
       updateQueueUI();
-      if(localStorage.getItem('dAicha12')) { globalData = JSON.parse(localStorage.getItem('dAicha12')); enableLogin(); }
+      if(localStorage.getItem('dAicha13')) { globalData = JSON.parse(localStorage.getItem('dAicha13')); enableLogin(); }
       try {
         const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: "ALL" }) });
         const result = await res.json();
-        if(result.status === "success") { globalData = result.data; localStorage.setItem('dAicha12', JSON.stringify(globalData)); enableLogin(); }
+        if(result.status === "success") { globalData = result.data; localStorage.setItem('dAicha13', JSON.stringify(globalData)); enableLogin(); }
       } catch (e) { if(!globalData.users.length) document.getElementById('loginStatus').textContent = "Offline. Cek Internet."; }
     }
 
@@ -214,10 +216,10 @@
 
     function validatePin() {
       const u = globalData.users.find(u => u.pin === currentPin);
-      if(u) { activeUser = u; localStorage.setItem('uAicha12', JSON.stringify(u)); setTimeout(showMainApp, 300); } 
+      if(u) { activeUser = u; localStorage.setItem('uAicha13', JSON.stringify(u)); setTimeout(showMainApp, 300); } 
       else { Swal.fire({toast:true, position:'top', icon:'error', title:'PIN Salah', showConfirmButton:false, timer:1500}); setTimeout(() => { currentPin = ""; updatePinUI(); }, 500); }
     }
-    function logout() { activeUser = null; currentPin = ""; localStorage.removeItem('uAicha12'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
+    function logout() { activeUser = null; currentPin = ""; localStorage.removeItem('uAicha13'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
 
     function showMainApp() {
       document.getElementById('loginScreen').style.display = 'none';
@@ -240,7 +242,7 @@
         let qOutlet = activeUser.role === "Owner" ? "ALL" : out;
         const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: qOutlet }) });
         const result = await res.json();
-        if(result.status === "success") { globalData = result.data; localStorage.setItem('dAicha12', JSON.stringify(globalData)); renderStockList(); renderOwner(); renderMasterList(); renderPO(); }
+        if(result.status === "success") { globalData = result.data; localStorage.setItem('dAicha13', JSON.stringify(globalData)); renderStockList(); renderOwner(); renderMasterList(); renderPO(); }
       } catch (e) { renderStockList(); renderOwner(); renderMasterList(); renderPO(); } 
     }
 
@@ -275,7 +277,6 @@
       globalData.products.forEach(p => {
         let key = `${out}_${p.name}`;
         let lItem = globalData.liveStock.find(x => x.name === p.name && x.outlet === out);
-        
         let currentQty = `0 ${p.uMain}`; let daysLeft = "-"; let adu = "-"; let isUpdatedToday = false; 
 
         let stats = globalData.inventoryStats[key];
@@ -299,9 +300,9 @@
         let bgClass = isUpdatedToday ? 'bg-grn' : (lItem && lItem.totalBase <= 0 ? 'bg-danger-soft' : 'bg-wht');
         let checkIcon = isUpdatedToday ? '<i class="bi bi-check-circle-fill text-success fs-5"></i>' : '<i class="bi bi-circle text-muted fs-5"></i>';
         
-        // Tampilkan info multi-expiry jika ada
+        // Multi-Expiry Badge
         let batchInfo = "";
-        if(lItem && lItem.batches.length > 1) {
+        if(lItem && lItem.batches && lItem.batches.length > 1) {
             batchInfo = `<div class="mt-1 mb-2 pt-1 border-top" style="font-size:0.65rem; color:#666;">`;
             lItem.batches.forEach(b => { batchInfo += `Exp ${b.displayExp}: <b>${b.displayQty}</b> | `; });
             batchInfo = batchInfo.slice(0, -2) + `</div>`;
@@ -309,7 +310,8 @@
 
         html += `
         <div class="card-box ${bgClass}" onclick="openInputModal('${p.name}')">
-          <div class="d-flex justify-content-between align-items-center mb-1"><div class="fw-bold text-dark" style="font-size:0.95rem;">${p.name}</div><div>${checkIcon}</div></div>
+          <button class="history-btn" onclick="event.stopPropagation(); showHistory('${p.name}')"><i class="bi bi-clock-history"></i></button>
+          <div class="d-flex justify-content-between align-items-center mb-1"><div class="fw-bold text-dark w-75" style="font-size:0.95rem;">${p.name}</div><div>${checkIcon}</div></div>
           <div class="text-danger fw-bold fs-4 my-1">${currentQty}</div>
           ${batchInfo}
           <div class="d-flex justify-content-between small text-secondary"><div><i class="bi bi-graph-up-arrow"></i> ADU: ${adu}/hr</div><div class="fw-bold">Est Habis: ${daysLeft} Hr</div></div>
@@ -318,123 +320,67 @@
       document.getElementById('liveBody').innerHTML = html;
     }
 
-    function renderOwner() {
-      document.getElementById('assetVal').innerText = toIDR(globalData.totalAsset || 0); let h='';
-      let outFilter = document.getElementById('outlet').value;
-      let filteredStock = activeUser.role !== "Owner" ? globalData.liveStock.filter(x => x.outlet === outFilter) : globalData.liveStock;
+    function showHistory(itemName) {
+      let out = document.getElementById('outlet').value;
+      let lItem = globalData.liveStock.find(x => x.name === itemName && x.outlet === out);
+      if(!lItem || !lItem.history || lItem.history.length === 0) return Swal.fire({toast:true, position:'top', icon:'info', title:'Belum ada riwayat transaksi.', showConfirmButton:false, timer:2000});
+      
+      let histHTML = `<div style="text-align:left; font-size:0.8rem; max-height: 300px; overflow-y:auto;">`;
+      lItem.history.forEach(h => {
+         let dateStr = new Date(h.date).toLocaleString('id-ID', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
+         let qtyStr = "";
+         let big = Math.floor(Math.abs(h.qtyBase) / lItem.isi); let small = Math.abs(h.qtyBase) % lItem.isi;
+         if(big>0) qtyStr += `${big} ${lItem.uMain} `; if(small>0) qtyStr += `${small} ${lItem.uSub}`;
+         
+         let color = "text-success"; let sign = "+";
+         if(h.type === "Opname Rutin") { color = "text-primary"; sign = "•"; }
+         else if(h.type === "Barang Rusak" || h.type.includes("Kirim")) { color = "text-danger"; sign = "-"; }
 
-      filteredStock.forEach(x => {
-         h+=`<div class="card-box bg-wht"><div class="d-flex justify-content-between mb-1"><div class="fw-bold" style="font-size:0.9rem;">[${x.outlet}] ${x.name}</div><div class="text-success fw-bold">${toIDR(x.assetVal)}</div></div>
-               <div class="small text-muted mb-2">Stok: <b class="text-dark">${x.displayQty}</b></div>
-               <div class="bg-light p-2 rounded small text-secondary d-flex justify-content-between"><span>PO Target: ${x.poNeed} ${x.uMain}</span><span class="fw-bold text-primary"><i class="bi bi-graph-up-arrow"></i> ADU: ${globalData.inventoryStats[x.outlet+'_'+x.name]?.adu || '-'}</span></div></div>`;
+         histHTML += `<div class="border-bottom py-2">
+                        <div class="d-flex justify-content-between fw-bold text-dark"><span>${dateStr}</span><span class="${color}">${sign}${qtyStr}</span></div>
+                        <div class="text-muted d-flex justify-content-between"><span>${h.type}</span><span>${h.user}</span></div>
+                      </div>`;
       });
-      document.getElementById('assetList').innerHTML = h;
+      histHTML += `</div>`;
+      
+      Swal.fire({ title: `<div style="font-size:1.1rem; color:#E31E24; font-weight:bold;">Riwayat ${itemName}</div>`, html: histHTML, confirmButtonColor: '#1E293B', confirmButtonText: 'Tutup' });
     }
 
-    function renderAnalytics() {
-        let overstock = []; let kritikal = [];
-        globalData.liveStock.forEach(x => {
-            if(x.stockStatus === "OVERSTOK") overstock.push(x);
-            if(x.stockStatus === "HABIS" || x.stockStatus === "KRITIS") kritikal.push(x);
-        });
-
-        let mutH = '';
-        kritikal.forEach(k => {
-            let helper = overstock.find(o => o.name === k.name);
-            if(helper) {
-                mutH += `<div class="bg-light p-3 rounded-xl border border-primary mb-2"><div class="fw-bold text-dark small mb-1">${k.name}</div>
-                            <div class="small d-flex justify-content-between align-items-center"><span class="text-danger fw-bold"><i class="bi bi-shop"></i> ${k.outlet} (Habis)</span><i class="bi bi-arrow-right text-muted"></i><span class="text-success fw-bold"><i class="bi bi-shop"></i> ${helper.outlet} (Sisa ${helper.daysLeft} hr)</span></div></div>`;
-            }
-        });
-        document.getElementById('mutationList').innerHTML = mutH || `<div class="text-muted small">Tidak ada saran mutasi (Distribusi merata).</div>`;
-
-        let phtml = '';
-        globalData.liveStock.forEach(x => {
-            let stats = globalData.inventoryStats[x.outlet+'_'+x.name];
-            let badges = [];
-            if(stats && stats.performa === "BOROS") badges.push(`<span class="badge-soft bg-red me-1">PEMAKAIAN BOROS</span>`);
-            x.batches.forEach(b => {
-                if(b.status === "EXPIRED" && !badges.includes("EXP")) badges.push(`<span class="badge-soft bg-red me-1">EXPIRED (${b.displayExp})</span>`);
-                else if (b.status === "WARNING" && !badges.includes("WARN")) badges.push(`<span class="badge-soft bg-yel me-1">MENDEKATI EXP</span>`);
-            });
-            if(badges.length > 0) {
-                phtml += `<div class="bg-white p-3 rounded-xl border mb-2 shadow-sm"><div class="d-flex justify-content-between align-items-center mb-1"><div class="fw-bold text-dark small">[${x.outlet}] ${x.name}</div></div><div class="mt-1">${badges.join('')}</div></div>`;
-            }
-        });
-        document.getElementById('performanceList').innerHTML = phtml || `<div class="text-muted small">Semua performa outlet dalam status wajar.</div>`;
-    }
-
-    function renderPO() {
-        let poMap = {}; activePO = {}; let grandTotal = 0;
-        let outFilter = document.getElementById('outlet').value;
-        let filteredStock = (activeUser.role !== "Owner" || outFilter !== "ALL") ? globalData.liveStock.filter(x => x.outlet === outFilter) : globalData.liveStock;
-
-        // Group PO Need by item
-        filteredStock.forEach(x => {
-            if(x.poNeed > 0) {
-                if(!poMap[x.name]) poMap[x.name] = { name: x.name, uMain: x.uMain, pMain: x.pMain, qty: 0 };
-                poMap[x.name].qty += x.poNeed;
-            }
-        });
-
-        let h = '';
-        for(let key in poMap) {
-            let item = poMap[key];
-            activePO[item.name] = { qty: item.qty, price: item.pMain, uMain: item.uMain };
-            let sub = item.qty * item.pMain; grandTotal += sub;
-            h += `<div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                    <div style="width:50%"><div class="fw-bold text-dark small">${item.name}</div><div class="text-muted" style="font-size:0.6rem;">${toIDR(item.pMain)} / ${item.uMain}</div></div>
-                    <div><input type="number" class="po-input" value="${item.qty}" onchange="updatePO('${item.name}', this.value)"></div>
-                    <div class="text-end fw-bold text-success" style="font-size:0.8rem; width:30%;" id="po_sub_${item.name.replace(/[^a-zA-Z0-9]/g, '')}">${toIDR(sub)}</div>
-                  </div>`;
-        }
-        document.getElementById('poList').innerHTML = h || `<div class="text-muted text-center small py-3">Tidak ada rekomendasi order. Stok aman.</div>`;
-        document.getElementById('poGrandTotal').innerText = toIDR(grandTotal);
-    }
-
-    window.updatePO = function(name, newQty) {
-        let qty = Number(newQty) || 0;
-        activePO[name].qty = qty;
-        let sub = qty * activePO[name].price;
-        document.getElementById('po_sub_'+name.replace(/[^a-zA-Z0-9]/g, '')).innerText = toIDR(sub);
-        let grand = 0; for(let k in activePO) grand += activePO[k].qty * activePO[k].price;
-        document.getElementById('poGrandTotal').innerText = toIDR(grand);
-    }
-
-    function renderChart() {
-      if(chartInstance) chartInstance.destroy();
-      const ctx = document.getElementById('assetChart').getContext('2d');
-      chartInstance = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(globalData.assetPerOutlet), datasets: [{ label: 'Nilai Aset (Rp)', data: Object.values(globalData.assetPerOutlet), backgroundColor: '#FF2E2E', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
-    }
-
-    function renderMasterList() {
-      let h=''; globalData.products.forEach(b => {
-        h+=`<div class="card-box p-3 bg-wht"><div class="d-flex justify-content-between align-items-center">
-              <div><div class="fw-bold text-dark" style="font-size:0.9rem;">${b.name}</div><div class="small text-secondary mt-1">1 ${b.uMain} = ${b.isi} ${b.uSub}</div></div>
-              <button onclick="openMasterModal('${b.name}', '${b.uMain}', '${b.pMain}', '${b.isi}', '${b.uSub}', '${b.pSub}')" class="btn btn-sm btn-light border"><i class="bi bi-pencil-fill text-primary"></i></button>
-            </div></div>`;
-      }); document.getElementById('masterList').innerHTML = h;
-    }
-
-    // --- SWAL INPUTS WITH AUTO-FILL ---
+    // --- SMART MULTI-EXPIRY INPUT MODAL ---
     function openInputModal(itemName) {
       let p = globalData.products.find(x => x.name === itemName); if(!p) return;
       let out = document.getElementById('outlet').value;
       let lItem = globalData.liveStock.find(x => x.name === p.name && x.outlet === out);
       
-      let defMain = lItem ? lItem.qtyMain : ""; let defSub = lItem ? lItem.qtySub : ""; 
-      let defExp = (lItem && lItem.batches.length > 0 && lItem.batches[0].expKey !== "NoDate") ? lItem.batches[0].expKey : "";
+      // Batch Selector Logic
+      let batchOptions = `<option value="NEW">➕ Tambah Expired Baru</option>`;
+      if(lItem && lItem.batches && lItem.batches.length > 0) {
+          lItem.batches.forEach((b, idx) => {
+              let selected = idx === 0 ? "selected" : "";
+              batchOptions += `<option value="${b.expKey}" data-qm="${b.qtyMain}" data-qs="${b.qtySub}" ${selected}>📆 Exp: ${b.displayExp} (Sisa ${b.displayQty})</option>`;
+          });
+      }
 
       Swal.fire({
-        html: `<div style="text-align:left;"><div style="font-size:1.1rem; font-weight:800; color:#1E293B; margin-bottom:15px; border-bottom:2px solid #f0f0f0; padding-bottom:10px;">${p.name}</div>
-            <div class="dual-input"><div class="inp-grp"><label class="inp-lbl text-danger">QTY (${p.uMain})</label><input id="swal-q1" type="number" class="inp-field fw-bold text-center" value="${defMain}" placeholder="0"></div>
-              <div class="inp-grp"><label class="inp-lbl text-primary">QTY (${p.uSub})</label><input id="swal-q2" type="number" class="inp-field fw-bold text-center" value="${defSub}" placeholder="0"></div></div>
-            <div class="dual-input"><div class="inp-grp"><label class="inp-lbl">KEDALUWARSA</label><input id="swal-exp" type="date" class="inp-field" value="${defExp}"></div>
+        html: `<div style="text-align:left;">
+            <div style="font-size:1.1rem; font-weight:800; color:#1E293B; margin-bottom:15px; border-bottom:2px solid #f0f0f0; padding-bottom:10px;">${p.name}</div>
+            
+            <label class="inp-lbl">PILIH BATCH (EXPIRED)</label>
+            <select id="swal-batch" class="inp-field mb-3" onchange="changeBatch()">${batchOptions}</select>
+
+            <div class="dual-input"><div class="inp-grp"><label class="inp-lbl text-danger">QTY (${p.uMain})</label><input id="swal-q1" type="number" class="inp-field fw-bold text-center" placeholder="0"></div>
+              <div class="inp-grp"><label class="inp-lbl text-primary">QTY (${p.uSub})</label><input id="swal-q2" type="number" class="inp-field fw-bold text-center" placeholder="0"></div></div>
+            <div class="dual-input"><div class="inp-grp"><label class="inp-lbl">TGL EXPIRED BARU</label><input id="swal-exp" type="date" class="inp-field"></div>
                <div class="inp-grp"><label class="inp-lbl">KETERANGAN</label><select id="swal-ket" class="inp-field"><option>Opname Rutin</option><option>Barang Masuk</option><option>Barang Rusak</option></select></div></div></div>`,
         confirmButtonColor: '#FF2E2E', confirmButtonText: 'Simpan', showCancelButton: true, cancelButtonText: 'Batal',
+        didOpen: () => { window.changeBatch(); },
         preConfirm: () => {
-          let q1 = document.getElementById('swal-q1').value, q2 = document.getElementById('swal-q2').value; if(q1==="" && q2==="") return Swal.showValidationMessage('Isi kuantitas!');
-          return { name: p.name, qtyMain: q1, qtySub: q2, exp: document.getElementById('swal-exp').value || "NoDate", ket: document.getElementById('swal-ket').value, conversion: p.isi };
+          let bSel = document.getElementById('swal-batch').value;
+          let exp = bSel === "NEW" ? document.getElementById('swal-exp').value : bSel;
+          let q1 = document.getElementById('swal-q1').value, q2 = document.getElementById('swal-q2').value; 
+          if(q1==="" && q2==="") return Swal.showValidationMessage('Isi kuantitas!');
+          if(bSel === "NEW" && !exp) return Swal.showValidationMessage('Isi Tanggal Expired untuk Batch Baru!');
+          return { name: p.name, qtyMain: q1, qtySub: q2, exp: exp || "NoDate", ket: document.getElementById('swal-ket').value, conversion: p.isi };
         }
       }).then(r => {
         if(r.isConfirmed) {
@@ -444,28 +390,21 @@
       });
     }
 
-    function reqItem() { Swal.fire({title:'Request Barang', input:'text', inputPlaceholder:'Misal: Sedotan Besar', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>{ if(r.isConfirmed&&r.value) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "requestBarang", data: { outlet: document.getElementById('outlet').value, item: r.value } }) }).then(()=>Swal.fire({toast:true,position:'top',icon:'success',title:'Terkirim',showConfirmButton:false,timer:1500})).finally(()=>document.getElementById('loading').style.display='none'); } }); }
-
-    function openMasterModal(nm="", uM="", pM="", isi="", uS="", pS="") {
-      Swal.fire({ title: nm?'Edit Barang':'Barang Baru', html:`<div style="text-align:left;"><label class="inp-lbl">Nama Barang</label><input id="mNama" class="inp-field mb-2" value="${nm}"><div class="dual-input"><div class="inp-grp"><label class="inp-lbl">Satuan Besar</label><input id="muMain" class="inp-field" value="${uM}"></div><div class="inp-grp"><label class="inp-lbl">Harga (Besar)</label><input id="mpMain" type="number" class="inp-field" value="${pM}"></div></div><div class="inp-grp mb-2"><label class="inp-lbl text-primary">Konversi (Isi per Satuan Besar)</label><input id="mIsi" type="number" class="inp-field" value="${isi}"></div><div class="dual-input"><div class="inp-grp"><label class="inp-lbl">Satuan Kecil</label><input id="muSub" class="inp-field" value="${uS}"></div><div class="inp-grp"><label class="inp-lbl">Harga (Kecil)</label><input id="mpSub" type="number" class="inp-field" value="${pS}"></div></div></div>`, confirmButtonColor:'#FF2E2E', showCancelButton:true, preConfirm:()=>{ return { namaLama: nm, nama: document.getElementById('mNama').value, uMain: document.getElementById('muMain').value, pMain: document.getElementById('mpMain').value, isi: document.getElementById('mIsi').value, uSub: document.getElementById('muSub').value, pSub: document.getElementById('mpSub').value } }
-      }).then(r=>{ if(r.isConfirmed) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "saveMasterBarang", data: r.value }) }).then(()=>fetchData()).finally(()=>document.getElementById('loading').style.display='none'); } });
+    window.changeBatch = function() {
+        let sel = document.getElementById('swal-batch');
+        let opt = sel.options[sel.selectedIndex];
+        let expInput = document.getElementById('swal-exp');
+        
+        if(sel.value === "NEW") {
+            document.getElementById('swal-q1').value = ""; document.getElementById('swal-q2').value = "";
+            expInput.value = ""; expInput.disabled = false;
+        } else {
+            document.getElementById('swal-q1').value = opt.dataset.qm; document.getElementById('swal-q2').value = opt.dataset.qs;
+            expInput.value = sel.value !== "NoDate" ? sel.value : ""; expInput.disabled = true;
+        }
     }
 
-    function updTrfLbl() { let s=document.getElementById('trfItem').value; let out=document.getElementById('outlet').value; let i=globalData.liveStock.find(x=>x.name===s && x.outlet===out); if(i) { document.getElementById('trfMax').innerText=i.displayQty; document.getElementById('lbl-trf-1').innerText=`QTY (${i.uMain})`; document.getElementById('lbl-trf-2').innerText=`QTY (${i.uSub})`; } }
-
-    async function processTransfer() {
-      let d={ from: document.getElementById('outlet').value, to: document.getElementById('trfDest').value, item: document.getElementById('trfItem').value, q1: document.getElementById('trf-q1').value, q2: document.getElementById('trf-q2').value, user: activeUser.username };
-      if(!d.from||!d.to||!d.item||(!d.q1&&!d.q2)) return Swal.fire({icon:'error', title:'Lengkapi Data!'});
-      document.getElementById('loading').style.display='flex';
-      try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "processTransfer", data: d }) }); Swal.fire({toast:true, position:'top', icon:'success', title:'Transfer Sukses', showConfirmButton:false, timer:1500}); document.getElementById('trf-q1').value=''; document.getElementById('trf-q2').value=''; fetchData(); showStok(); } catch(e){} finally { document.getElementById('loading').style.display='none'; }
-    }
-
-    // --- PWA SYNC ---
-    function simpanKeQueue(payload) { opnameQueue.push(payload); localStorage.setItem('qAicha12', JSON.stringify(opnameQueue)); updateQueueUI(); renderStockList(); Swal.fire({toast:true, position:'top', icon:'warning', title:'Tersimpan Offline', showConfirmButton:false, timer:1500}); }
-    async function syncOfflineData() { if(!navigator.onLine || opnameQueue.length === 0) return; document.getElementById('loading').style.display='flex'; try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [...opnameQueue] }) }); opnameQueue = []; localStorage.setItem('qAicha12', JSON.stringify([])); updateQueueUI(); fetchData(); Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500}); } catch(e) {} finally { document.getElementById('loading').style.display='none'; } }
-    function updateQueueUI() { document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none'; document.getElementById('queueCount').innerText = `${opnameQueue.length} Antrean`; }
-
-    // --- WA COPIERS ---
+    // --- WA REPORT (MULTI-EXPIRY) ---
     function copyWA() {
       if(opnameQueue.length>0) return Swal.fire({icon:'warning', title:'Sync Offline Dulu!'});
       let out = document.getElementById('outlet').value; let tgl = new Date().toLocaleDateString('id-ID', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
@@ -476,31 +415,33 @@
         let stats = globalData.inventoryStats[`${out}_${p.name}`]; let adu = stats ? stats.adu : '-';
         if(lItem && lItem.totalBase > 0) {
            txt += `➖ *${p.name}*\n   └ Stok: *${lItem.displayQty}*\n`;
-           if(lItem.batches.length > 1) { lItem.batches.forEach(b => { let bdg = b.status==="EXPIRED"?"⛔":(b.status==="WARNING"?"⚠️":"✅"); txt += `     • Exp ${b.displayExp}: ${b.displayQty} ${bdg}\n`; }); }
+           if(lItem.batches.length > 0) { lItem.batches.forEach(b => { let bdg = b.status==="EXPIRED"?"⛔":(b.status==="WARNING"?"⚠️":"✅"); txt += `     • Exp ${b.displayExp}: ${b.displayQty} ${bdg}\n`; }); }
            txt += `   └ ADU: ${adu}/hr | Est: ${lItem.daysLeft} hr\n`; 
         } else {
            txt += `➖ *${p.name}*\n   └ Stok: *0 ${p.uMain} 0 ${p.uSub}* (KOSONG)\n`;
         }
       });
-      txt += `\n_Dikirim via Ai-CHA Enterprise V12_`;
+      txt += `\n_Dikirim via Ai-CHA Enterprise V13_`;
       navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Teks WA Tersalin!', showConfirmButton:false, timer:2000})).catch(() => Swal.fire({icon:'error', title:'Gagal Copy'}));
     }
 
-    window.copyPOWA = function() {
-       let out = document.getElementById('outlet').value;
-       let txt = `🛒 *FORM PURCHASE ORDER (PO) AI-CHA*\n🏢 Target: ${out==='ALL'?'SELURUH OUTLET':out}\n📅 ${new Date().toLocaleDateString('id-ID')}\n\n*Rincian Order:*\n`;
-       let hasPO = false; let gTot = 0;
-       for(let k in activePO) {
-           if(activePO[k].qty > 0) {
-               let sub = activePO[k].qty * activePO[k].price; gTot += sub;
-               txt += `➖ ${k} : *${activePO[k].qty} ${activePO[k].uMain}*\n`;
-               hasPO = true;
-           }
-       }
-       if(!hasPO) return Swal.fire({icon:'warning', title:'Order Kosong'});
-       txt += `\n💰 *Total Estimasi Tagihan: ${toIDR(gTot)}*\n\nMohon diproses, terima kasih.`;
-       navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Format PO Tersalin!', showConfirmButton:false, timer:2000}));
-    }
+    function reqItem() { Swal.fire({title:'Request Barang', input:'text', inputPlaceholder:'Misal: Sedotan Besar', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>{ if(r.isConfirmed&&r.value) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "requestBarang", data: { outlet: document.getElementById('outlet').value, item: r.value } }) }).then(()=>Swal.fire({toast:true,position:'top',icon:'success',title:'Terkirim',showConfirmButton:false,timer:1500})).finally(()=>document.getElementById('loading').style.display='none'); } }); }
+    function openMasterModal(nm="", uM="", pM="", isi="", uS="", pS="") { Swal.fire({ title: nm?'Edit Barang':'Barang Baru', html:`<div style="text-align:left;"><label class="inp-lbl">Nama Barang</label><input id="mNama" class="inp-field mb-2" value="${nm}"><div class="dual-input"><div class="inp-grp"><label class="inp-lbl">Satuan Besar</label><input id="muMain" class="inp-field" value="${uM}"></div><div class="inp-grp"><label class="inp-lbl">Harga (Besar)</label><input id="mpMain" type="number" class="inp-field" value="${pM}"></div></div><div class="inp-grp mb-2"><label class="inp-lbl text-primary">Konversi (Isi per Satuan Besar)</label><input id="mIsi" type="number" class="inp-field" value="${isi}"></div><div class="dual-input"><div class="inp-grp"><label class="inp-lbl">Satuan Kecil</label><input id="muSub" class="inp-field" value="${uS}"></div><div class="inp-grp"><label class="inp-lbl">Harga (Kecil)</label><input id="mpSub" type="number" class="inp-field" value="${pS}"></div></div></div>`, confirmButtonColor:'#FF2E2E', showCancelButton:true, preConfirm:()=>{ return { namaLama: nm, nama: document.getElementById('mNama').value, uMain: document.getElementById('muMain').value, pMain: document.getElementById('mpMain').value, isi: document.getElementById('mIsi').value, uSub: document.getElementById('muSub').value, pSub: document.getElementById('mpSub').value } } }).then(r=>{ if(r.isConfirmed) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "saveMasterBarang", data: r.value }) }).then(()=>fetchData()).finally(()=>document.getElementById('loading').style.display='none'); } }); }
+    function updTrfLbl() { let s=document.getElementById('trfItem').value; let out=document.getElementById('outlet').value; let i=globalData.liveStock.find(x=>x.name===s && x.outlet===out); if(i) { document.getElementById('trfMax').innerText=i.displayQty; document.getElementById('lbl-trf-1').innerText=`QTY (${i.uMain})`; document.getElementById('lbl-trf-2').innerText=`QTY (${i.uSub})`; } }
+    async function processTransfer() { let d={ from: document.getElementById('outlet').value, to: document.getElementById('trfDest').value, item: document.getElementById('trfItem').value, q1: document.getElementById('trf-q1').value, q2: document.getElementById('trf-q2').value, user: activeUser.username }; if(!d.from||!d.to||!d.item||(!d.q1&&!d.q2)) return Swal.fire({icon:'error', title:'Lengkapi Data!'}); document.getElementById('loading').style.display='flex'; try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "processTransfer", data: d }) }); Swal.fire({toast:true, position:'top', icon:'success', title:'Transfer Sukses', showConfirmButton:false, timer:1500}); document.getElementById('trf-q1').value=''; document.getElementById('trf-q2').value=''; fetchData(); showStok(); } catch(e){} finally { document.getElementById('loading').style.display='none'; } }
+    
+    function simpanKeQueue(payload) { opnameQueue.push(payload); localStorage.setItem('qAicha13', JSON.stringify(opnameQueue)); updateQueueUI(); renderStockList(); Swal.fire({toast:true, position:'top', icon:'warning', title:'Tersimpan Offline', showConfirmButton:false, timer:1500}); }
+    async function syncOfflineData() { if(!navigator.onLine || opnameQueue.length === 0) return; document.getElementById('loading').style.display='flex'; try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [...opnameQueue] }) }); opnameQueue = []; localStorage.setItem('qAicha13', JSON.stringify([])); updateQueueUI(); fetchData(); Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500}); } catch(e) {} finally { document.getElementById('loading').style.display='none'; } }
+    function updateQueueUI() { document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none'; document.getElementById('queueCount').innerText = `${opnameQueue.length} Antrean`; }
+
+    // --- OWNER TABS ---
+    function renderOwner() { document.getElementById('assetVal').innerText = toIDR(globalData.totalAsset || 0); let h=''; let outFilter = document.getElementById('outlet').value; let filteredStock = activeUser.role !== "Owner" ? globalData.liveStock.filter(x => x.outlet === outFilter) : globalData.liveStock; filteredStock.forEach(x => { h+=`<div class="card-box bg-wht"><div class="d-flex justify-content-between mb-1"><div class="fw-bold" style="font-size:0.9rem;">[${x.outlet}] ${x.name}</div><div class="text-success fw-bold">${toIDR(x.assetVal)}</div></div><div class="small text-muted mb-2">Stok: <b class="text-dark">${x.displayQty}</b></div><div class="bg-light p-2 rounded small text-secondary d-flex justify-content-between"><span>PO Target: ${x.poNeed} ${x.uMain}</span><span class="fw-bold text-primary"><i class="bi bi-graph-up-arrow"></i> ADU: ${globalData.inventoryStats[x.outlet+'_'+x.name]?.adu || '-'}</span></div></div>`; }); document.getElementById('assetList').innerHTML = h; }
+    function renderChart() { if(chartInstance) chartInstance.destroy(); const ctx = document.getElementById('assetChart').getContext('2d'); chartInstance = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(globalData.assetPerOutlet), datasets: [{ label: 'Nilai Aset (Rp)', data: Object.values(globalData.assetPerOutlet), backgroundColor: '#FF2E2E', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } }); }
+    function renderAnalytics() { let overstock = []; let kritikal = []; globalData.liveStock.forEach(x => { if(x.stockStatus === "OVERSTOK") overstock.push(x); if(x.stockStatus === "HABIS" || x.stockStatus === "KRITIS") kritikal.push(x); }); let mutH = ''; kritikal.forEach(k => { let helper = overstock.find(o => o.name === k.name); if(helper) { mutH += `<div class="bg-light p-3 rounded-xl border border-primary mb-2"><div class="fw-bold text-dark small mb-1">${k.name}</div><div class="small d-flex justify-content-between align-items-center"><span class="text-danger fw-bold"><i class="bi bi-shop"></i> ${k.outlet} (Habis)</span><i class="bi bi-arrow-right text-muted"></i><span class="text-success fw-bold"><i class="bi bi-shop"></i> ${helper.outlet} (Sisa ${helper.daysLeft} hr)</span></div></div>`; } }); document.getElementById('mutationList').innerHTML = mutH || `<div class="text-muted small">Tidak ada saran mutasi (Distribusi merata).</div>`; let phtml = ''; globalData.liveStock.forEach(x => { let stats = globalData.inventoryStats[x.outlet+'_'+x.name]; let badges = []; if(stats && stats.performa === "BOROS") badges.push(`<span class="badge-soft bg-red me-1">PEMAKAIAN BOROS</span>`); x.batches.forEach(b => { if(b.status === "EXPIRED" && !badges.includes("EXP")) badges.push(`<span class="badge-soft bg-red me-1">EXPIRED (${b.displayExp})</span>`); else if (b.status === "WARNING" && !badges.includes("WARN")) badges.push(`<span class="badge-soft bg-yel me-1">MENDEKATI EXP</span>`); }); if(badges.length > 0) { phtml += `<div class="bg-white p-3 rounded-xl border mb-2 shadow-sm"><div class="d-flex justify-content-between align-items-center mb-1"><div class="fw-bold text-dark small">[${x.outlet}] ${x.name}</div></div><div class="mt-1">${badges.join('')}</div></div>`; } }); document.getElementById('performanceList').innerHTML = phtml || `<div class="text-muted small">Semua performa outlet dalam status wajar.</div>`; }
+    function renderMasterList() { let h=''; globalData.products.forEach(b => { h+=`<div class="card-box p-3 bg-wht"><div class="d-flex justify-content-between align-items-center"><div><div class="fw-bold text-dark" style="font-size:0.9rem;">${b.name}</div><div class="small text-secondary mt-1">1 ${b.uMain} = ${b.isi} ${b.uSub}</div></div><button onclick="openMasterModal('${b.name}', '${b.uMain}', '${b.pMain}', '${b.isi}', '${b.uSub}', '${b.pSub}')" class="btn btn-sm btn-light border"><i class="bi bi-pencil-fill text-primary"></i></button></div></div>`; }); document.getElementById('masterList').innerHTML = h; }
+    function renderPO() { let poMap = {}; activePO = {}; let grandTotal = 0; let outFilter = document.getElementById('outlet').value; let filteredStock = (activeUser.role !== "Owner" || outFilter !== "ALL") ? globalData.liveStock.filter(x => x.outlet === outFilter) : globalData.liveStock; filteredStock.forEach(x => { if(x.poNeed > 0) { if(!poMap[x.name]) poMap[x.name] = { name: x.name, uMain: x.uMain, pMain: x.pMain, qty: 0 }; poMap[x.name].qty += x.poNeed; } }); let h = ''; for(let key in poMap) { let item = poMap[key]; activePO[item.name] = { qty: item.qty, price: item.pMain, uMain: item.uMain }; let sub = item.qty * item.pMain; grandTotal += sub; h += `<div class="d-flex justify-content-between align-items-center border-bottom py-2"><div style="width:50%"><div class="fw-bold text-dark small">${item.name}</div><div class="text-muted" style="font-size:0.6rem;">${toIDR(item.pMain)} / ${item.uMain}</div></div><div><input type="number" class="po-input" value="${item.qty}" onchange="updatePO('${item.name}', this.value)"></div><div class="text-end fw-bold text-success" style="font-size:0.8rem; width:30%;" id="po_sub_${item.name.replace(/[^a-zA-Z0-9]/g, '')}">${toIDR(sub)}</div></div>`; } document.getElementById('poList').innerHTML = h || `<div class="text-muted text-center small py-3">Tidak ada rekomendasi order. Stok aman.</div>`; document.getElementById('poGrandTotal').innerText = toIDR(grandTotal); }
+    window.updatePO = function(name, newQty) { let qty = Number(newQty) || 0; activePO[name].qty = qty; let sub = qty * activePO[name].price; document.getElementById('po_sub_'+name.replace(/[^a-zA-Z0-9]/g, '')).innerText = toIDR(sub); let grand = 0; for(let k in activePO) grand += activePO[k].qty * activePO[k].price; document.getElementById('poGrandTotal').innerText = toIDR(grand); }
+    window.copyPOWA = function() { let out = document.getElementById('outlet').value; let txt = `🛒 *FORM PURCHASE ORDER (PO) AI-CHA*\n🏢 Target: ${out==='ALL'?'SELURUH OUTLET':out}\n📅 ${new Date().toLocaleDateString('id-ID')}\n\n*Rincian Order:*\n`; let hasPO = false; let gTot = 0; for(let k in activePO) { if(activePO[k].qty > 0) { let sub = activePO[k].qty * activePO[k].price; gTot += sub; txt += `➖ ${k} : *${activePO[k].qty} ${activePO[k].uMain}*\n`; hasPO = true; } } if(!hasPO) return Swal.fire({icon:'warning', title:'Order Kosong'}); txt += `\n💰 *Total Estimasi Tagihan: ${toIDR(gTot)}*\n\nMohon diproses, terima kasih.`; navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Format PO Tersalin!', showConfirmButton:false, timer:2000})); }
   </script>
 </body>
 </html>
