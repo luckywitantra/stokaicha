@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Ai-CHA Precision V24.0</title>
+  <title>Ai-CHA Precision V24.1</title>
   <meta name="theme-color" content="#FF2E2E">
   <meta name="apple-mobile-web-app-capable" content="yes">
   
@@ -76,7 +76,7 @@
   </div>
 
   <div id="loginScreen" style="position:fixed; inset:0; background:#111827; z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-    <div class="text-center mb-5"><div style="height:80px; width:80px; background:var(--primary); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px;"><i class="bi bi-rocket-takeoff-fill text-white fs-1"></i></div><h1 class="text-white fw-bolder">AI-CHA V24</h1><p id="loginStatus" class="text-secondary small mt-1">Sistem Keamanan & Eksekutif Aktif</p></div>
+    <div class="text-center mb-5"><div style="height:80px; width:80px; background:var(--primary); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px;"><i class="bi bi-rocket-takeoff-fill text-white fs-1"></i></div><h1 class="text-white fw-bolder">AI-CHA V24</h1><p id="loginStatus" class="text-secondary small mt-1">Menyinkronkan Server...</p></div>
     <div class="d-flex gap-3 mb-5" id="pinIndicators"><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div></div>
     <div id="numpad" class="row g-4" style="max-width:280px; opacity:0.5; pointer-events:none;">
       <div class="col-4 d-flex justify-content-center" onclick="enterPin('1')"><button class="btn btn-dark rounded-circle" style="width:70px; height:70px; font-size:1.5rem;">1</button></div>
@@ -219,10 +219,10 @@
     // MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycby7dZBessRRDYW5k4kfyb-F4UG2yxQdlPLd1QHU6Mp9FPUoCjUqL-q9azwKEYUfA3YTJQ/exec";
     
-    let globalData = { users:[], outlets:[], products:[], liveStock:[], inventoryStats:{} };
-    let opnameQueue = []; let activeUser = null; let clusterizeInstance = null; let searchTimeout;
+    let globalData = { users:[], outlets:[], products:[], liveStock:[], inventoryStats:{}, assetPerOutlet:{}, expiredAssetPerOutlet:{}, wastePerOutlet:{}, hppPerOutlet:{} };
+    let opnameQueue = []; let activeUser = null; let currentPin = ""; let chartInstance = null; let activePO = {}; let searchTimeout;
     let deferredPrompt; 
-    window.hasShownFocus = false; // Flag to prevent multiple focus popups
+    window.hasShownFocus = false; 
     const toIDR=(n)=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n);
 
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('installPrompt').classList.remove('d-none'); document.getElementById('installPrompt').classList.add('d-flex'); });
@@ -241,12 +241,29 @@
         try {
           const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: "ALL" }) });
           const result = await res.json();
-          if(result.status === "success") { globalData = result.data; await localforage.setItem('dAicha24', globalData); enableLogin(); if(activeUser) showMainApp(); }
-        } catch (e) {}
+          if(result.status === "success") { 
+              globalData = result.data; await localforage.setItem('dAicha24', globalData); 
+              document.getElementById('loginStatus').textContent = "Sistem Keamanan & Eksekutif Aktif";
+              enableLogin(); if(activeUser) showMainApp(); 
+          } else {
+              document.getElementById('loginStatus').innerHTML = `<span class="text-danger fw-bold">Server Error: ${result.message}</span>`;
+              if(cache) enableLogin();
+          }
+        } catch (e) { 
+            document.getElementById('loginStatus').innerHTML = `<span class="text-warning fw-bold">Koneksi Terputus (Mode Offline)</span>`;
+            if(cache) enableLogin();
+        }
     });
 
-    // --- PIN LOGIC ---
-    let currentPin = "";
+    function setupSessionTimeout() {
+        let time; const TIMEOUT_MS = 2 * 60 * 60 * 1000; 
+        window.onload = resetTimer; document.onmousemove = resetTimer; document.onkeypress = resetTimer; document.ontouchstart = resetTimer;
+        function doLogout() { if(activeUser) { logout(); Swal.fire({toast:true, position:'top', icon:'info', title:'Sesi Berakhir', text:'Logout otomatis karena idle.', showConfirmButton:false, timer:3000}); } }
+        function resetTimer() { clearTimeout(time); time = setTimeout(doLogout, TIMEOUT_MS); }
+    }
+    setupSessionTimeout();
+
+    function enableLogin() { document.getElementById('numpad').style.opacity = 1; document.getElementById('numpad').style.pointerEvents = 'auto'; if(activeUser) showMainApp(); }
     function enterPin(n) { if(currentPin.length < 4) { currentPin += n; updatePinUI(); if(currentPin.length===4) validatePin(); } }
     function deletePin() { if(currentPin.length > 0) { currentPin = currentPin.slice(0, -1); updatePinUI(); } }
     function updatePinUI() { document.querySelectorAll('.pin-dot').forEach((d, i) => d.style.background = i < currentPin.length ? 'white' : 'transparent'); }
@@ -255,8 +272,8 @@
         if(u) { activeUser = u; await localforage.setItem('uAicha24', u); showMainApp(); }
         else { Swal.fire('PIN Salah','','error'); currentPin = ""; updatePinUI(); }
     }
-    function enableLogin() { document.getElementById('numpad').style.opacity = 1; document.getElementById('numpad').style.pointerEvents = 'auto'; if(activeUser) showMainApp(); }
-    async function doLogout() { activeUser = null; currentPin = ""; window.hasShownFocus = false; await localforage.removeItem('uAicha24'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
+    async function logout() { activeUser = null; currentPin = ""; window.hasShownFocus = false; await localforage.removeItem('uAicha24'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
+    window.doLogout = logout;
 
     function showMainApp() {
         document.getElementById('loginScreen').style.display = 'none';
@@ -283,11 +300,13 @@
             globalData = result.data; 
             renderStockList(); 
             showDailyFocusPopup(); 
+        } else {
+            Swal.fire('Peringatan Server', result.message, 'warning');
+            renderStockList();
         }
       } catch (e) { renderStockList(); }
     }
 
-    // --- POPUP FOKUS HARI INI ---
     function forceShowFocusPopup() { window.hasShownFocus = false; showDailyFocusPopup(); }
     function showDailyFocusPopup() {
         if(activeUser.role === "Owner" || window.hasShownFocus) return;
@@ -335,7 +354,6 @@
 
     function debounceSearch() { clearTimeout(searchTimeout); searchTimeout = setTimeout(renderStockList, 300); }
 
-    // --- RENDER & VIRTUAL DOM WITH SORTING ---
     function renderStockList() {
       let out = document.getElementById('outlet').value;
       if(out === "ALL") {
@@ -347,7 +365,6 @@
       let targetProducts = globalData.products;
       if(q !== "") targetProducts = targetProducts.filter(p => p.name.toLowerCase().includes(q));
 
-      // ENRICH WITH LIVESTOCK FOR SORTING
       let enrichedProducts = targetProducts.map(p => {
           let lItem = globalData.liveStock.find(x => x.name === p.name && x.outlet === out);
           let tBase = lItem ? lItem.totalBase : 0;
@@ -357,7 +374,6 @@
           return { ...p, lItem, tBase, minExp, maxExp };
       });
 
-      // APPLY SORTING
       let sortVal = document.getElementById('sortSelect').value;
       if(sortVal === 'az') enrichedProducts.sort((a,b) => a.name.localeCompare(b.name));
       else if(sortVal === 'za') enrichedProducts.sort((a,b) => b.name.localeCompare(a.name));
@@ -422,7 +438,6 @@
       else clusterizeInstance.update(rowsHTML);
     }
 
-    // --- TERIMA BARANG MASUK ---
     window.openReceiveModal = function() {
         let options = globalData.products.map(p => `<option value="${p.name}">${p.name}</option>`).join("");
         Swal.fire({
@@ -437,7 +452,6 @@
         }).then(r => { if(r.isConfirmed) submitSingle(r.value); });
     }
 
-    // --- OPNAME RUTIN ---
     window.openDetailModal = function(itemName) {
         let out = document.getElementById('outlet').value; let p = globalData.products.find(x => x.name === itemName); let lItem = globalData.liveStock.find(x => x.name === itemName && x.outlet === out);
         let chartHtml = `<canvas id="detailChart" height="150"></canvas>`; let expHtml = "";
@@ -484,7 +498,6 @@
         }).then(r => { if(r.isConfirmed) submitSingle(r.value); });
     }
 
-    // --- UNDO ACTIONS ---
     window.undoLocal = async function(barang, outlet) {
       if(await Swal.fire({title:'Batalkan Antrean?', text:'Hapus dari memori offline.', icon:'warning', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>r.isConfirmed)) {
          opnameQueue = opnameQueue.filter(q => !(q.barangId === barang && q.outletId === outlet));
@@ -497,11 +510,10 @@
       } 
     }
 
-    async function submitSingle(payload) { showSkeletonLoader(); try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) }); fetchData(); } catch (e) { opnameQueue.push(payload); await localforage.setItem('qAicha24', opnameQueue); updateQueueUI(); renderStockList(); } }
+    async function submitSingle(payload) { showSkeletonLoader(); try { let res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) }); let result = await res.json(); if(result.status !== "success") throw new Error(result.message); fetchData(); } catch (e) { opnameQueue.push(payload); await localforage.setItem('qAicha24', opnameQueue); updateQueueUI(); renderStockList(); } }
     async function syncOfflineData() { if(!navigator.onLine || opnameQueue.length === 0) return; showSkeletonLoader(); try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: opnameQueue }) }); opnameQueue = []; await localforage.setItem('qAicha24', []); updateQueueUI(); fetchData(); Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500}); } catch(e) { renderStockList(); } }
     function updateQueueUI() { document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none'; document.getElementById('queueCount').innerText = `${opnameQueue.length} Antrean`; }
     
-    // --- LAPORAN WA SUPER DETAIL ---
     function copyWA() {
       if(opnameQueue.length>0) return Swal.fire({icon:'warning', title:'Sync Offline Dulu!'});
       let out = document.getElementById('outlet').value; let tgl = new Date().toLocaleDateString('id-ID', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
@@ -535,12 +547,11 @@
       
       if(alertItems !== "") txt += `🚨 *PERHATIAN KHUSUS (Habis/Expired):*\n${alertItems}\n`;
       txt += `📦 *STOK AMAN:*\n${safeItems}`;
-      txt += `\n_Dikirim via Ai-CHA Enterprise V24.0_`;
+      txt += `\n_Dikirim via Ai-CHA Enterprise V24.1_`;
       
       navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Teks WA Tersalin!', showConfirmButton:false, timer:2000})).catch(() => Swal.fire({icon:'error', title:'Gagal Copy'}));
     }
     
-    // --- REUSE OWNER MODULES ---
     function renderOwner() { 
       let outFilter = document.getElementById('outlet').value; 
       let totAset = 0; let totLoss = 0; let totHPP = 0; let totWaste = 0;
@@ -593,7 +604,7 @@
       renderLeaderboard();
     }
 
-    function renderMasterList() { let h=''; globalData.products.forEach(b => { h+=`<div class="card-box p-3 bg-wht"><div class="d-flex justify-content-between align-items-center"><div><div class="fw-bold text-dark" style="font-size:0.9rem;">${b.name}</div><div class="small text-secondary mt-1">1 ${b.uMain} = ${b.isi} ${b.uSub}</div></div><button onclick="openMasterModal('${b.name}', '${b.uMain}', '${b.pMain}', '${b.isi}', '${b.uSub}', '${b.pSub}', ${b.hasExpiry})" class="btn btn-sm btn-light border"><i class="bi bi-pencil-fill text-primary"></i></button></div></div>`; }); document.getElementById('masterList').innerHTML = h; }
+    function renderMasterList() { let h=''; globalData.products.forEach(b => { h+=`<div class="card-box p-3 bg-wht"><div class="d-flex justify-content-between align-items-center"><div><div class="fw-bold text-dark" style="font-size:0.9rem;">${b.name}</div><div class="small text-secondary mt-1">1 ${b.uMain} = ${b.isi} ${b.uSub}</div></div><button onclick="openMasterModal('${b.name}', '${b.uMain}', '${b.pMain}', '${b.isi}', '${b.uSub}', '${b.pSub}')" class="btn btn-sm btn-light border"><i class="bi bi-pencil-fill text-primary"></i></button></div></div>`; }); document.getElementById('masterList').innerHTML = h; }
     window.showHistory = function(itemName) { /* LOGIC HELD, REUSE EXISTING*/ }
     function reqItem() { /* REUSE EXISTING */ }
     function openMasterModal() { /* REUSE EXISTING */ }
