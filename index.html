@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Ai-CHA Precision V20.0</title>
+  <title>Ai-CHA Precision V21.0</title>
   <meta name="theme-color" content="#FF2E2E">
   <meta name="apple-mobile-web-app-capable" content="yes">
   
@@ -70,7 +70,6 @@
     .po-input { width:60px; padding:4px; text-align:center; font-weight:bold; border:1px solid #ccc; border-radius:8px; }
     #scrollArea { max-height: calc(100vh - 280px); overflow-y: auto; padding-bottom: 20px; }
     
-    /* LEADERBOARD STYLES */
     .rank-badge { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
     .rank-1 { background: #F59E0B; } .rank-2 { background: #9CA3AF; } .rank-3 { background: #B45309; } .rank-other { background: #1E293B; }
   </style>
@@ -78,7 +77,7 @@
 <body>
 
   <div id="installPrompt" class="fixed-top bg-primary text-white p-3 shadow-lg d-none align-items-center justify-content-between z-[9999]">
-     <div class="small fw-bold"><i class="bi bi-box-arrow-down me-2"></i>Instal Aplikasi Ai-CHA ke HP Anda.</div>
+     <div class="small fw-bold"><i class="bi bi-box-arrow-down me-2"></i>Instal Aplikasi Ai-CHA ke HP.</div>
      <button class="btn btn-sm btn-light fw-bold text-primary" onclick="installPWA()">Instal</button>
   </div>
 
@@ -87,7 +86,7 @@
       <div style="height:80px; width:80px; background:var(--primary); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; box-shadow: 0 10px 25px rgba(255,46,46,0.4);">
         <i class="bi bi-rocket-takeoff-fill text-white fs-1"></i>
       </div>
-      <h1 class="text-white fw-bolder" style="letter-spacing:1px;">AI-CHA<span style="color:var(--primary)">V20</span></h1>
+      <h1 class="text-white fw-bolder" style="letter-spacing:1px;">AI-CHA<span style="color:var(--primary)">V21</span></h1>
       <p id="loginStatus" class="text-secondary small mt-1">Mengambil Data (IndexedDB)...</p>
     </div>
     <div class="d-flex gap-3 mb-5" id="pinIndicators"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
@@ -181,23 +180,18 @@
     </div>
 
     <div id="owner-aset" style="height:calc(100vh - 350px); overflow-y:auto;">
-      <div class="card-box bg-wht mb-3 d-flex justify-content-between align-items-center">
-         <span class="fw-bold">TOTAL NILAI ASET</span><span class="text-primary fw-bolder fs-4" id="assetVal">Rp 0</span>
-      </div>
+      <div class="card-box bg-wht mb-3 d-flex justify-content-between align-items-center"><span class="fw-bold">TOTAL NILAI ASET</span><span class="text-primary fw-bolder fs-4" id="assetVal">Rp 0</span></div>
       <div id="assetList"></div>
     </div>
 
     <div id="owner-rank" style="display:none; height:calc(100vh - 350px); overflow-y:auto;">
-      <h6 class="fw-bold text-dark mt-1"><i class="bi bi-trophy-fill text-warning"></i> Leaderboard Outlet</h6>
-      <div id="leaderboardList" class="mb-4"></div>
-      <h6 class="fw-bold text-dark"><i class="bi bi-shuffle text-primary"></i> Rekomendasi Distribusi</h6>
-      <div id="mutationList"></div>
+      <h6 class="fw-bold text-dark mt-1"><i class="bi bi-trophy-fill text-warning"></i> Leaderboard Outlet</h6><div id="leaderboardList" class="mb-4"></div>
+      <h6 class="fw-bold text-dark"><i class="bi bi-shuffle text-primary"></i> Rekomendasi Distribusi</h6><div id="mutationList"></div>
     </div>
 
     <div id="owner-trend" style="display:none; height:calc(100vh - 350px); overflow-y:auto;">
       <div class="card-box bg-wht mb-3" style="height:250px;"><canvas id="trendChart"></canvas></div>
-      <h6 class="fw-bold text-dark mt-1"><i class="bi bi-exclamation-triangle text-warning"></i> Analisis Performa</h6>
-      <div id="performanceList"></div>
+      <h6 class="fw-bold text-dark mt-1"><i class="bi bi-exclamation-triangle text-warning"></i> Analisis Performa</h6><div id="performanceList"></div>
     </div>
 
     <div id="owner-po" style="display:none; height:calc(100vh - 350px); overflow-y:auto;">
@@ -237,9 +231,9 @@
     }
 
     document.addEventListener("DOMContentLoaded", async () => { 
-        opnameQueue = (await localforage.getItem('qAicha20')) || [];
-        activeUser = (await localforage.getItem('uAicha20')) || null;
-        let cachedData = await localforage.getItem('dAicha20');
+        opnameQueue = (await localforage.getItem('qAicha21')) || [];
+        activeUser = (await localforage.getItem('uAicha21')) || null;
+        let cachedData = await localforage.getItem('dAicha21');
         updateQueueUI();
         if(cachedData) { globalData = cachedData; enableLogin(); }
         
@@ -247,7 +241,7 @@
           const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: "ALL" }) });
           const result = await res.json();
           if(result.status === "success") { 
-              globalData = result.data; await localforage.setItem('dAicha20', globalData); 
+              globalData = result.data; await localforage.setItem('dAicha21', globalData); 
               enableLogin(); if(activeUser) showMainApp();
           }
         } catch (e) { if(!globalData.users.length) document.getElementById('loginStatus').textContent = "Offline. Cek Internet."; }
@@ -262,10 +256,10 @@
 
     async function validatePin() {
       const u = globalData.users.find(u => u.pin === currentPin);
-      if(u) { activeUser = u; await localforage.setItem('uAicha20', u); setTimeout(showMainApp, 300); } 
+      if(u) { activeUser = u; await localforage.setItem('uAicha21', u); setTimeout(showMainApp, 300); } 
       else { Swal.fire({toast:true, position:'top', icon:'error', title:'PIN Salah', showConfirmButton:false, timer:1500}); setTimeout(() => { currentPin = ""; updatePinUI(); }, 500); }
     }
-    async function doLogout() { activeUser = null; currentPin = ""; await localforage.removeItem('uAicha20'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
+    async function doLogout() { activeUser = null; currentPin = ""; await localforage.removeItem('uAicha21'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
 
     function showMainApp() {
       document.getElementById('loginScreen').style.display = 'none';
@@ -288,7 +282,7 @@
         let qOutlet = activeUser.role === "Owner" ? "ALL" : out;
         const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: qOutlet }) });
         const result = await res.json();
-        if(result.status === "success") { globalData = result.data; await localforage.setItem('dAicha20', globalData); renderStockList(); renderOwner(); renderMasterList(); renderPO(); renderDailyChecklist(); }
+        if(result.status === "success") { globalData = result.data; await localforage.setItem('dAicha21', globalData); renderStockList(); renderOwner(); renderMasterList(); renderPO(); renderDailyChecklist(); }
       } catch (e) { renderStockList(); renderOwner(); renderMasterList(); renderPO(); renderDailyChecklist(); } 
     }
 
@@ -318,13 +312,13 @@
     }
     function debounceSearch() { clearTimeout(searchTimeout); searchTimeout = setTimeout(renderStockList, 300); }
 
-    // --- DAILY CHECKLIST (AUTO-FOCUS KRITIS) ---
+    // --- DAILY CHECKLIST ---
     function renderDailyChecklist() {
       if(activeUser.role === "Owner") return;
       let out = document.getElementById('outlet').value;
       let criticals = globalData.liveStock.filter(x => x.outlet === out && (x.stockStatus === "KRITIS" || x.stockStatus === "HABIS" || x.batches.some(b=>b.status==="EXPIRED")));
       if(criticals.length > 0) {
-         let itemsHTML = criticals.slice(0,3).map(c => `<li><b>${c.name}</b> (Est: ${c.daysLeft} hr)</li>`).join("");
+         let itemsHTML = criticals.slice(0,3).map(c => `<li><b>${c.name}</b> (Est: ${c.daysLeft===999?"-":c.daysLeft} hr)</li>`).join("");
          if(criticals.length > 3) itemsHTML += `<li><i>...dan ${criticals.length - 3} lainnya</i></li>`;
          document.getElementById('dailyChecklist').innerHTML = `<div class="alert alert-warning border-warning shadow-sm"><div class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill"></i> FOKUS HARI INI:</div><ul class="mb-0 small ps-3">${itemsHTML}</ul></div>`;
          document.getElementById('dailyChecklist').style.display = 'block';
@@ -334,8 +328,7 @@
     // --- VIRTUAL DOM RENDERING ---
     function renderStockList() {
       let trf=document.getElementById('trfItem'); trf.innerHTML='<option disabled selected>Pilih Item...</option>'; 
-      let todayStr = new Date().toLocaleDateString('id-ID');
-      let out = document.getElementById('outlet').value;
+      let todayStr = new Date().toLocaleDateString('id-ID'); let out = document.getElementById('outlet').value;
       
       if(out === "ALL") {
           document.getElementById('liveBody').innerHTML = '<div class="text-center py-5 text-muted small"><i class="bi bi-info-circle fs-3 d-block mb-2"></i>Pilih outlet spesifik di atas untuk memulai opname.</div>';
@@ -350,8 +343,7 @@
       if(targetProducts.length === 0) rowsHTML.push('<div class="text-center py-5 text-muted small">Barang tidak ditemukan.</div>');
 
       targetProducts.forEach(p => {
-        let key = `${out}_${p.name}`;
-        let lItem = globalData.liveStock.find(x => x.name === p.name && x.outlet === out);
+        let key = `${out}_${p.name}`; let lItem = globalData.liveStock.find(x => x.name === p.name && x.outlet === out);
         let currentQty = `0 ${p.uMain}`; let daysLeft = "-"; let adu = "-"; let isUpdatedToday = false; let rowIndex = null;
 
         let stats = globalData.inventoryStats[key];
@@ -432,7 +424,7 @@
                     new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Tren Stok ('+lItem.uMain+')', data: dataPoints, borderColor: '#FF2E2E', backgroundColor: 'rgba(255, 46, 46, 0.1)', fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
                 }
             }
-        }).then((result) => { if (result.isConfirmed) { setTimeout(() => openInputModal(itemName), 300); } else if (result.isDenied) { setTimeout(() => showHistory(itemName), 300); } });
+        }).then((result) => { if (result.isConfirmed) { setTimeout(() => openSmartInputModal(itemName), 300); } else if (result.isDenied) { setTimeout(() => showHistory(itemName), 300); } });
     }
 
     window.showHistory = function(itemName) {
@@ -452,10 +444,12 @@
       Swal.fire({ title: `<div style="font-size:1.1rem; color:#E31E24; font-weight:bold;">Riwayat ${itemName}</div>`, html: histHTML, confirmButtonColor: '#1E293B', confirmButtonText: 'Tutup' });
     }
 
-    // --- FORM INPUT OPNAME ---
-    window.openInputModal = function(itemName) {
-      let p = globalData.products.find(x => x.name === itemName); if(!p) return; let out = document.getElementById('outlet').value;
+    // --- SMART OPNAME FORM (2-IN-1: Masuk & Sisa) ---
+    window.openSmartInputModal = function(itemName) {
+      let p = globalData.products.find(x => x.name === itemName); if(!p) return;
+      let out = document.getElementById('outlet').value;
       let lItem = globalData.liveStock.find(x => x.name === p.name && x.outlet === out);
+      
       let batchOptions = `<option value="NEW">➕ Tambah Baru</option>`;
       if(lItem && lItem.batches && lItem.batches.length > 0) { lItem.batches.forEach((b, idx) => { let selected = idx === 0 ? "selected" : ""; batchOptions += `<option value="${b.expKey}" data-qm="${b.qtyMain}" data-qs="${b.qtySub}" ${selected}>📆 Exp: ${b.displayExp} (Sisa ${b.displayQty})</option>`; }); }
 
@@ -463,61 +457,100 @@
       if(p.hasExpiry === false || p.hasExpiry === "FALSE") {
           expUI = `<div class="inp-grp"><label class="inp-lbl">KEDALUWARSA</label><input id="swal-exp" type="text" class="inp-field bg-light text-secondary" value="Non-Expiry" disabled></div>`;
           batchOptions = `<option value="Non-Expiry" selected>Non-Expiry Item</option>`;
-      } else { expUI = `<div class="inp-grp"><label class="inp-lbl">TGL EXPIRED <span class="text-muted text-lowercase" style="font-weight:600;">(Opsional)</span></label><input id="swal-exp" type="date" class="inp-field"></div>`; }
+      } else { expUI = `<div class="inp-grp"><label class="inp-lbl">TGL EXPIRED BARU <span class="text-muted text-lowercase" style="font-weight:600;">(Opsional)</span></label><input id="swal-exp" type="date" class="inp-field"></div>`; }
 
       Swal.fire({
-        html: `<div style="text-align:left;"><div style="font-size:1.1rem; font-weight:800; color:#1E293B; margin-bottom:15px; border-bottom:2px solid #f0f0f0; padding-bottom:10px;">${p.name}</div>
-            <label class="inp-lbl">PILIH BATCH / EXPIRED</label><select id="swal-batch" class="inp-field mb-3" onchange="changeBatch()">${batchOptions}</select>
-            <div class="dual-input"><div class="inp-grp"><label class="inp-lbl text-danger">QTY (${p.uMain})</label><input id="swal-q1" type="number" class="inp-field fw-bold text-center" placeholder="0"></div>
-              <div class="inp-grp"><label class="inp-lbl text-primary">QTY (${p.uSub})</label><input id="swal-q2" type="number" class="inp-field fw-bold text-center" placeholder="0"></div></div>
-            <div class="dual-input">${expUI}
-               <div class="inp-grp"><label class="inp-lbl">KETERANGAN</label><select id="swal-ket" class="inp-field"><option>Opname Rutin</option><option>Barang Masuk</option><option>Barang Rusak</option></select></div></div></div>`,
-        confirmButtonColor: '#FF2E2E', confirmButtonText: 'Simpan', showCancelButton: true, cancelButtonText: 'Batal',
-        didOpen: () => { window.changeBatch(); },
+        html: `<div style="text-align:left;">
+            <div style="font-size:1.1rem; font-weight:800; color:#1E293B; margin-bottom:15px; border-bottom:2px solid #f0f0f0; padding-bottom:10px;">${p.name}</div>
+            
+            <label class="inp-lbl">PILIH BATCH / EXPIRED</label>
+            <select id="swal-batch" class="inp-field mb-3" onchange="changeBatchSmart()">${batchOptions}</select>
+
+            <div class="p-2 mb-3 rounded bg-light border border-primary">
+                <label class="inp-lbl text-primary"><i class="bi bi-box-arrow-in-down"></i> 1. Tambah Barang Masuk (Opsional)</label>
+                <div class="dual-input mb-0">
+                    <div class="inp-grp"><input id="swal-in-q1" type="number" class="inp-field text-center" placeholder="${p.uMain}"></div>
+                    <div class="inp-grp"><input id="swal-in-q2" type="number" class="inp-field text-center" placeholder="${p.uSub}"></div>
+                </div>
+            </div>
+
+            <div class="p-2 mb-3 rounded bg-light border border-success">
+                <label class="inp-lbl text-success"><i class="bi bi-check-circle"></i> 2. Sisa Fisik Akhir (Wajib)</label>
+                <div class="dual-input mb-0">
+                    <div class="inp-grp"><input id="swal-op-q1" type="number" class="inp-field fw-bold text-center" placeholder="${p.uMain}"></div>
+                    <div class="inp-grp"><input id="swal-op-q2" type="number" class="inp-field fw-bold text-center" placeholder="${p.uSub}"></div>
+                </div>
+            </div>
+
+            <div class="dual-input mb-0">
+               ${expUI}
+               <div class="inp-grp"><label class="inp-lbl">KETERANGAN LAIN</label>
+                   <select id="swal-ket" class="inp-field"><option value="Opname Rutin">Tutup Shift Normal</option><option value="Barang Rusak">Lapor Rusak/Basi</option></select>
+               </div>
+            </div>
+        </div>`,
+        confirmButtonColor: '#FF2E2E', confirmButtonText: 'Simpan Data', showCancelButton: true, cancelButtonText: 'Batal',
+        didOpen: () => { window.changeBatchSmart(); },
         preConfirm: () => {
-          let bSel = document.getElementById('swal-batch').value; let expVal = bSel === "NEW" ? document.getElementById('swal-exp').value : bSel; if(!expVal) expVal = "NoDate";
-          let q1 = document.getElementById('swal-q1').value, q2 = document.getElementById('swal-q2').value; if(q1==="" && q2==="") return Swal.showValidationMessage('Isi kuantitas!');
-          return { name: p.name, qtyMain: q1, qtySub: q2, exp: expVal, ket: document.getElementById('swal-ket').value, conversion: p.isi, user: activeUser.username };
+          let bSel = document.getElementById('swal-batch').value;
+          let expVal = bSel === "NEW" ? document.getElementById('swal-exp').value : bSel;
+          if(!expVal) expVal = "NoDate";
+
+          let in_q1 = document.getElementById('swal-in-q1').value; let in_q2 = document.getElementById('swal-in-q2').value;
+          let op_q1 = document.getElementById('swal-op-q1').value; let op_q2 = document.getElementById('swal-op-q2').value;
+          let ket = document.getElementById('swal-ket').value;
+
+          if(op_q1 === "" && op_q2 === "") return Swal.showValidationMessage('Isi sisa fisik akhir!');
+          
+          let payloads = []; let timeNow = new Date();
+          
+          // 1. Kirim Barang Masuk Dulu (Jika diisi)
+          if(in_q1 !== "" || in_q2 !== "") {
+              payloads.push({ user: activeUser.username, outletId: document.getElementById('outlet').value, barangId: p.name, qtyMain: in_q1, qtySub: in_q2, conversion: p.isi, expiredDate: expVal, keterangan: "Barang Masuk", timestamp: new Date(timeNow.getTime() - 1000).toISOString() });
+          }
+          // 2. Kirim Opname Fisik Akhir (Atau Rusak)
+          payloads.push({ user: activeUser.username, outletId: document.getElementById('outlet').value, barangId: p.name, qtyMain: op_q1, qtySub: op_q2, conversion: p.isi, expiredDate: expVal, keterangan: ket, timestamp: timeNow.toISOString() });
+
+          return payloads;
         }
       }).then(r => {
         if(r.isConfirmed) {
-          const payload = { user: activeUser.username, outletId: document.getElementById('outlet').value, barangId: r.value.name, qtyMain: r.value.qtyMain, qtySub: r.value.qtySub, conversion: r.value.conversion, expiredDate: r.value.exp, keterangan: r.value.ket, timestamp: new Date().toISOString() };
-          if(navigator.onLine) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) }).then(()=>fetchData()).finally(()=>document.getElementById('loading').style.display='none'); } else simpanKeQueue(payload);
+          if(navigator.onLine) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: r.value }) }).then(()=>fetchData()).finally(()=>document.getElementById('loading').style.display='none'); } else simpanKeQueue(r.value);
         }
       });
     }
 
-    window.changeBatch = function() {
+    window.changeBatchSmart = function() {
         let sel = document.getElementById('swal-batch'); let opt = sel.options[sel.selectedIndex]; let expInput = document.getElementById('swal-exp');
-        if(sel.value === "NEW") { document.getElementById('swal-q1').value = ""; document.getElementById('swal-q2').value = ""; if(expInput) { expInput.value = ""; expInput.disabled = false; } } 
-        else if (sel.value === "Non-Expiry") { document.getElementById('swal-q1').value = opt.dataset.qm||""; document.getElementById('swal-q2').value = opt.dataset.qs||""; }
-        else { document.getElementById('swal-q1').value = opt.dataset.qm; document.getElementById('swal-q2').value = opt.dataset.qs; if(expInput) { expInput.value = sel.value !== "NoDate" ? sel.value : ""; expInput.disabled = true; } }
+        if(sel.value === "NEW") { document.getElementById('swal-op-q1').value = ""; document.getElementById('swal-op-q2').value = ""; if(expInput) { expInput.value = ""; expInput.disabled = false; } } 
+        else if (sel.value === "Non-Expiry") { document.getElementById('swal-op-q1').value = opt.dataset.qm||""; document.getElementById('swal-op-q2').value = opt.dataset.qs||""; }
+        else { document.getElementById('swal-op-q1').value = opt.dataset.qm; document.getElementById('swal-op-q2').value = opt.dataset.qs; if(expInput) { expInput.value = sel.value !== "NoDate" ? sel.value : ""; expInput.disabled = true; } }
     }
 
-    // --- TRANSFER & MASTER API ---
+    // --- OTHER APIs ---
     function reqItem() { Swal.fire({title:'Request Barang', input:'text', inputPlaceholder:'Misal: Sedotan Besar', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>{ if(r.isConfirmed&&r.value) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "requestBarang", data: { outlet: document.getElementById('outlet').value, item: r.value, user: activeUser.username } }) }).then(()=>Swal.fire({toast:true,position:'top',icon:'success',title:'Terkirim',showConfirmButton:false,timer:1500})).finally(()=>document.getElementById('loading').style.display='none'); } }); }
     function openMasterModal(nm="", uM="", pM="", isi="", uS="", pS="", hasExp=true) { let chk = hasExp ? "checked" : ""; Swal.fire({ title: nm?'Edit Barang':'Barang Baru', html:`<div style="text-align:left;"><label class="inp-lbl">Nama Barang</label><input id="mNama" class="inp-field mb-2" value="${nm}"><div class="dual-input"><div class="inp-grp"><label class="inp-lbl">Satuan Besar</label><input id="muMain" class="inp-field" value="${uM}"></div><div class="inp-grp"><label class="inp-lbl">Harga (Besar)</label><input id="mpMain" type="number" class="inp-field" value="${pM}"></div></div><div class="inp-grp mb-2"><label class="inp-lbl text-primary">Konversi (Isi per Sat. Besar)</label><input id="mIsi" type="number" class="inp-field" value="${isi}"></div><div class="dual-input"><div class="inp-grp"><label class="inp-lbl">Satuan Kecil</label><input id="muSub" class="inp-field" value="${uS}"></div><div class="inp-grp"><label class="inp-lbl">Harga (Kecil)</label><input id="mpSub" type="number" class="inp-field" value="${pS}"></div></div><div class="form-check form-switch mt-2"><input class="form-check-input" type="checkbox" id="mExp" ${chk}><label class="form-check-label fw-bold text-dark small" for="mExp">Barang Punya Kadaluwarsa</label></div></div>`, confirmButtonColor:'#FF2E2E', showCancelButton:true, preConfirm:()=>{ return { namaLama: nm, nama: document.getElementById('mNama').value, uMain: document.getElementById('muMain').value, pMain: document.getElementById('mpMain').value, isi: document.getElementById('mIsi').value, uSub: document.getElementById('muSub').value, pSub: document.getElementById('mpSub').value, hasExpiry: document.getElementById('mExp').checked, user: activeUser.username } } }).then(r=>{ if(r.isConfirmed) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "saveMasterBarang", data: r.value }) }).then(()=>fetchData()).finally(()=>document.getElementById('loading').style.display='none'); } }); }
     function updTrfLbl() { let s=document.getElementById('trfItem').value; let out=document.getElementById('outlet').value; let i=globalData.liveStock.find(x=>x.name===s && x.outlet===out); if(i) { document.getElementById('trfMax').innerText=i.displayQty; document.getElementById('lbl-trf-1').innerText=`QTY (${i.uMain})`; document.getElementById('lbl-trf-2').innerText=`QTY (${i.uSub})`; } }
     async function processTransfer() { let d={ from: document.getElementById('outlet').value, to: document.getElementById('trfDest').value, item: document.getElementById('trfItem').value, q1: document.getElementById('trf-q1').value, q2: document.getElementById('trf-q2').value, user: activeUser.username }; if(!d.from||!d.to||!d.item||(!d.q1&&!d.q2)) return Swal.fire({icon:'error', title:'Lengkapi Data!'}); document.getElementById('loading').style.display='flex'; try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "processTransfer", data: d }) }); Swal.fire({toast:true, position:'top', icon:'success', title:'Transfer Sukses', showConfirmButton:false, timer:1500}); document.getElementById('trf-q1').value=''; document.getElementById('trf-q2').value=''; fetchData(); showStok(); } catch(e){} finally { document.getElementById('loading').style.display='none'; } }
     
-    // --- OFFLINE UNDO & SYNC ---
+    // --- UNDO & SYNC LOGIC ---
     window.undoLocal = async function(barang, outlet) {
-      if(await Swal.fire({title:'Batalkan Input?', text:'Hapus dari antrean offline.', icon:'warning', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>r.isConfirmed)) {
+      if(await Swal.fire({title:'Batalkan Antrean?', text:'Hapus dari memori offline.', icon:'warning', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>r.isConfirmed)) {
          opnameQueue = opnameQueue.filter(q => !(q.barangId === barang && q.outletId === outlet));
-         await localforage.setItem('qAicha20', opnameQueue); updateQueueUI(); renderStockList();
+         await localforage.setItem('qAicha21', opnameQueue); updateQueueUI(); renderStockList();
          Swal.fire({toast:true, position:'top', icon:'success', title:'Dibatalkan', showConfirmButton:false, timer:1500});
       }
     }
     window.delStock = async function(id) { 
-      if(await Swal.fire({title:'Batalkan Input?', text:'Tindakan ini akan direkam (Soft Delete).', icon:'warning', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>r.isConfirmed)) { 
+      if(await Swal.fire({title:'Batalkan Input Sistem?', text:'Tindakan ralat ini akan direkam audit.', icon:'warning', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>r.isConfirmed)) { 
         document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteStock", data: {rowIndex: id, user: activeUser.username} }) }).then(()=>fetchData()).finally(()=>document.getElementById('loading').style.display='none'); 
       } 
     }
-    async function simpanKeQueue(payload) { opnameQueue.push(payload); await localforage.setItem('qAicha20', opnameQueue); updateQueueUI(); renderStockList(); Swal.fire({toast:true, position:'top', icon:'warning', title:'Tersimpan Offline', showConfirmButton:false, timer:1500}); }
-    async function syncOfflineData() { if(!navigator.onLine || opnameQueue.length === 0) return; document.getElementById('loading').style.display='flex'; try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [...opnameQueue] }) }); opnameQueue = []; await localforage.setItem('qAicha20', []); updateQueueUI(); fetchData(); Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500}); } catch(e) {} finally { document.getElementById('loading').style.display='none'; } }
+    async function simpanKeQueue(payloads) { opnameQueue.push(...payloads); await localforage.setItem('qAicha21', opnameQueue); updateQueueUI(); renderStockList(); Swal.fire({toast:true, position:'top', icon:'warning', title:'Tersimpan Offline', showConfirmButton:false, timer:1500}); }
+    async function syncOfflineData() { if(!navigator.onLine || opnameQueue.length === 0) return; document.getElementById('loading').style.display='flex'; try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: opnameQueue }) }); opnameQueue = []; await localforage.setItem('qAicha21', []); updateQueueUI(); fetchData(); Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500}); } catch(e) {} finally { document.getElementById('loading').style.display='none'; } }
     function updateQueueUI() { document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none'; document.getElementById('queueCount').innerText = `${opnameQueue.length} Antrean`; }
 
-    // --- OWNER TABS & REPORT ---
+    // --- OWNER TABS ---
     function renderOwner() { 
       let outFilter = document.getElementById('outlet').value; 
       let totAset = 0; let totLoss = 0; let totHPP = 0; let totWaste = 0;
@@ -532,78 +565,37 @@
           totHPP = globalData.hppPerOutlet ? (globalData.hppPerOutlet[outFilter] || 0) : 0;
           totWaste = globalData.wastePerOutlet ? (globalData.wastePerOutlet[outFilter] || 0) : 0;
       }
-
-      document.getElementById('assetVal').innerText = toIDR(totAset); 
-      document.getElementById('hppVal').innerText = toIDR(totHPP); 
-      document.getElementById('wasteVal').innerText = toIDR(totWaste + totLoss); 
-      
+      document.getElementById('assetVal').innerText = toIDR(totAset); document.getElementById('hppVal').innerText = toIDR(totHPP); document.getElementById('wasteVal').innerText = toIDR(totWaste + totLoss); 
       let h=''; let filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter); 
-      filteredStock.forEach(x => { 
-        h+=`<div class="card-box bg-wht"><div class="d-flex justify-content-between mb-1"><div class="fw-bold" style="font-size:0.9rem;">[${x.outlet}] ${x.name}</div><div class="text-success fw-bold">${toIDR(x.assetVal)}</div></div><div class="small text-muted mb-2">Stok: <b class="text-dark">${x.displayQty}</b></div><div class="bg-light p-2 rounded small text-secondary d-flex justify-content-between"><span>PO Target: ${x.poNeed} ${x.uMain}</span><span class="fw-bold text-primary"><i class="bi bi-graph-up-arrow"></i> ADU: ${globalData.inventoryStats[x.outlet+'_'+x.name]?.adu || '-'}</span></div></div>`; 
-      }); 
+      filteredStock.forEach(x => { h+=`<div class="card-box bg-wht"><div class="d-flex justify-content-between mb-1"><div class="fw-bold" style="font-size:0.9rem;">[${x.outlet}] ${x.name}</div><div class="text-success fw-bold">${toIDR(x.assetVal)}</div></div><div class="small text-muted mb-2">Stok: <b class="text-dark">${x.displayQty}</b></div><div class="bg-light p-2 rounded small text-secondary d-flex justify-content-between"><span>PO Target: ${x.poNeed} ${x.uMain}</span><span class="fw-bold text-primary"><i class="bi bi-graph-up-arrow"></i> ADU: ${globalData.inventoryStats[x.outlet+'_'+x.name]?.adu || '-'}</span></div></div>`; }); 
       document.getElementById('assetList').innerHTML = h; 
     }
-    
     function renderChart() { 
         if(chartInstance) chartInstance.destroy(); const ctx = document.getElementById('trendChart').getContext('2d'); 
-        let hppData = Object.values(globalData.hppPerOutlet || {});
-        let wasteData = Object.values(globalData.wastePerOutlet || {});
-        
-        chartInstance = new Chart(ctx, { 
-            type: 'bar', 
-            data: { 
-                labels: Object.keys(globalData.hppPerOutlet || {}), 
-                datasets: [
-                    { label: 'HPP Harian (Rp)', data: hppData, backgroundColor: '#10B981', borderRadius: 4 },
-                    { label: 'Waste (Rp)', data: wasteData, backgroundColor: '#EF4444', borderRadius: 4 }
-                ] 
-            }, 
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } 
-        }); 
+        let hppData = Object.values(globalData.hppPerOutlet || {}); let wasteData = Object.values(globalData.wastePerOutlet || {});
+        chartInstance = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(globalData.hppPerOutlet || {}), datasets: [ { label: 'HPP Harian (Rp)', data: hppData, backgroundColor: '#10B981', borderRadius: 4 }, { label: 'Waste (Rp)', data: wasteData, backgroundColor: '#EF4444', borderRadius: 4 } ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } }); 
     }
-    
     function renderLeaderboard() {
         let scores = [];
         globalData.outlets.forEach(o => {
             if(o.id === "ALL") return;
-            let waste = globalData.wastePerOutlet[o.id] || 0;
-            let exp = globalData.expiredAssetPerOutlet[o.id] || 0;
-            let totalLoss = waste + exp;
-            
-            // Rumus Skor Sederhana: Start 100, kurangin poin jika ada loss
-            let score = 100 - (totalLoss / 50000); // Misal: setiap Rp 50.000 waste, poin kurang 1
-            if(score < 0) score = 0; if(score > 100) score = 100;
+            let waste = globalData.wastePerOutlet[o.id] || 0; let exp = globalData.expiredAssetPerOutlet[o.id] || 0; let totalLoss = waste + exp;
+            let score = 100 - (totalLoss / 50000); if(score < 0) score = 0; if(score > 100) score = 100;
             scores.push({ name: o.nama, score: Math.round(score), loss: totalLoss });
         });
         scores.sort((a,b) => b.score - a.score);
-
         let h = '';
-        scores.forEach((s, idx) => {
-            let rankClass = idx===0?'rank-1':(idx===1?'rank-2':(idx===2?'rank-3':'rank-other'));
-            h += `<div class="card-box bg-wht mb-2 d-flex align-items-center">
-                    <div class="rank-badge ${rankClass} me-3">${idx+1}</div>
-                    <div class="flex-grow-1">
-                        <div class="fw-bold text-dark">${s.name}</div>
-                        <div class="small text-danger">Total Loss: ${toIDR(s.loss)}</div>
-                    </div>
-                    <div class="fs-4 fw-bolder text-primary">${s.score}</div>
-                  </div>`;
-        });
+        scores.forEach((s, idx) => { let rankClass = idx===0?'rank-1':(idx===1?'rank-2':(idx===2?'rank-3':'rank-other')); h += `<div class="card-box bg-wht mb-2 d-flex align-items-center"><div class="rank-badge ${rankClass} me-3">${idx+1}</div><div class="flex-grow-1"><div class="fw-bold text-dark">${s.name}</div><div class="small text-danger">Total Loss: ${toIDR(s.loss)}</div></div><div class="fs-4 fw-bolder text-primary">${s.score}</div></div>`; });
         document.getElementById('leaderboardList').innerHTML = h;
     }
-
     function renderAnalytics() { 
-      let outFilter = document.getElementById('outlet').value; 
-      let filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter);
-      let overstock = []; let kritikal = []; 
-      filteredStock.forEach(x => { if(x.stockStatus === "OVERSTOK") overstock.push(x); if(x.stockStatus === "HABIS" || x.stockStatus === "KRITIS") kritikal.push(x); }); 
-      
+      let outFilter = document.getElementById('outlet').value; let filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter);
+      let overstock = []; let kritikal = []; filteredStock.forEach(x => { if(x.stockStatus === "OVERSTOK") overstock.push(x); if(x.stockStatus === "HABIS" || x.stockStatus === "KRITIS") kritikal.push(x); }); 
       let mutH = ''; kritikal.forEach(k => { let helper = overstock.find(o => o.name === k.name); if(helper) { mutH += `<div class="bg-light p-3 rounded-xl border border-primary mb-2"><div class="fw-bold text-dark small mb-1">${k.name}</div><div class="small d-flex justify-content-between align-items-center"><span class="text-danger fw-bold"><i class="bi bi-shop"></i> ${k.outlet} (Habis)</span><i class="bi bi-arrow-right text-muted"></i><span class="text-success fw-bold"><i class="bi bi-shop"></i> ${helper.outlet} (Sisa ${helper.daysLeft} hr)</span></div></div>`; } }); 
       document.getElementById('mutationList').innerHTML = mutH || `<div class="text-muted small">Tidak ada saran mutasi.</div>`; 
       renderLeaderboard();
     }
-    
-    function renderMasterList() { let h=''; globalData.products.forEach(b => { h+=`<div class="card-box p-3 bg-wht"><div class="d-flex justify-content-between align-items-center"><div><div class="fw-bold text-dark" style="font-size:0.9rem;">${b.name}</div><div class="small text-secondary mt-1">1 ${b.uMain} = ${b.isi} ${b.uSub}</div></div><button onclick="openMasterModal('${b.name}', '${b.uMain}', '${b.pMain}', '${b.isi}', '${b.uSub}', '${b.pSub}', ${b.hasExpiry})" class="btn btn-sm btn-light border"><i class="bi bi-pencil-fill text-primary"></i></button></div></div>`; }); document.getElementById('masterList').innerHTML = h; }
+    function renderMasterList() { let h=''; globalData.products.forEach(b => { h+=`<div class="card-box p-3 bg-wht"><div class="d-flex justify-content-between align-items-center"><div><div class="fw-bold text-dark" style="font-size:0.9rem;">${b.name}</div><div class="small text-secondary mt-1">1 ${b.uMain} = ${b.isi} ${b.uSub}</div></div><button onclick="openMasterModal('${b.name}', '${b.uMain}', '${b.pMain}', '${b.isi}', '${b.uSub}', '${b.pSub}')" class="btn btn-sm btn-light border"><i class="bi bi-pencil-fill text-primary"></i></button></div></div>`; }); document.getElementById('masterList').innerHTML = h; }
     function renderPO() { let poMap = {}; activePO = {}; let grandTotal = 0; let outFilter = document.getElementById('outlet').value; let filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter); filteredStock.forEach(x => { if(x.poNeed > 0) { if(!poMap[x.name]) poMap[x.name] = { name: x.name, uMain: x.uMain, pMain: x.pMain, qty: 0 }; poMap[x.name].qty += x.poNeed; } }); let h = ''; for(let key in poMap) { let item = poMap[key]; activePO[item.name] = { qty: item.qty, price: item.pMain, uMain: item.uMain }; let sub = item.qty * item.pMain; grandTotal += sub; h += `<div class="d-flex justify-content-between align-items-center border-bottom py-2"><div style="width:50%"><div class="fw-bold text-dark small">${item.name}</div><div class="text-muted" style="font-size:0.6rem;">${toIDR(item.pMain)} / ${item.uMain}</div></div><div><input type="number" class="po-input" value="${item.qty}" onchange="updatePO('${item.name}', this.value)"></div><div class="text-end fw-bold text-success" style="font-size:0.8rem; width:30%;" id="po_sub_${item.name.replace(/[^a-zA-Z0-9]/g, '')}">${toIDR(sub)}</div></div>`; } document.getElementById('poList').innerHTML = h || `<div class="text-muted text-center small py-3">Tidak ada rekomendasi order. Stok aman.</div>`; document.getElementById('poGrandTotal').innerText = toIDR(grandTotal); }
     window.updatePO = function(name, newQty) { let qty = Number(newQty) || 0; activePO[name].qty = qty; let sub = qty * activePO[name].price; document.getElementById('po_sub_'+name.replace(/[^a-zA-Z0-9]/g, '')).innerText = toIDR(sub); let grand = 0; for(let k in activePO) grand += activePO[k].qty * activePO[k].price; document.getElementById('poGrandTotal').innerText = toIDR(grand); }
     window.copyPOWA = function() { let out = document.getElementById('outlet').value; let txt = `🛒 *FORM PURCHASE ORDER (PO) AI-CHA*\n🏢 Target: ${out==='ALL'?'SELURUH OUTLET':out}\n📅 ${new Date().toLocaleDateString('id-ID')}\n\n*Rincian Order:*\n`; let hasPO = false; let gTot = 0; for(let k in activePO) { if(activePO[k].qty > 0) { let sub = activePO[k].qty * activePO[k].price; gTot += sub; txt += `➖ ${k} : *${activePO[k].qty} ${activePO[k].uMain}*\n`; hasPO = true; } } if(!hasPO) return Swal.fire({icon:'warning', title:'Order Kosong'}); txt += `\n💰 *Total Estimasi Tagihan: ${toIDR(gTot)}*\n\nMohon diproses, terima kasih.`; navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Format PO Tersalin!', showConfirmButton:false, timer:2000})); }
@@ -622,7 +614,7 @@
         } 
         else { txt += `➖ *${p.name}*\n   └ Stok: *0 ${p.uMain} 0 ${p.uSub}* (KOSONG)\n`; }
       });
-      txt += `\n_Dikirim via Ai-CHA Enterprise V20.0_`;
+      txt += `\n_Dikirim via Ai-CHA Enterprise V21.0_`;
       navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Teks WA Tersalin!', showConfirmButton:false, timer:2000})).catch(() => Swal.fire({icon:'error', title:'Gagal Copy'}));
     }
   </script>
