@@ -1,387 +1,371 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Aicha Precision System V8.2</title>
-  <meta name="theme-color" content="#E31E24">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Ai-CHA Precision V8.5</title>
+  <meta name="theme-color" content="#FF2E2E">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-material-ui/material-ui.css" rel="stylesheet">
+
   <style>
-    body { background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
-    .glass-card { background: rgba(255, 255, 255, 0.98); border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-    .pin-dot { transition: all 0.2s ease; }
-    ::-webkit-scrollbar { display: none; }
+    :root { --primary: #FF2E2E; --bg: #F8F9FD; --text: #1E293B; --gray: #64748B; --radius: 20px; }
+    body { font-family: 'Urbanist', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 90px; overflow-x: hidden; }
+    
+    .glass-header { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 15px 20px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .brand { font-weight: 800; font-size: 1.3rem; color: var(--primary); }
+    .role-btn { font-size: 0.8rem; background: #f0f0f0; padding: 6px 14px; border-radius: 50px; font-weight: 700; cursor: pointer; color: #555; }
+    
+    .outlet-sel { width: 100%; border: none; background: white; font-weight: 800; font-size: 1rem; outline: none; padding: 12px 15px; border-radius: 12px; margin: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+    .outlet-wrap { padding: 0 20px; }
+
+    .card-box { background: white; border-radius: var(--radius); padding: 18px; margin-bottom: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); border: 1px solid #f8f8f8; transition: 0.2s; }
+    .card-box:active { transform: scale(0.98); }
+    
+    .dual-input { display: flex; gap: 10px; margin-bottom: 15px; }
+    .inp-grp { flex: 1; }
+    .inp-lbl { font-size: 0.7rem; font-weight: 800; color: var(--gray); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+    .inp-field { width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 12px; background: #fafafa; outline: none; font-weight: 600; color: #333; font-size: 1rem; }
+    .inp-field:focus { border-color: var(--primary); background: white; }
+    
+    .btn-act { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 14px; font-weight: 800; margin-top: 5px; box-shadow: 0 4px 10px rgba(255, 46, 46, 0.2); }
+    .fab { position: fixed; bottom: 85px; right: 20px; background: #25D366; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3); z-index: 99; transition: 0.3s; border: none; }
+    .fab:active { transform: scale(0.9); }
+    
+    .nav-bot { position: fixed; bottom: 0; left: 0; right: 0; background: white; height: 75px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #f0f0f0; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+    .nav-item { display: flex; flex-direction: column; align-items: center; color: #ccc; transition: 0.2s; width: 60px; cursor: pointer; }
+    .nav-item.active { color: var(--primary); transform: translateY(-4px); }
+    .nav-item i { font-size: 1.5rem; margin-bottom: 2px; } 
+    .nav-item span { font-size: 0.7rem; font-weight: 700; }
+
+    .badge-soft { padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; }
+    .bg-red { background: #FEF2F2; color: #EF4444; } .bg-yel { background: #FFFBEB; color: #F59E0B; } .bg-grn { background: #ECFDF5; color: #10B981; }
+
+    #loading { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(5px); }
+    
+    /* PWA Numpad Overlay */
+    #loginScreen { position: fixed; inset: 0; background: #111827; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #4B5563; transition: 0.2s; }
+    .pin-dot.filled { background: white; border-color: white; }
+    .num-btn { width: 70px; height: 70px; border-radius: 50%; background: #1F2937; color: white; font-size: 1.5rem; border: none; font-family: 'Urbanist'; transition: 0.1s; }
+    .num-btn:active { background: #374151; transform: scale(0.95); }
+
+    .sync-badge { background: #FFFBEB; border: 1px solid #FDE68A; padding: 10px 15px; border-radius: 12px; margin: 0 20px 15px; display: flex; justify-content: space-between; align-items: center; }
   </style>
 </head>
-<body class="text-slate-800 h-screen flex flex-col overflow-hidden">
+<body>
 
-  <div id="loginScreen" class="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center transition-opacity duration-300">
-    <div class="text-center mb-10">
-      <div class="h-20 w-20 bg-[#E31E24] rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-red-600/40">
-        <i class="fa-solid fa-ice-cream text-4xl text-white"></i>
+  <div id="loginScreen">
+    <div class="text-center mb-5">
+      <div style="height:80px; width:80px; background:var(--primary); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; box-shadow: 0 10px 25px rgba(255,46,46,0.4);">
+        <i class="bi bi-grid-fill text-white fs-1"></i>
       </div>
-      <h1 class="text-3xl font-black text-white tracking-wide">AICHA<span class="text-[#E31E24]">PRO</span></h1>
-      <p class="text-slate-400 text-sm mt-2" id="loginStatus">V8.2 - Menyinkronkan Data...</p>
+      <h1 class="text-white fw-bolder" style="letter-spacing:1px;">AI-CHA<span style="color:var(--primary)">PRO</span></h1>
+      <p id="loginStatus" class="text-secondary small mt-1">Menyinkronkan Server...</p>
     </div>
-    <div class="flex space-x-4 mb-12" id="pinIndicators">
-      <div class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div><div class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div><div class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div><div class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
+    <div class="d-flex gap-3 mb-5" id="pinIndicators">
+      <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
     </div>
-    <div class="grid grid-cols-3 gap-6 max-w-[280px] w-full pointer-events-none opacity-50" id="numpad">
-      <button class="h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('1')">1</button>
-      <button class="h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('2')">2</button>
-      <button class="h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('3')">3</button>
-      <button class="h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('4')">4</button>
-      <button class="h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('5')">5</button>
-      <button class="h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('6')">6</button>
-      <button class="h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('7')">7</button>
-      <button class="h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('8')">8</button>
-      <button class="h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('9')">9</button>
-      <div></div>
-      <button class="h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('0')">0</button>
-      <button class="h-16 w-16 rounded-full text-slate-400 text-xl hover:text-white transition" onclick="deletePin()"><i class="fa-solid fa-delete-left"></i></button>
+    <div class="row g-4" style="max-width: 280px; margin: 0 auto; opacity: 0.5; pointer-events: none;" id="numpad">
+      <div class="col-4 d-flex justify-content-center"><button class="num-btn" onclick="enterPin('1')">1</button></div>
+      <div class="col-4 d-flex justify-content-center"><button class="num-btn" onclick="enterPin('2')">2</button></div>
+      <div class="col-4 d-flex justify-content-center"><button class="num-btn" onclick="enterPin('3')">3</button></div>
+      <div class="col-4 d-flex justify-content-center"><button class="num-btn" onclick="enterPin('4')">4</button></div>
+      <div class="col-4 d-flex justify-content-center"><button class="num-btn" onclick="enterPin('5')">5</button></div>
+      <div class="col-4 d-flex justify-content-center"><button class="num-btn" onclick="enterPin('6')">6</button></div>
+      <div class="col-4 d-flex justify-content-center"><button class="num-btn" onclick="enterPin('7')">7</button></div>
+      <div class="col-4 d-flex justify-content-center"><button class="num-btn" onclick="enterPin('8')">8</button></div>
+      <div class="col-4 d-flex justify-content-center"><button class="num-btn" onclick="enterPin('9')">9</button></div>
+      <div class="col-4"></div>
+      <div class="col-4 d-flex justify-content-center"><button class="num-btn" onclick="enterPin('0')">0</button></div>
+      <div class="col-4 d-flex justify-content-center"><button class="num-btn bg-transparent text-secondary" onclick="deletePin()"><i class="bi bi-backspace-fill"></i></button></div>
     </div>
   </div>
 
-  <div id="mainApp" class="hidden h-full flex flex-col relative">
-    
-    <div class="bg-gradient-to-br from-[#E31E24] to-red-900 text-white px-6 pt-8 pb-16 rounded-b-[2.5rem] relative z-10 shrink-0 shadow-lg">
-      <div class="flex justify-between items-center">
-        <div>
-          <p class="text-red-200 text-xs font-semibold uppercase tracking-wider mb-1" id="roleLabel">STAFF OPERASIONAL</p>
-          <h1 class="text-2xl font-bold" id="userGreeting">Halo, -</h1>
-        </div>
-        <button onclick="logout()" class="h-10 w-10 bg-white/10 rounded-full flex items-center justify-center text-red-100 hover:text-white transition"><i class="fa-solid fa-power-off"></i></button>
-      </div>
-    </div>
-
-    <div class="px-5 -mt-10 relative z-20 flex-1 overflow-y-auto pb-24" id="viewContainer">
-      
-      <div id="viewOpname">
-        <div class="glass-card rounded-2xl p-5 mb-5 flex items-center justify-between">
-          <div class="w-full">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Lokasi Outlet</p>
-            <select id="outletSelect" onchange="changeBarangLabel()" class="bg-transparent font-bold text-slate-700 text-lg outline-none w-full appearance-none">
-              <option value="" disabled selected>Memuat...</option>
-            </select>
-          </div>
-          <div class="h-10 w-10 bg-red-50 rounded-xl flex items-center justify-center text-[#E31E24] shrink-0 shadow-sm"><i class="fa-solid fa-store"></i></div>
-        </div>
-
-        <div id="syncBadge" class="hidden mb-5 bg-yellow-100 border border-yellow-200 rounded-xl p-3 flex justify-between items-center">
-          <span class="text-xs font-bold text-yellow-700"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> <span id="queueCount">0</span> antrean lokal</span>
-          <button onclick="syncOfflineData()" class="bg-yellow-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow">Sync</button>
-        </div>
-
-        <div class="glass-card rounded-2xl p-6 mb-5">
-          <h2 class="text-sm font-bold text-slate-800 mb-4 border-b border-slate-100 pb-3 flex items-center"><i class="fa-solid fa-barcode text-[#E31E24] mr-2"></i> Presisi Stok & Kedaluwarsa</h2>
-          
-          <form onsubmit="submitData(event)">
-            <div class="mb-4 relative">
-              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Item Barang Aicha</label>
-              <select id="barangSelect" onchange="changeBarangLabel()" class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-xl appearance-none font-medium" required>
-                <option value="" disabled selected>Pilih Item...</option>
-              </select>
-              <i class="fa-solid fa-chevron-down absolute right-4 top-10 text-slate-400 text-sm pointer-events-none"></i>
-            </div>
-
-            <div id="analyticBox" class="hidden mb-4 bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 rounded-xl p-3 flex items-center justify-between">
-              <div><p class="text-[10px] font-bold text-indigo-400 uppercase">ADU (Terkecil)</p><p class="text-sm font-bold text-indigo-800"><span id="txtAdu">0</span> <span class="text-xs font-medium">/ hr</span></p></div>
-              <div class="text-right"><p class="text-[10px] font-bold text-blue-400 uppercase">Est. Habis</p><p class="text-sm font-bold text-blue-800"><span id="txtHabis">0</span> <span class="text-xs font-medium">hari</span></p></div>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <label id="lblQtyMain" class="block text-[10px] font-bold text-[#E31E24] uppercase mb-2">Qty Besar (CTN)</label>
-                <input type="number" id="stokMain" class="w-full bg-slate-50 border border-slate-200 text-[#E31E24] py-3.5 px-4 rounded-xl font-bold text-xl text-center shadow-inner" placeholder="0" min="0" step="any">
-              </div>
-              <div>
-                <label id="lblQtySub" class="block text-[10px] font-bold text-blue-600 uppercase mb-2">Qty Kecil (Pcs)</label>
-                <input type="number" id="stokSub" class="w-full bg-slate-50 border border-slate-200 text-blue-700 py-3.5 px-4 rounded-xl font-bold text-xl text-center shadow-inner" placeholder="0" min="0" step="any">
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Expired Date</label>
-              <input type="date" id="expDateInput" class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-xl font-semibold text-sm">
-            </div>
-
-            <div class="mb-6 relative">
-              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Keterangan</label>
-              <select id="keteranganInput" class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-xl appearance-none font-medium" required>
-                <option value="Opname Rutin">Opname Rutin</option>
-                <option value="Barang Masuk">Barang Masuk</option>
-                <option value="Barang Rusak / Basi">Barang Rusak / Basi</option>
-              </select>
-              <i class="fa-solid fa-chevron-down absolute right-4 top-10 text-slate-400 text-sm pointer-events-none"></i>
-            </div>
-            
-            <button type="submit" class="w-full bg-[#E31E24] hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-200 flex items-center justify-center transition active:scale-[0.98]">
-              <i class="fa-solid fa-check-circle mr-2"></i> Simpan Data Rinci
-            </button>
-          </form>
-        </div>
-
-        <div class="glass-card rounded-2xl p-5 border border-red-100 bg-red-50/50">
-          <div class="flex items-start justify-between">
-            <div class="pr-4">
-              <h3 class="text-sm font-bold text-red-900 mb-1">Laporan Enterprise</h3>
-              <p class="text-[11px] text-slate-500">Kirim rekap opname rinci ke WA Owner.</p>
-            </div>
-            <div class="h-10 w-10 bg-red-100 rounded-full flex items-center justify-center text-[#E31E24] shrink-0"><i class="fa-brands fa-whatsapp text-xl"></i></div>
-          </div>
-          <button onclick="kirimLaporanWA()" class="mt-4 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-green-200 transition">
-            <i class="fa-solid fa-paper-plane mr-2"></i> Kirim WA Owner
-          </button>
-        </div>
-      </div>
-
-      <div id="viewMaster" class="hidden">
-        <div class="glass-card rounded-2xl p-5 mb-5 flex justify-between items-center">
-          <div><h2 class="text-lg font-black text-slate-800">Master Item</h2><p class="text-xs text-slate-500">Kelola Satuan & Konversi.</p></div>
-          <button onclick="openMasterModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md"><i class="fa-solid fa-plus mr-1"></i> Baru</button>
-        </div>
-        <div class="glass-card rounded-2xl p-2 max-h-[60vh] overflow-y-auto" id="masterListContainer"></div>
-      </div>
-    </div>
-
-    <div class="absolute bottom-0 w-full bg-white border-t border-slate-200 flex justify-around items-center py-4 px-6 z-30 pb-safe shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
-      <div onclick="switchView('opname')" id="navOpname" class="flex flex-col items-center text-[#E31E24] cursor-pointer transition"><i class="fa-solid fa-pen-to-square text-xl mb-1"></i><span class="text-[9px] font-bold">Input Rinci</span></div>
-      <div onclick="switchView('master')" id="navMaster" class="hidden flex-col items-center text-slate-300 cursor-pointer transition"><i class="fa-solid fa-boxes-stacked text-xl mb-1"></i><span class="text-[9px] font-bold">Master</span></div>
-    </div>
+  <div id="loading" style="display:none;">
+    <div class="spinner-border text-danger mb-3"></div>
+    <div class="fw-bold text-secondary" style="letter-spacing:1px;">MEMPROSES...</div>
   </div>
 
-  <div id="masterModal" class="fixed inset-0 bg-slate-900/60 z-[150] hidden items-center justify-center backdrop-blur-sm px-4">
-    <div class="bg-white rounded-3xl p-5 w-full max-w-sm shadow-2xl relative overflow-y-auto max-h-[90vh]">
-      <h2 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2" id="modalTitle">Konfigurasi Item</h2>
-      <form onsubmit="saveMasterData(event)">
-        <input type="hidden" id="mNamaLama">
+  <div class="glass-header">
+    <div class="brand"><i class="bi bi-grid-fill me-2"></i>Ai-CHA</div>
+    <div class="role-btn" id="roleLabel" onclick="logout()"><i class="bi bi-power text-danger me-1"></i>Logout</div>
+  </div>
+
+  <div class="outlet-wrap">
+    <select id="outlet" class="outlet-sel" onchange="fetchData()"></select>
+  </div>
+
+  <div id="syncBadge" class="sync-badge" style="display:none;">
+    <div><i class="bi bi-cloud-arrow-up-fill text-warning me-1"></i><span class="fw-bold text-dark" style="font-size:0.8rem;" id="queueCount">0 Antrean</span></div>
+    <button class="btn btn-sm btn-warning fw-bold text-white rounded-pill px-3" onclick="syncOfflineData()">Sync</button>
+  </div>
+
+  <div id="managerView">
+    <div class="px-3" id="page-stok">
+      <div class="d-flex gap-2 mb-3">
+        <button class="btn-act" style="background:#111; margin:0;" onclick="openInputModal()"><i class="bi bi-plus-lg me-1"></i> Input Stok</button>
+        <button class="btn-act" style="background:white; color:#333; border:1px solid #eee; margin:0;" onclick="showTransfer()"><i class="bi bi-arrow-left-right me-1"></i> Transfer</button>
+      </div>
+      <div id="liveBody"></div>
+    </div>
+
+    <div class="px-3" id="page-transfer" style="display:none;">
+      <div class="card-box" style="border-top: 4px solid var(--primary);">
+        <h6 class="fw-bold mb-4 text-danger"><i class="bi bi-send-fill me-2"></i>KIRIM BARANG</h6>
+        <div class="mb-3"><label class="inp-lbl">TUJUAN</label><select id="trfDest" class="inp-field"></select></div>
         <div class="mb-3">
-          <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nama Barang</label>
-          <input type="text" id="mNama" class="w-full bg-slate-50 border border-slate-200 py-2.5 px-3 rounded-lg text-sm font-bold" required>
+           <label class="inp-lbl">PILIH BARANG</label><select id="trfItem" class="inp-field" onchange="updTrfLbl()"></select>
+           <div class="text-end small fw-bold text-secondary mt-1 pe-1">Stok: <span id="trfMax" class="text-dark">-</span></div>
         </div>
-        
-        <div class="bg-indigo-50 p-3 rounded-xl mb-3 border border-indigo-100">
-          <p class="text-[10px] font-bold text-indigo-500 uppercase mb-2">Satuan Besar (Utama)</p>
-          <div class="flex space-x-2">
-            <input type="text" id="muMain" class="w-1/3 bg-white border border-slate-200 py-2 px-2 rounded-lg text-sm text-center" required placeholder="CTN">
-            <input type="number" id="mpMain" class="w-2/3 bg-white border border-slate-200 py-2 px-2 rounded-lg text-sm font-bold text-indigo-700" required placeholder="Harga CTN" step="any">
-          </div>
+        <div class="dual-input">
+           <div class="inp-grp"><label class="inp-lbl" id="lbl-trf-1">QTY BESAR</label><input type="number" id="trf-q1" class="inp-field" placeholder="0"></div>
+           <div class="inp-grp"><label class="inp-lbl" id="lbl-trf-2">QTY KECIL</label><input type="number" id="trf-q2" class="inp-field" placeholder="0"></div>
         </div>
-
-        <div class="mb-3 text-center"><span class="bg-slate-200 text-slate-500 text-[10px] font-bold px-3 py-1 rounded-full"><i class="fa-solid fa-arrow-down mr-1"></i>Terdiri dari<i class="fa-solid fa-arrow-down ml-1"></i></span></div>
-
-        <div class="bg-blue-50 p-3 rounded-xl mb-4 border border-blue-100">
-          <div class="flex space-x-2 mb-2">
-            <div class="w-1/3"><label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">Isi/Konversi</label><input type="number" id="mIsi" class="w-full bg-white border border-slate-200 py-2 px-2 rounded-lg text-sm text-center font-bold" required placeholder="20"></div>
-            <div class="w-2/3"><label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">Satuan Kecil</label><input type="text" id="muSub" class="w-full bg-white border border-slate-200 py-2 px-2 rounded-lg text-sm text-center" required placeholder="Bags"></div>
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-blue-500 uppercase mb-1">Harga Satuan Kecil</label>
-            <input type="number" id="mpSub" class="w-full bg-white border border-slate-200 py-2 px-2 rounded-lg text-sm font-bold text-blue-700" required placeholder="Harga per Bag" step="any">
-          </div>
-        </div>
-
-        <div class="flex space-x-3">
-          <button type="button" onclick="closeMasterModal()" class="w-1/2 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl">Batal</button>
-          <button type="submit" class="w-1/2 bg-indigo-600 text-white font-bold py-3 rounded-xl shadow-lg">Simpan</button>
-        </div>
-      </form>
+        <button class="btn-act" onclick="processTransfer()">Kirim Sekarang</button>
+        <button class="btn-act bg-white text-secondary border mt-2" onclick="showStok()">Kembali</button>
+      </div>
     </div>
   </div>
 
-  <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/60 z-[200] hidden flex-col items-center justify-center backdrop-blur-sm"><div class="animate-spin rounded-full h-12 w-12 border-t-4 border-[#E31E24] mb-4"></div></div>
-  <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 text-white px-6 py-3.5 rounded-full shadow-2xl z-[250] transition-all duration-300 opacity-0 flex items-center w-max max-w-[90%] font-medium text-sm"><i id="toastIcon" class="fa-solid mr-2 text-lg"></i><span id="toastMsg"></span></div>
+  <div id="ownerView" style="display:none;" class="px-3">
+    <div class="card-box bg-danger text-white text-center py-4 mb-3 border-0">
+      <small style="opacity:0.8; letter-spacing:1px; font-weight:700;">TOTAL NILAI ASET</small>
+      <h1 id="assetVal" style="margin:5px 0 0 0; font-weight:800;">Rp 0</h1>
+    </div>
+    <div id="assetList"></div>
+  </div>
+
+  <button class="fab" id="fabBtn" onclick="sendWA()"><i class="bi bi-whatsapp"></i></button>
+
+  <div class="nav-bot">
+    <div class="nav-item active" id="nav-gudang" onclick="nav('gudang')"><i class="bi bi-box-seam-fill"></i><span>Gudang</span></div>
+    <div class="nav-item" id="nav-lapor" onclick="nav('lapor')"><i class="bi bi-pie-chart-fill"></i><span>Laporan</span></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
+    // MASUKKAN URL WEB APP ANDA DI SINI
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzUYyLJeUchPyusCbVJU8fGl-uzYY2mhg5T9AB5YNtYE8itnLiH_pWw_6IFT-vUGnzIFw/exec";
 
-    let globalData = { users: [], outlets: [], barangs: [], inventoryStats: {} };
-    let opnameQueue = JSON.parse(localStorage.getItem('opnameQueueV8')) || [];
-    let activeUser = JSON.parse(localStorage.getItem('activeSessionV8')) || null;
+    let globalData = { users: [], outlets: [], products: [], liveStock: [], inventoryStats: {} };
+    let opnameQueue = JSON.parse(localStorage.getItem('queueAICHA')) || [];
+    let activeUser = JSON.parse(localStorage.getItem('userAICHA')) || null;
     let currentPin = "";
-    let selectedItemConf = null;
+    const toIDR=(n)=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n);
 
     document.addEventListener("DOMContentLoaded", () => { initApp(); window.addEventListener('online', syncOfflineData); });
 
     async function initApp() {
       updateQueueUI();
-      if(localStorage.getItem('sysDataV8')) { globalData = JSON.parse(localStorage.getItem('sysDataV8')); enableLogin(); }
+      if(localStorage.getItem('dataAICHA')) { globalData = JSON.parse(localStorage.getItem('dataAICHA')); enableLogin(); }
       try {
         const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData" }) });
         const result = await res.json();
-        if(result.status === "success") {
-          globalData = result.data; localStorage.setItem('sysDataV8', JSON.stringify(globalData)); enableLogin();
-        }
+        if(result.status === "success") { globalData = result.data; localStorage.setItem('dataAICHA', JSON.stringify(globalData)); enableLogin(); }
       } catch (e) { if(!globalData.users.length) document.getElementById('loginStatus').textContent = "Offline. Cek Internet."; }
     }
 
-    function enableLogin() { if(activeUser) showMainApp(); else { document.getElementById('loginStatus').textContent = "Masukkan PIN 4 digit"; document.getElementById('numpad').classList.remove('pointer-events-none', 'opacity-50'); } }
+    // --- PIN SYSTEM ---
+    function enableLogin() { if(activeUser) showMainApp(); else { document.getElementById('loginStatus').textContent = "Masukkan PIN 4 digit"; document.getElementById('numpad').style.opacity = 1; document.getElementById('numpad').style.pointerEvents = 'auto'; } }
     function enterPin(n) { if(currentPin.length < 4) { currentPin += n; updatePinUI(); if(currentPin.length === 4) validatePin(); } }
     function deletePin() { if(currentPin.length > 0) { currentPin = currentPin.slice(0, -1); updatePinUI(); } }
-    function updatePinUI() { document.querySelectorAll('.pin-dot').forEach((d, i) => d.className = `w-4 h-4 rounded-full border-2 ${i < currentPin.length ? 'bg-white border-white' : 'border-slate-600'} pin-dot`); }
+    function updatePinUI() { document.querySelectorAll('.pin-dot').forEach((d, i) => { if(i < currentPin.length) d.classList.add('filled'); else d.classList.remove('filled'); }); }
 
     function validatePin() {
       const u = globalData.users.find(u => u.pin === currentPin);
-      if(u) { activeUser = u; localStorage.setItem('activeSessionV8', JSON.stringify(u)); setTimeout(showMainApp, 300); } 
-      else { showToast("PIN Salah!", "bg-red-500", "fa-xmark"); document.getElementById('pinIndicators').classList.add('animate-bounce'); setTimeout(() => { currentPin = ""; updatePinUI(); document.getElementById('pinIndicators').classList.remove('animate-bounce'); }, 500); }
+      if(u) { activeUser = u; localStorage.setItem('userAICHA', JSON.stringify(u)); setTimeout(showMainApp, 300); } 
+      else { Swal.fire({toast:true, position:'top', icon:'error', title:'PIN Salah', showConfirmButton:false, timer:1500}); setTimeout(() => { currentPin = ""; updatePinUI(); }, 500); }
     }
+    function logout() { activeUser = null; currentPin = ""; localStorage.removeItem('userAICHA'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
 
-    function logout() { activeUser = null; currentPin = ""; localStorage.removeItem('activeSessionV8'); updatePinUI(); document.getElementById('mainApp').classList.add('hidden'); document.getElementById('loginScreen').classList.remove('hidden'); }
-
+    // --- MAIN APP INIT ---
     function showMainApp() {
-      document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('mainApp').classList.remove('hidden');
-      document.getElementById('userGreeting').textContent = activeUser.username; document.getElementById('roleLabel').textContent = activeUser.role;
-      populateDropdowns();
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('roleLabel').innerHTML = `<i class="bi bi-person-fill text-danger me-1"></i> ${activeUser.role}`;
       
-      const out = document.getElementById('outletSelect');
+      const out = document.getElementById('outlet'); const dest = document.getElementById('trfDest');
+      out.innerHTML = '<option value="" disabled selected>Pilih Outlet...</option>'; dest.innerHTML = '';
+      globalData.outlets.forEach(o => { out.add(new Option(o.nama, o.id)); dest.add(new Option(o.nama, o.id)); });
+      
       if(activeUser.role !== "Owner" && activeUser.idOutlet !== "ALL") { out.value = activeUser.idOutlet; out.disabled = true; } 
-      else { out.disabled = false; out.value = ""; }
-
-      const nv = document.getElementById('navMaster');
-      if(activeUser.role === "Owner") { nv.classList.remove('hidden'); nv.classList.add('flex'); renderMasterList(); } 
-      else { nv.classList.add('hidden'); nv.classList.remove('flex'); }
-      switchView('opname'); changeBarangLabel();
-    }
-
-    function populateDropdowns() {
-      const out = document.getElementById('outletSelect'); const brg = document.getElementById('barangSelect');
-      out.innerHTML = '<option value="" disabled selected>Pilih Outlet...</option>'; brg.innerHTML = '<option value="" disabled selected>Pilih Item...</option>';
-      globalData.outlets.forEach(o => out.add(new Option(o.nama, o.id)));
-      const s = globalData.barangs.sort((a,b)=>String(a.name).localeCompare(String(b.name)));
-      s.forEach(b => brg.add(new Option(`${b.name} (${b.uMain}/${b.uSub})`, b.name)));
-    }
-
-    // DYNAMIC DUAL-UNIT LABEL & ANALYTICS
-    function changeBarangLabel() {
-      const val = document.getElementById('barangSelect').value;
-      const out = document.getElementById('outletSelect').value;
-      const lblMain = document.getElementById('lblQtyMain'); const lblSub = document.getElementById('lblQtySub');
-      const box = document.getElementById('analyticBox');
+      else { out.disabled = false; out.value = globalData.outlets[0].id; }
       
-      if(val) {
-        selectedItemConf = globalData.barangs.find(b => b.name === val);
-        if(selectedItemConf) {
-          lblMain.innerText = `Qty Besar (${selectedItemConf.uMain})`;
-          lblSub.innerText = `Qty Kecil (${selectedItemConf.uSub})`;
-          document.getElementById('stokMain').placeholder = `0 ${selectedItemConf.uMain}`;
-          document.getElementById('stokSub').placeholder = `0 ${selectedItemConf.uSub}`;
-        }
-        
-        if(out) {
-          let key = `${out}_${val}`; let stats = globalData.inventoryStats[key];
-          if(stats) { document.getElementById('txtAdu').textContent = stats.adu; document.getElementById('txtHabis').textContent = stats.sisaHari; } 
-          else { document.getElementById('txtAdu').textContent = "-"; document.getElementById('txtHabis').textContent = "-"; }
-          box.classList.remove('hidden');
-        }
+      fetchData(); nav('gudang');
+    }
+
+    async function fetchData() {
+      const out = document.getElementById('outlet').value; if(!out) return;
+      document.getElementById('liveBody').innerHTML='<div class="text-center py-5 spinner-border text-danger"></div>';
+      try {
+        const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: out }) });
+        const result = await res.json();
+        if(result.status === "success") { globalData = result.data; localStorage.setItem('dataAICHA', JSON.stringify(globalData)); renderStock(); renderOwner(); }
+      } catch (e) { renderStock(); renderOwner(); } // Fallback to offline cached data
+    }
+
+    // --- NAVIGATION ---
+    function nav(p) {
+      document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
+      document.getElementById('nav-'+p).classList.add('active');
+      
+      if(p==='lapor'){
+        if(activeUser.role==='Owner') { document.getElementById('managerView').style.display='none'; document.getElementById('ownerView').style.display='block'; document.getElementById('fabBtn').style.display='none'; }
+        else { document.getElementById('managerView').style.display='block'; document.getElementById('ownerView').style.display='none'; document.getElementById('fabBtn').style.display='flex'; showStok(); }
       } else {
-        lblMain.innerText = `Qty Besar`; lblSub.innerText = `Qty Kecil`; box.classList.add('hidden');
+        document.getElementById('managerView').style.display='block'; document.getElementById('ownerView').style.display='none'; document.getElementById('fabBtn').style.display='flex'; showStok();
       }
     }
+    function showStok(){ document.getElementById('page-stok').style.display='block'; document.getElementById('page-transfer').style.display='none'; }
+    function showTransfer(){ document.getElementById('page-stok').style.display='none'; document.getElementById('page-transfer').style.display='block'; }
 
-    async function submitData(e) {
-      e.preventDefault();
-      if(!selectedItemConf) return;
-      const qM = document.getElementById('stokMain').value; const qS = document.getElementById('stokSub').value;
-      if(qM === "" && qS === "") { showToast("Isi minimal satu Qty!", "bg-red-500", "fa-xmark"); return; }
-
-      const payload = {
-        user: activeUser.username, outletId: document.getElementById('outletSelect').value,
-        barangId: selectedItemConf.name, qtyMain: qM, qtySub: qS, conversion: selectedItemConf.isi,
-        expiredDate: document.getElementById('expDateInput').value, keterangan: document.getElementById('keteranganInput').value,
-        timestamp: new Date().toISOString()
-      };
-      
-      document.getElementById('stokMain').value = ''; document.getElementById('stokSub').value = ''; document.getElementById('expDateInput').value = '';
-      
-      if (navigator.onLine) {
-        showLoading(true);
-        try {
-          await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) });
-          showLoading(false); showToast("Data Rinci Tersimpan", "bg-green-600", "fa-check"); initApp();
-        } catch (err) { showLoading(false); simpanKeQueue(payload); }
-      } else simpanKeQueue(payload);
+    // --- RENDER VIEWS ---
+    function renderStock() {
+      let trf=document.getElementById('trfItem'); trf.innerHTML='<option disabled selected>Pilih Item...</option>';
+      let h='';
+      if(globalData.liveStock.length === 0) h = '<div class="text-center py-5 text-muted small">Belum ada data stok.</div>';
+      else {
+         globalData.liveStock.forEach(i => {
+            let badge = i.status==="EXPIRED"?'<span class="badge-soft bg-red">EXP</span>':(i.status==="WARNING"?'<span class="badge-soft bg-yel">Warning</span>':'<span class="badge-soft bg-grn">Aman</span>');
+            h+=`<div class="card-box">
+                  <div class="d-flex justify-content-between mb-1 align-items-center"><div class="fw-bold text-dark" style="font-size:0.9rem;">${i.name} ${badge}</div><div class="text-danger fw-bold fs-5">${i.displayQty}</div></div>
+                  <div class="d-flex justify-content-between small text-secondary border-top pt-2 mt-2"><div><i class="bi bi-hourglass-split"></i> Exp: ${i.displayExp}</div><div class="fw-bold text-dark">Sisa Est: ${i.daysLeft} Hr</div></div>
+                  <div class="text-end mt-2"><i class="bi bi-trash text-danger fs-5" style="cursor:pointer;" onclick="delStock(${i.rowIndex})"></i></div>
+                </div>`;
+            trf.add(new Option(`${i.name} (Sisa: ${i.displayQty})`, i.name));
+         });
+      }
+      document.getElementById('liveBody').innerHTML = h; updTrfLbl();
     }
 
-    // MASTER DATA LOGIC
-    function switchView(v) {
-      document.getElementById('viewOpname').style.display = v==='opname'?'block':'none'; document.getElementById('viewMaster').style.display = v==='master'?'block':'none';
-      document.getElementById('navOpname').className = `flex flex-col items-center cursor-pointer transition ${v==='opname'?'text-[#E31E24]':'text-slate-300'}`;
-      document.getElementById('navMaster').className = `flex flex-col items-center cursor-pointer transition ${v==='master'?'text-indigo-600':'text-slate-300'}`;
+    function renderOwner() {
+      document.getElementById('assetVal').innerText = toIDR(globalData.totalAsset || 0);
+      let h='';
+      globalData.liveStock.forEach(x => {
+         h+=`<div class="card-box">
+               <div class="d-flex justify-content-between mb-1"><div class="fw-bold" style="font-size:0.9rem;">${x.name}</div><div class="text-success fw-bold">${toIDR(x.assetVal)}</div></div>
+               <div class="small text-muted mb-2">Stok: <b class="text-dark">${x.displayQty}</b></div>
+               <div class="bg-light p-2 rounded small text-secondary d-flex justify-content-between"><span>PO Target: ${x.poNeed} ${x.uMain}</span><span class="fw-bold text-primary"><i class="bi bi-graph-up-arrow"></i> ADU: ${globalData.inventoryStats[document.getElementById('outlet').value+'_'+x.name]?.adu || '-'}</span></div>
+             </div>`;
+      });
+      document.getElementById('assetList').innerHTML = h;
     }
 
-    function renderMasterList() {
-      const c = document.getElementById('masterListContainer'); c.innerHTML = "";
-      const s = globalData.barangs.sort((a,b)=>String(a.name).localeCompare(String(b.name)));
-      s.forEach(b => {
-        c.innerHTML += `
-          <div class="flex justify-between items-center p-4 border-b border-slate-100 last:border-0 hover:bg-slate-50 rounded-xl transition">
-            <div>
-              <p class="font-bold text-slate-700 text-sm">${b.name}</p>
-              <p class="text-[10px] font-bold text-slate-400 mt-0.5">1 ${b.uMain} = ${b.isi} ${b.uSub}</p>
+    // --- SWEETALERT INPUT DUAL UNIT + ANALYTICS ---
+    function openInputModal() {
+      let opts = '<option value="" disabled selected>Pilih Item...</option>' + globalData.products.map(p=>`<option value="${p.name}" data-um="${p.uMain}" data-us="${p.uSub}" data-isi="${p.isi}">${p.name}</option>`).join('');
+      
+      Swal.fire({
+        title: '<div style="font-size:1.2rem; font-weight:800; color:#FF2E2E;">INPUT STOK RINCI</div>',
+        html: `
+          <div style="text-align:left;">
+            <label class="inp-lbl">PILIH BARANG AICHA</label>
+            <select id="swal-item" class="inp-field mb-3" onchange="updModal()">${opts}</select>
+            
+            <div id="swal-analytic" style="display:none; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:10px; margin-bottom:15px; justify-content:space-between; align-items:center;">
+               <div><div style="font-size:0.6rem; font-weight:800; color:#6366F1;">LAJU PAKAI</div><div style="font-size:0.9rem; font-weight:800; color:#312E81;"><span id="swal-adu">0</span><small>/hr</small></div></div>
+               <div style="text-align:right;"><div style="font-size:0.6rem; font-weight:800; color:#3B82F6;">EST HABIS</div><div style="font-size:0.9rem; font-weight:800; color:#1E3A8A;"><span id="swal-habis">0</span><small> hr</small></div></div>
             </div>
-            <button onclick="openMasterModal('${b.name}', '${b.uMain}', '${b.pMain}', '${b.isi}', '${b.uSub}', '${b.pSub}')" class="h-8 w-8 bg-indigo-50 text-indigo-500 rounded-lg flex items-center justify-center"><i class="fa-solid fa-pen"></i></button>
-          </div>`;
+
+            <div class="dual-input">
+              <div class="inp-grp"><label id="swal-l1" class="inp-lbl text-danger">QTY BESAR</label><input id="swal-q1" type="number" class="inp-field fw-bold text-center" placeholder="0"></div>
+              <div class="inp-grp"><label id="swal-l2" class="inp-lbl text-primary">QTY KECIL</label><input id="swal-q2" type="number" class="inp-field fw-bold text-center" placeholder="0"></div>
+            </div>
+            
+            <div class="dual-input">
+               <div class="inp-grp"><label class="inp-lbl">KEDALUWARSA</label><input id="swal-exp" type="date" class="inp-field"></div>
+               <div class="inp-grp">
+                 <label class="inp-lbl">KETERANGAN</label>
+                 <select id="swal-ket" class="inp-field"><option>Opname Rutin</option><option>Barang Masuk</option><option>Barang Rusak</option></select>
+               </div>
+            </div>
+          </div>`,
+        confirmButtonColor: '#FF2E2E', confirmButtonText: '<i class="bi bi-check-circle"></i> Simpan Data', showCancelButton: true, cancelButtonText: 'Batal',
+        preConfirm: () => {
+          let s = document.getElementById('swal-item'); if(!s.value) { Swal.showValidationMessage('Pilih barang!'); return false; }
+          let q1 = document.getElementById('swal-q1').value, q2 = document.getElementById('swal-q2').value;
+          if(!q1 && !q2) { Swal.showValidationMessage('Isi kuantitas!'); return false; }
+          return { name: s.value, qtyMain: q1, qtySub: q2, exp: document.getElementById('swal-exp').value || "NoDate", ket: document.getElementById('swal-ket').value, conversion: s.options[s.selectedIndex].dataset.isi };
+        }
+      }).then(r => {
+        if(r.isConfirmed) {
+          const payload = { user: activeUser.username, outletId: document.getElementById('outlet').value, barangId: r.value.name, qtyMain: r.value.qtyMain, qtySub: r.value.qtySub, conversion: r.value.conversion, expiredDate: r.value.exp, keterangan: r.value.ket, timestamp: new Date().toISOString() };
+          if(navigator.onLine) {
+            document.getElementById('loading').style.display='flex';
+            fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) }).then(()=>fetchData()).finally(()=>document.getElementById('loading').style.display='none');
+          } else simpanKeQueue(payload);
+        }
       });
     }
 
-    function openMasterModal(nm="", uM="", pM="", isi="", uS="", pS="") {
-      document.getElementById('modalTitle').textContent = nm ? "Konfigurasi Item" : "Item Baru";
-      document.getElementById('mNamaLama').value = nm; document.getElementById('mNama').value = nm;
-      document.getElementById('muMain').value = uM; document.getElementById('mpMain').value = pM;
-      document.getElementById('mIsi').value = isi; document.getElementById('muSub').value = uS; document.getElementById('mpSub').value = pS;
-      document.getElementById('masterModal').classList.remove('hidden'); document.getElementById('masterModal').classList.add('flex');
+    // Modal Dynamic Updater (Attached to window for SweetAlert)
+    window.updModal = function() {
+      let s = document.getElementById('swal-item'); let out = document.getElementById('outlet').value;
+      if(!s.value) return;
+      let d = s.options[s.selectedIndex].dataset;
+      document.getElementById('swal-l1').innerText = `QTY (${d.um})`; document.getElementById('swal-l2').innerText = `QTY (${d.us})`;
+      
+      let key = `${out}_${s.value}`; let stats = globalData.inventoryStats[key];
+      let bx = document.getElementById('swal-analytic');
+      if(stats) { document.getElementById('swal-adu').innerText = stats.adu; document.getElementById('swal-habis').innerText = stats.sisaHari; bx.style.display = 'flex'; }
+      else bx.style.display = 'none';
     }
-    function closeMasterModal() { document.getElementById('masterModal').classList.add('hidden'); document.getElementById('masterModal').classList.remove('flex'); }
 
-    async function saveMasterData(e) {
-      e.preventDefault();
-      const payload = {
-        namaLama: document.getElementById('mNamaLama').value, nama: document.getElementById('mNama').value,
-        uMain: document.getElementById('muMain').value, pMain: document.getElementById('mpMain').value,
-        isi: document.getElementById('mIsi').value, uSub: document.getElementById('muSub').value, pSub: document.getElementById('mpSub').value
-      };
-      closeMasterModal(); showLoading(true);
+    // --- TRANSFER LOGIC ---
+    function updTrfLbl() {
+      let s = document.getElementById('trfItem').value; let i = globalData.liveStock.find(x => x.name === s);
+      if(i) { document.getElementById('trfMax').innerText = i.displayQty; document.getElementById('lbl-trf-1').innerText = `QTY (${i.uMain})`; document.getElementById('lbl-trf-2').innerText = `QTY (${i.uSub})`; }
+    }
+
+    async function processTransfer() {
+      let f = document.getElementById('outlet').value, t = document.getElementById('trfDest').value, i = document.getElementById('trfItem').value, q1 = document.getElementById('trf-q1').value, q2 = document.getElementById('trf-q2').value;
+      if(!f||!t||!i||(!q1&&!q2)) return Swal.fire({icon:'error', title:'Lengkapi Data!'});
+      document.getElementById('loading').style.display='flex';
       try {
-        await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "saveMasterBarang", data: payload }) });
-        showLoading(false); showToast("Master Diperbarui!", "bg-indigo-600", "fa-check"); initApp();
-      } catch(err) { showLoading(false); showToast("Gagal simpan master", "bg-red-500", "fa-xmark"); }
+        await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "processTransfer", data: {from: f, to: t, item: i, q1: q1, q2: q2, user: activeUser.username} }) });
+        Swal.fire({toast:true, position:'top', icon:'success', title:'Transfer Sukses', showConfirmButton:false, timer:1500});
+        document.getElementById('trf-q1').value=''; document.getElementById('trf-q2').value=''; fetchData(); showStok();
+      } catch(e) { Swal.fire('Gagal Transfer'); } finally { document.getElementById('loading').style.display='none'; }
     }
 
-    async function kirimLaporanWA() {
-      const out = document.getElementById('outletSelect').value;
-      if(!out) { showToast("Pilih outlet!", "bg-red-500", "fa-xmark"); return; }
-      if(opnameQueue.length>0) { showToast("Sync offline dulu!", "bg-yellow-500", "fa-triangle-exclamation"); return; }
-      if(!confirm("Kirim rekap opname rinci ke WA Owner?")) return;
-      showLoading(true);
-      try {
-        const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "sendReportWA", data: { outletId: out, user: activeUser.username } }) });
-        const result = await res.json(); showLoading(false);
-        showToast(result.data.message, result.data.status==="success"?"bg-green-500":"bg-red-500", "fa-whatsapp");
-      } catch(err) { showLoading(false); showToast("Gagal kirim WA", "bg-red-500", "fa-wifi"); }
+    async function delStock(id) {
+      if(await Swal.fire({title:'Hapus Data?', icon:'warning', showCancelButton:true}).then(r=>r.isConfirmed)) {
+        document.getElementById('loading').style.display='flex';
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteStock", id: id }) }).then(()=>fetchData()).finally(()=>document.getElementById('loading').style.display='none');
+      }
     }
 
+    // --- PWA OFFLINE SYNC ---
     function simpanKeQueue(payload) {
-      opnameQueue.push(payload); localStorage.setItem('opnameQueueV8', JSON.stringify(opnameQueue));
-      updateQueueUI(); showToast("Tersimpan offline", "bg-yellow-500", "fa-database");
+      opnameQueue.push(payload); localStorage.setItem('queueAICHA', JSON.stringify(opnameQueue));
+      updateQueueUI(); Swal.fire({toast:true, position:'top', icon:'warning', title:'Tersimpan Offline', showConfirmButton:false, timer:1500});
     }
 
     async function syncOfflineData() {
-      if (!navigator.onLine || opnameQueue.length === 0) return; showLoading(true);
+      if(!navigator.onLine || opnameQueue.length === 0) return;
+      document.getElementById('loading').style.display='flex';
       try {
         await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [...opnameQueue] }) });
-        showLoading(false); opnameQueue = []; localStorage.setItem('opnameQueueV8', JSON.stringify([])); updateQueueUI();
-        showToast("Sync Berhasil!", "bg-blue-500", "fa-cloud-arrow-up"); initApp();
-      } catch (error) { showLoading(false); showToast("Gagal sync data", "bg-red-500", "fa-times"); }
+        opnameQueue = []; localStorage.setItem('queueAICHA', JSON.stringify([])); updateQueueUI(); fetchData();
+        Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500});
+      } catch(e) {} finally { document.getElementById('loading').style.display='none'; }
     }
+    function updateQueueUI() { document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none'; document.getElementById('queueCount').innerText = `${opnameQueue.length} Antrean`; }
 
-    function updateQueueUI() { document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none'; document.getElementById('queueCount').textContent = opnameQueue.length; }
-    function showLoading(s) { document.getElementById('loadingOverlay').style.display = s ? 'flex' : 'none'; }
-    function showToast(m, bg, ic) {
-      const t = document.getElementById('toast');
-      t.className = `fixed top-5 left-1/2 transform -translate-x-1/2 text-white px-6 py-3.5 rounded-full shadow-2xl z-[250] transition-all duration-300 flex items-center w-max max-w-[90%] font-medium text-sm ${bg}`;
-      document.getElementById('toastIcon').className = `fa-solid ${ic} mr-2 text-lg`; document.getElementById('toastMsg').textContent = m;
-      t.style.opacity = '1'; t.style.top = '20px'; setTimeout(() => { t.style.opacity = '0'; t.style.top = '-50px'; }, 3500);
+    // --- WHATSAPP REPORT ---
+    async function sendWA() {
+      if(opnameQueue.length>0) return Swal.fire({icon:'warning', title:'Sync Offline Dulu!'});
+      if(await Swal.fire({title:'Kirim Laporan WA?', text:'Rekap otomatis ke Owner.', showCancelButton:true}).then(r=>r.isConfirmed)){
+        document.getElementById('loading').style.display='flex';
+        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "sendReportWA", data: { outletId: document.getElementById('outlet').value, user: activeUser.username } }) })
+        .then(res=>res.json()).then(r=>Swal.fire({toast:true, position:'top', icon:r.status, title:r.data.msg, showConfirmButton:false, timer:1500}))
+        .finally(()=>document.getElementById('loading').style.display='none');
+      }
     }
   </script>
 </body>
