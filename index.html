@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Ai-CHA Precision V11.0</title>
+  <title>Ai-CHA Precision V12.0</title>
   <meta name="theme-color" content="#FF2E2E">
   
   <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;800&display=swap" rel="stylesheet">
@@ -54,6 +54,8 @@
     .num-btn { width: 70px; height: 70px; border-radius: 50%; background: #1F2937; color: white; font-size: 1.5rem; border: none; font-family: 'Urbanist'; transition: 0.1s; }
     .num-btn:active { background: #374151; transform: scale(0.95); }
     .sync-badge { background: #FFFBEB; border: 1px solid #FDE68A; padding: 10px 15px; border-radius: 12px; margin: 0 20px 15px; display: flex; justify-content: space-between; align-items: center; }
+    
+    .po-input { width:60px; padding:4px; text-align:center; font-weight:bold; border:1px solid #ccc; border-radius:8px; }
   </style>
 </head>
 <body>
@@ -63,7 +65,7 @@
       <div style="height:80px; width:80px; background:var(--primary); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; box-shadow: 0 10px 25px rgba(255,46,46,0.4);">
         <i class="bi bi-shield-lock-fill text-white fs-1"></i>
       </div>
-      <h1 class="text-white fw-bolder" style="letter-spacing:1px;">AI-CHA<span style="color:var(--primary)">V11</span></h1>
+      <h1 class="text-white fw-bolder" style="letter-spacing:1px;">AI-CHA<span style="color:var(--primary)">V12</span></h1>
       <p id="loginStatus" class="text-secondary small mt-1">Mengambil Data Server...</p>
     </div>
     <div class="d-flex gap-3 mb-5" id="pinIndicators">
@@ -139,28 +141,38 @@
 
   <div id="ownerView" style="display:none;" class="px-3">
     <div class="card-box bg-danger text-white text-center py-4 mb-3 border-0">
-      <small style="opacity:0.8; letter-spacing:1px; font-weight:700;">TOTAL NILAI ASET (ALL OUTLET)</small>
+      <small style="opacity:0.8; letter-spacing:1px; font-weight:700;">TOTAL NILAI ASET</small>
       <h1 id="assetVal" style="margin:5px 0 0 0; font-weight:800;">Rp 0</h1>
     </div>
 
     <div class="d-flex gap-2 mb-3">
-       <button class="btn btn-dark w-50 fw-bold" onclick="showOwnerTab('aset')">Data Aset</button>
-       <button class="btn btn-outline-dark w-50 fw-bold" onclick="showOwnerTab('perform')">Performa & Mutasi</button>
+       <button class="btn btn-dark w-33 fw-bold" style="font-size:0.8rem;" onclick="showOwnerTab('aset')">Aset</button>
+       <button class="btn btn-outline-dark w-33 fw-bold" style="font-size:0.8rem;" onclick="showOwnerTab('perform')">Performa</button>
+       <button class="btn btn-outline-dark w-33 fw-bold" style="font-size:0.8rem;" onclick="showOwnerTab('po')">PO Calc</button>
     </div>
 
     <div id="owner-aset">
-      <div class="card-box bg-wht mb-3" style="height:250px;">
-        <canvas id="assetChart"></canvas>
-      </div>
+      <div class="card-box bg-wht mb-3" style="height:250px;"><canvas id="assetChart"></canvas></div>
       <div id="assetList"></div>
     </div>
 
     <div id="owner-perform" style="display:none;">
-      <h6 class="fw-bold text-dark mt-2"><i class="bi bi-shuffle text-primary"></i> Rekomendasi Distribusi Cerdas</h6>
+      <h6 class="fw-bold text-dark mt-2"><i class="bi bi-shuffle text-primary"></i> Rekomendasi Distribusi</h6>
       <div id="mutationList" class="mb-4"></div>
-
-      <h6 class="fw-bold text-dark"><i class="bi bi-exclamation-triangle text-warning"></i> Analitik Performa Outlet</h6>
+      <h6 class="fw-bold text-dark"><i class="bi bi-exclamation-triangle text-warning"></i> Analitik Outlet</h6>
       <div id="performanceList"></div>
+    </div>
+
+    <div id="owner-po" style="display:none;">
+      <div class="card-box bg-wht">
+         <h6 class="fw-bold text-dark mb-3"><i class="bi bi-calculator text-primary"></i> Kalkulator Purchase Order</h6>
+         <div id="poList"></div>
+         <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
+            <span class="fw-bold text-secondary">Estimasi Tagihan:</span>
+            <span class="fw-bold text-danger fs-5" id="poGrandTotal">Rp 0</span>
+         </div>
+         <button class="btn-act mt-3" onclick="copyPOWA()"><i class="bi bi-whatsapp"></i> Copy Format PO</button>
+      </div>
     </div>
   </div>
 
@@ -175,28 +187,26 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzUYyLJeUchPyusCbVJU8fGl-uzYY2mhg5T9AB5YNtYE8itnLiH_pWw_6IFT-vUGnzIFw/exec";
 
     let globalData = { users: [], outlets: [], products: [], liveStock: [], inventoryStats: {}, assetPerOutlet: {} };
-    let opnameQueue = JSON.parse(localStorage.getItem('qAicha11')) || [];
-    let activeUser = JSON.parse(localStorage.getItem('uAicha11')) || null;
-    let currentPin = ""; let chartInstance = null;
+    let opnameQueue = JSON.parse(localStorage.getItem('qAicha12')) || [];
+    let activeUser = JSON.parse(localStorage.getItem('uAicha12')) || null;
+    let currentPin = ""; let chartInstance = null; let activePO = {};
     const toIDR=(n)=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n);
 
     document.addEventListener("DOMContentLoaded", () => { initApp(); window.addEventListener('online', syncOfflineData); });
 
     async function initApp() {
       updateQueueUI();
-      if(localStorage.getItem('dAicha11')) { globalData = JSON.parse(localStorage.getItem('dAicha11')); enableLogin(); }
+      if(localStorage.getItem('dAicha12')) { globalData = JSON.parse(localStorage.getItem('dAicha12')); enableLogin(); }
       try {
         const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: "ALL" }) });
         const result = await res.json();
-        if(result.status === "success") { globalData = result.data; localStorage.setItem('dAicha11', JSON.stringify(globalData)); enableLogin(); }
+        if(result.status === "success") { globalData = result.data; localStorage.setItem('dAicha12', JSON.stringify(globalData)); enableLogin(); }
       } catch (e) { if(!globalData.users.length) document.getElementById('loginStatus').textContent = "Offline. Cek Internet."; }
     }
 
-    // --- PIN AUTH ---
     function enableLogin() { if(activeUser) showMainApp(); else { document.getElementById('loginStatus').textContent = "Masukkan PIN Akses"; document.getElementById('numpad').style.opacity = 1; document.getElementById('numpad').style.pointerEvents = 'auto'; } }
     function enterPin(n) { if(currentPin.length < 4) { currentPin += n; updatePinUI(); if(currentPin.length === 4) validatePin(); } }
     function deletePin() { if(currentPin.length > 0) { currentPin = currentPin.slice(0, -1); updatePinUI(); } }
@@ -204,12 +214,11 @@
 
     function validatePin() {
       const u = globalData.users.find(u => u.pin === currentPin);
-      if(u) { activeUser = u; localStorage.setItem('uAicha11', JSON.stringify(u)); setTimeout(showMainApp, 300); } 
+      if(u) { activeUser = u; localStorage.setItem('uAicha12', JSON.stringify(u)); setTimeout(showMainApp, 300); } 
       else { Swal.fire({toast:true, position:'top', icon:'error', title:'PIN Salah', showConfirmButton:false, timer:1500}); setTimeout(() => { currentPin = ""; updatePinUI(); }, 500); }
     }
-    function logout() { activeUser = null; currentPin = ""; localStorage.removeItem('uAicha11'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
+    function logout() { activeUser = null; currentPin = ""; localStorage.removeItem('uAicha12'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
 
-    // --- APP INIT ---
     function showMainApp() {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('roleLabel').innerHTML = `<i class="bi bi-shield-check text-danger me-1"></i> ${activeUser.role}`;
@@ -231,17 +240,16 @@
         let qOutlet = activeUser.role === "Owner" ? "ALL" : out;
         const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: qOutlet }) });
         const result = await res.json();
-        if(result.status === "success") { globalData = result.data; localStorage.setItem('dAicha11', JSON.stringify(globalData)); renderStockList(); renderOwner(); renderMasterList(); }
-      } catch (e) { renderStockList(); renderOwner(); renderMasterList(); } 
+        if(result.status === "success") { globalData = result.data; localStorage.setItem('dAicha12', JSON.stringify(globalData)); renderStockList(); renderOwner(); renderMasterList(); renderPO(); }
+      } catch (e) { renderStockList(); renderOwner(); renderMasterList(); renderPO(); } 
     }
 
-    // --- ROUTING ---
     function nav(p) {
       document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active')); document.getElementById('nav-'+p).classList.add('active');
       document.getElementById('page-stok').style.display = 'none'; document.getElementById('page-transfer').style.display = 'none'; document.getElementById('page-master').style.display = 'none';
       
       if(p==='lapor'){
-        if(activeUser.role==='Owner') { document.getElementById('managerView').style.display='none'; document.getElementById('ownerView').style.display='block'; document.getElementById('fabBtn').style.display='none'; renderChart(); renderAnalytics(); }
+        if(activeUser.role==='Owner') { document.getElementById('managerView').style.display='none'; document.getElementById('ownerView').style.display='block'; document.getElementById('fabBtn').style.display='none'; renderChart(); renderAnalytics(); renderPO(); }
         else { document.getElementById('managerView').style.display='block'; document.getElementById('page-stok').style.display='block'; document.getElementById('ownerView').style.display='none'; document.getElementById('fabBtn').style.display='flex'; }
       } else if(p==='master') {
         document.getElementById('managerView').style.display='block'; document.getElementById('page-master').style.display='block'; document.getElementById('ownerView').style.display='none'; document.getElementById('fabBtn').style.display='none';
@@ -252,8 +260,10 @@
     function showStok(){ document.getElementById('page-stok').style.display='block'; document.getElementById('page-transfer').style.display='none'; }
     function showTransfer(){ document.getElementById('page-stok').style.display='none'; document.getElementById('page-transfer').style.display='block'; }
     function showOwnerTab(tab){
-        document.getElementById('owner-aset').style.display = tab==='aset'?'block':'none';
-        document.getElementById('owner-perform').style.display = tab==='perform'?'block':'none';
+        ['aset','perform','po'].forEach(t => {
+            document.getElementById('owner-'+t).style.display = tab===t?'block':'none';
+            event.target.parentElement.children[['aset','perform','po'].indexOf(t)].className = tab===t?'btn btn-dark w-33 fw-bold':'btn btn-outline-dark w-33 fw-bold';
+        });
     }
 
     // --- RENDER VIEWS ---
@@ -264,16 +274,17 @@
 
       globalData.products.forEach(p => {
         let key = `${out}_${p.name}`;
-        let lItems = globalData.liveStock.filter(x => x.name === p.name && x.outlet === out);
-        let currentQty = `0 ${p.uMain}`; let daysLeft = "-"; let adu = "-"; let isUpdatedToday = false; let rowIndex = null;
+        let lItem = globalData.liveStock.find(x => x.name === p.name && x.outlet === out);
+        
+        let currentQty = `0 ${p.uMain}`; let daysLeft = "-"; let adu = "-"; let isUpdatedToday = false; 
 
         let stats = globalData.inventoryStats[key];
         if(stats) { adu = stats.adu; if(new Date(stats.lastDate).toLocaleDateString('id-ID') === todayStr) isUpdatedToday = true; }
         
-        if(lItems.length > 0) {
-           let i = lItems[0]; rowIndex = i.rowIndex; currentQty = i.displayQty; daysLeft = i.daysLeft;
+        if(lItem) {
+           currentQty = lItem.displayQty; daysLeft = lItem.daysLeft;
            trf.add(new Option(`${p.name} (Stok: ${currentQty})`, p.name));
-           if(i.totalBase <= 0) currentQty = `<span class="text-danger">KOSONG</span>`;
+           if(lItem.totalBase <= 0) currentQty = `<span class="text-danger">KOSONG</span>`;
         }
 
         let inQueue = opnameQueue.find(q => q.barangId === p.name && q.outletId === out);
@@ -285,21 +296,23 @@
            currentQty = str.join(' ') + ' <i class="bi bi-cloud-arrow-up text-warning"></i>';
         }
         
-        let bgClass = isUpdatedToday ? 'bg-grn' : (lItems.length > 0 && lItems[0].totalBase <= 0 ? 'bg-danger-soft' : 'bg-wht');
+        let bgClass = isUpdatedToday ? 'bg-grn' : (lItem && lItem.totalBase <= 0 ? 'bg-danger-soft' : 'bg-wht');
         let checkIcon = isUpdatedToday ? '<i class="bi bi-check-circle-fill text-success fs-5"></i>' : '<i class="bi bi-circle text-muted fs-5"></i>';
-        let undoBtn = (isUpdatedToday && !inQueue && rowIndex) ? `<i class="bi bi-arrow-counterclockwise text-danger ms-3" onclick="event.stopPropagation(); delStock(${rowIndex});" title="Batalkan"></i>` : '';
+        
+        // Tampilkan info multi-expiry jika ada
+        let batchInfo = "";
+        if(lItem && lItem.batches.length > 1) {
+            batchInfo = `<div class="mt-1 mb-2 pt-1 border-top" style="font-size:0.65rem; color:#666;">`;
+            lItem.batches.forEach(b => { batchInfo += `Exp ${b.displayExp}: <b>${b.displayQty}</b> | `; });
+            batchInfo = batchInfo.slice(0, -2) + `</div>`;
+        }
 
         html += `
         <div class="card-box ${bgClass}" onclick="openInputModal('${p.name}')">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-             <div class="fw-bold text-dark" style="font-size:0.95rem;">${p.name}</div>
-             <div>${checkIcon} ${undoBtn}</div>
-          </div>
+          <div class="d-flex justify-content-between align-items-center mb-1"><div class="fw-bold text-dark" style="font-size:0.95rem;">${p.name}</div><div>${checkIcon}</div></div>
           <div class="text-danger fw-bold fs-4 my-1">${currentQty}</div>
-          <div class="d-flex justify-content-between small text-secondary">
-             <div><i class="bi bi-graph-up-arrow"></i> ADU: ${adu}/hr</div>
-             <div class="fw-bold">Est Habis: ${daysLeft} Hr</div>
-          </div>
+          ${batchInfo}
+          <div class="d-flex justify-content-between small text-secondary"><div><i class="bi bi-graph-up-arrow"></i> ADU: ${adu}/hr</div><div class="fw-bold">Est Habis: ${daysLeft} Hr</div></div>
         </div>`;
       });
       document.getElementById('liveBody').innerHTML = html;
@@ -308,9 +321,7 @@
     function renderOwner() {
       document.getElementById('assetVal').innerText = toIDR(globalData.totalAsset || 0); let h='';
       let outFilter = document.getElementById('outlet').value;
-      
-      let filteredStock = globalData.liveStock;
-      if(activeUser.role !== "Owner") filteredStock = filteredStock.filter(x => x.outlet === outFilter);
+      let filteredStock = activeUser.role !== "Owner" ? globalData.liveStock.filter(x => x.outlet === outFilter) : globalData.liveStock;
 
       filteredStock.forEach(x => {
          h+=`<div class="card-box bg-wht"><div class="d-flex justify-content-between mb-1"><div class="fw-bold" style="font-size:0.9rem;">[${x.outlet}] ${x.name}</div><div class="text-success fw-bold">${toIDR(x.assetVal)}</div></div>
@@ -321,7 +332,6 @@
     }
 
     function renderAnalytics() {
-        // Distribusi Cerdas (Balancing)
         let overstock = []; let kritikal = [];
         globalData.liveStock.forEach(x => {
             if(x.stockStatus === "OVERSTOK") overstock.push(x);
@@ -332,49 +342,69 @@
         kritikal.forEach(k => {
             let helper = overstock.find(o => o.name === k.name);
             if(helper) {
-                mutH += `<div class="bg-light p-3 rounded-xl border border-primary mb-2">
-                            <div class="fw-bold text-dark small mb-1">${k.name}</div>
-                            <div class="small d-flex justify-content-between align-items-center">
-                                <span class="text-danger fw-bold"><i class="bi bi-shop"></i> ${k.outlet} (Habis)</span>
-                                <i class="bi bi-arrow-right text-muted"></i>
-                                <span class="text-success fw-bold"><i class="bi bi-shop"></i> ${helper.outlet} (Sisa ${helper.daysLeft} hr)</span>
-                            </div>
-                         </div>`;
+                mutH += `<div class="bg-light p-3 rounded-xl border border-primary mb-2"><div class="fw-bold text-dark small mb-1">${k.name}</div>
+                            <div class="small d-flex justify-content-between align-items-center"><span class="text-danger fw-bold"><i class="bi bi-shop"></i> ${k.outlet} (Habis)</span><i class="bi bi-arrow-right text-muted"></i><span class="text-success fw-bold"><i class="bi bi-shop"></i> ${helper.outlet} (Sisa ${helper.daysLeft} hr)</span></div></div>`;
             }
         });
-        if(!mutH) mutH = `<div class="text-muted small">Tidak ada saran mutasi (Distribusi merata).</div>`;
-        document.getElementById('mutationList').innerHTML = mutH;
+        document.getElementById('mutationList').innerHTML = mutH || `<div class="text-muted small">Tidak ada saran mutasi (Distribusi merata).</div>`;
 
-        // Analitik Performa Outlet
         let phtml = '';
         globalData.liveStock.forEach(x => {
             let stats = globalData.inventoryStats[x.outlet+'_'+x.name];
-            if(stats && (stats.performa === "BOROS" || x.expStatus === "EXPIRED" || x.expStatus === "WARNING")) {
-                let badge = "";
-                if(stats.performa === "BOROS") badge += `<span class="badge-soft bg-red me-1">PEMAKAIAN BOROS</span>`;
-                if(x.expStatus === "EXPIRED") badge += `<span class="badge-soft bg-red me-1">EXPIRED</span>`;
-                else if (x.expStatus === "WARNING") badge += `<span class="badge-soft bg-yel me-1">MENDEKATI EXP</span>`;
-
-                phtml += `<div class="bg-white p-3 rounded-xl border mb-2 shadow-sm">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <div class="fw-bold text-dark small">[${x.outlet}] ${x.name}</div>
-                            </div>
-                            <div class="mt-1">${badge}</div>
-                          </div>`;
+            let badges = [];
+            if(stats && stats.performa === "BOROS") badges.push(`<span class="badge-soft bg-red me-1">PEMAKAIAN BOROS</span>`);
+            x.batches.forEach(b => {
+                if(b.status === "EXPIRED" && !badges.includes("EXP")) badges.push(`<span class="badge-soft bg-red me-1">EXPIRED (${b.displayExp})</span>`);
+                else if (b.status === "WARNING" && !badges.includes("WARN")) badges.push(`<span class="badge-soft bg-yel me-1">MENDEKATI EXP</span>`);
+            });
+            if(badges.length > 0) {
+                phtml += `<div class="bg-white p-3 rounded-xl border mb-2 shadow-sm"><div class="d-flex justify-content-between align-items-center mb-1"><div class="fw-bold text-dark small">[${x.outlet}] ${x.name}</div></div><div class="mt-1">${badges.join('')}</div></div>`;
             }
         });
-        if(!phtml) phtml = `<div class="text-muted small">Semua performa outlet dalam status wajar.</div>`;
-        document.getElementById('performanceList').innerHTML = phtml;
+        document.getElementById('performanceList').innerHTML = phtml || `<div class="text-muted small">Semua performa outlet dalam status wajar.</div>`;
+    }
+
+    function renderPO() {
+        let poMap = {}; activePO = {}; let grandTotal = 0;
+        let outFilter = document.getElementById('outlet').value;
+        let filteredStock = (activeUser.role !== "Owner" || outFilter !== "ALL") ? globalData.liveStock.filter(x => x.outlet === outFilter) : globalData.liveStock;
+
+        // Group PO Need by item
+        filteredStock.forEach(x => {
+            if(x.poNeed > 0) {
+                if(!poMap[x.name]) poMap[x.name] = { name: x.name, uMain: x.uMain, pMain: x.pMain, qty: 0 };
+                poMap[x.name].qty += x.poNeed;
+            }
+        });
+
+        let h = '';
+        for(let key in poMap) {
+            let item = poMap[key];
+            activePO[item.name] = { qty: item.qty, price: item.pMain, uMain: item.uMain };
+            let sub = item.qty * item.pMain; grandTotal += sub;
+            h += `<div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                    <div style="width:50%"><div class="fw-bold text-dark small">${item.name}</div><div class="text-muted" style="font-size:0.6rem;">${toIDR(item.pMain)} / ${item.uMain}</div></div>
+                    <div><input type="number" class="po-input" value="${item.qty}" onchange="updatePO('${item.name}', this.value)"></div>
+                    <div class="text-end fw-bold text-success" style="font-size:0.8rem; width:30%;" id="po_sub_${item.name.replace(/[^a-zA-Z0-9]/g, '')}">${toIDR(sub)}</div>
+                  </div>`;
+        }
+        document.getElementById('poList').innerHTML = h || `<div class="text-muted text-center small py-3">Tidak ada rekomendasi order. Stok aman.</div>`;
+        document.getElementById('poGrandTotal').innerText = toIDR(grandTotal);
+    }
+
+    window.updatePO = function(name, newQty) {
+        let qty = Number(newQty) || 0;
+        activePO[name].qty = qty;
+        let sub = qty * activePO[name].price;
+        document.getElementById('po_sub_'+name.replace(/[^a-zA-Z0-9]/g, '')).innerText = toIDR(sub);
+        let grand = 0; for(let k in activePO) grand += activePO[k].qty * activePO[k].price;
+        document.getElementById('poGrandTotal').innerText = toIDR(grand);
     }
 
     function renderChart() {
       if(chartInstance) chartInstance.destroy();
       const ctx = document.getElementById('assetChart').getContext('2d');
-      chartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: { labels: Object.keys(globalData.assetPerOutlet), datasets: [{ label: 'Nilai Aset (Rp)', data: Object.values(globalData.assetPerOutlet), backgroundColor: '#FF2E2E', borderRadius: 8 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-      });
+      chartInstance = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(globalData.assetPerOutlet), datasets: [{ label: 'Nilai Aset (Rp)', data: Object.values(globalData.assetPerOutlet), backgroundColor: '#FF2E2E', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
     }
 
     function renderMasterList() {
@@ -390,14 +420,10 @@
     function openInputModal(itemName) {
       let p = globalData.products.find(x => x.name === itemName); if(!p) return;
       let out = document.getElementById('outlet').value;
+      let lItem = globalData.liveStock.find(x => x.name === p.name && x.outlet === out);
       
-      // AUTO-FILL LOGIC: Get last recorded stock for this item at this outlet
-      let lItems = globalData.liveStock.filter(x => x.name === p.name && x.outlet === out);
-      let defMain = ""; let defSub = ""; let defExp = "";
-      if(lItems.length > 0) {
-          defMain = lItems[0].qtyMain; defSub = lItems[0].qtySub; 
-          if(lItems[0].expKey !== "NoDate") defExp = lItems[0].expKey;
-      }
+      let defMain = lItem ? lItem.qtyMain : ""; let defSub = lItem ? lItem.qtySub : ""; 
+      let defExp = (lItem && lItem.batches.length > 0 && lItem.batches[0].expKey !== "NoDate") ? lItem.batches[0].expKey : "";
 
       Swal.fire({
         html: `<div style="text-align:left;"><div style="font-size:1.1rem; font-weight:800; color:#1E293B; margin-bottom:15px; border-bottom:2px solid #f0f0f0; padding-bottom:10px;">${p.name}</div>
@@ -418,18 +444,14 @@
       });
     }
 
-    function reqItem() {
-      Swal.fire({title:'Request Barang', input:'text', inputPlaceholder:'Misal: Sedotan Besar', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>{
-        if(r.isConfirmed&&r.value) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "requestBarang", data: { outlet: document.getElementById('outlet').value, item: r.value } }) }).then(()=>Swal.fire({toast:true,position:'top',icon:'success',title:'Terkirim',showConfirmButton:false,timer:1500})).finally(()=>document.getElementById('loading').style.display='none'); }
-      });
-    }
+    function reqItem() { Swal.fire({title:'Request Barang', input:'text', inputPlaceholder:'Misal: Sedotan Besar', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>{ if(r.isConfirmed&&r.value) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "requestBarang", data: { outlet: document.getElementById('outlet').value, item: r.value } }) }).then(()=>Swal.fire({toast:true,position:'top',icon:'success',title:'Terkirim',showConfirmButton:false,timer:1500})).finally(()=>document.getElementById('loading').style.display='none'); } }); }
 
     function openMasterModal(nm="", uM="", pM="", isi="", uS="", pS="") {
       Swal.fire({ title: nm?'Edit Barang':'Barang Baru', html:`<div style="text-align:left;"><label class="inp-lbl">Nama Barang</label><input id="mNama" class="inp-field mb-2" value="${nm}"><div class="dual-input"><div class="inp-grp"><label class="inp-lbl">Satuan Besar</label><input id="muMain" class="inp-field" value="${uM}"></div><div class="inp-grp"><label class="inp-lbl">Harga (Besar)</label><input id="mpMain" type="number" class="inp-field" value="${pM}"></div></div><div class="inp-grp mb-2"><label class="inp-lbl text-primary">Konversi (Isi per Satuan Besar)</label><input id="mIsi" type="number" class="inp-field" value="${isi}"></div><div class="dual-input"><div class="inp-grp"><label class="inp-lbl">Satuan Kecil</label><input id="muSub" class="inp-field" value="${uS}"></div><div class="inp-grp"><label class="inp-lbl">Harga (Kecil)</label><input id="mpSub" type="number" class="inp-field" value="${pS}"></div></div></div>`, confirmButtonColor:'#FF2E2E', showCancelButton:true, preConfirm:()=>{ return { namaLama: nm, nama: document.getElementById('mNama').value, uMain: document.getElementById('muMain').value, pMain: document.getElementById('mpMain').value, isi: document.getElementById('mIsi').value, uSub: document.getElementById('muSub').value, pSub: document.getElementById('mpSub').value } }
       }).then(r=>{ if(r.isConfirmed) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "saveMasterBarang", data: r.value }) }).then(()=>fetchData()).finally(()=>document.getElementById('loading').style.display='none'); } });
     }
 
-    function updTrfLbl() { let s=document.getElementById('trfItem').value; let out=document.getElementById('outlet').value; let lItems=globalData.liveStock.filter(x=>x.name===s && x.outlet===out); if(lItems.length>0) { document.getElementById('trfMax').innerText=lItems[0].displayQty; document.getElementById('lbl-trf-1').innerText=`QTY (${lItems[0].uMain})`; document.getElementById('lbl-trf-2').innerText=`QTY (${lItems[0].uSub})`; } }
+    function updTrfLbl() { let s=document.getElementById('trfItem').value; let out=document.getElementById('outlet').value; let i=globalData.liveStock.find(x=>x.name===s && x.outlet===out); if(i) { document.getElementById('trfMax').innerText=i.displayQty; document.getElementById('lbl-trf-1').innerText=`QTY (${i.uMain})`; document.getElementById('lbl-trf-2').innerText=`QTY (${i.uSub})`; } }
 
     async function processTransfer() {
       let d={ from: document.getElementById('outlet').value, to: document.getElementById('trfDest').value, item: document.getElementById('trfItem').value, q1: document.getElementById('trf-q1').value, q2: document.getElementById('trf-q2').value, user: activeUser.username };
@@ -438,37 +460,46 @@
       try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "processTransfer", data: d }) }); Swal.fire({toast:true, position:'top', icon:'success', title:'Transfer Sukses', showConfirmButton:false, timer:1500}); document.getElementById('trf-q1').value=''; document.getElementById('trf-q2').value=''; fetchData(); showStok(); } catch(e){} finally { document.getElementById('loading').style.display='none'; }
     }
 
-    async function delStock(id) { 
-      if(await Swal.fire({title:'Batalkan Input?', text:'Tindakan ini akan direkam (Soft Delete).', icon:'warning', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>r.isConfirmed)) { 
-        document.getElementById('loading').style.display='flex'; 
-        fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteStock", data: {rowIndex: id, user: activeUser.username} }) }).then(()=>fetchData()).finally(()=>document.getElementById('loading').style.display='none'); 
-      } 
-    }
-
     // --- PWA SYNC ---
-    function simpanKeQueue(payload) { opnameQueue.push(payload); localStorage.setItem('qAicha11', JSON.stringify(opnameQueue)); updateQueueUI(); renderStockList(); Swal.fire({toast:true, position:'top', icon:'warning', title:'Tersimpan Offline', showConfirmButton:false, timer:1500}); }
-    async function syncOfflineData() { if(!navigator.onLine || opnameQueue.length === 0) return; document.getElementById('loading').style.display='flex'; try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [...opnameQueue] }) }); opnameQueue = []; localStorage.setItem('qAicha11', JSON.stringify([])); updateQueueUI(); fetchData(); Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500}); } catch(e) {} finally { document.getElementById('loading').style.display='none'; } }
+    function simpanKeQueue(payload) { opnameQueue.push(payload); localStorage.setItem('qAicha12', JSON.stringify(opnameQueue)); updateQueueUI(); renderStockList(); Swal.fire({toast:true, position:'top', icon:'warning', title:'Tersimpan Offline', showConfirmButton:false, timer:1500}); }
+    async function syncOfflineData() { if(!navigator.onLine || opnameQueue.length === 0) return; document.getElementById('loading').style.display='flex'; try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [...opnameQueue] }) }); opnameQueue = []; localStorage.setItem('qAicha12', JSON.stringify([])); updateQueueUI(); fetchData(); Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500}); } catch(e) {} finally { document.getElementById('loading').style.display='none'; } }
     function updateQueueUI() { document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none'; document.getElementById('queueCount').innerText = `${opnameQueue.length} Antrean`; }
 
-    // --- WA REPORT (ALL ITEMS) ---
+    // --- WA COPIERS ---
     function copyWA() {
       if(opnameQueue.length>0) return Swal.fire({icon:'warning', title:'Sync Offline Dulu!'});
       let out = document.getElementById('outlet').value; let tgl = new Date().toLocaleDateString('id-ID', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
       let txt = `📋 *LAPORAN OPNAME AI-CHA ${out.toUpperCase()}*\n📅 ${tgl}\n👤 Petugas: ${activeUser.username}\n\n📦 *STOK GUDANG:*\n`;
       
       globalData.products.forEach(p => {
-        let lItems = globalData.liveStock.filter(x => x.name === p.name && x.outlet === out);
-        if(lItems.length > 0) {
-           let i = lItems[0]; let stats = globalData.inventoryStats[`${out}_${p.name}`]; let adu = stats ? stats.adu : '-';
-           let badge = i.expStatus === "EXPIRED" ? "⛔" : (i.expStatus === "WARNING" ? "⚠️" : "✅");
-           txt += `➖ *${p.name}*\n   └ Stok: *${i.displayQty}*\n   └ ADU: ${adu}/hr | Est: ${i.daysLeft} hr ${badge}\n`; 
+        let lItem = globalData.liveStock.find(x => x.name === p.name && x.outlet === out);
+        let stats = globalData.inventoryStats[`${out}_${p.name}`]; let adu = stats ? stats.adu : '-';
+        if(lItem && lItem.totalBase > 0) {
+           txt += `➖ *${p.name}*\n   └ Stok: *${lItem.displayQty}*\n`;
+           if(lItem.batches.length > 1) { lItem.batches.forEach(b => { let bdg = b.status==="EXPIRED"?"⛔":(b.status==="WARNING"?"⚠️":"✅"); txt += `     • Exp ${b.displayExp}: ${b.displayQty} ${bdg}\n`; }); }
+           txt += `   └ ADU: ${adu}/hr | Est: ${lItem.daysLeft} hr\n`; 
         } else {
-           // TAMPILKAN BARANG KOSONG
-           txt += `➖ *${p.name}*\n   └ Stok: *0 ${p.uMain} 0 ${p.uSub}* (KOSONG)\n   └ ADU: - | Est: 0 hr ⛔\n`;
+           txt += `➖ *${p.name}*\n   └ Stok: *0 ${p.uMain} 0 ${p.uSub}* (KOSONG)\n`;
         }
       });
-      txt += `\n_Dikirim otomatis via Ai-CHA Enterprise V11_`;
+      txt += `\n_Dikirim via Ai-CHA Enterprise V12_`;
       navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Teks WA Tersalin!', showConfirmButton:false, timer:2000})).catch(() => Swal.fire({icon:'error', title:'Gagal Copy'}));
+    }
+
+    window.copyPOWA = function() {
+       let out = document.getElementById('outlet').value;
+       let txt = `🛒 *FORM PURCHASE ORDER (PO) AI-CHA*\n🏢 Target: ${out==='ALL'?'SELURUH OUTLET':out}\n📅 ${new Date().toLocaleDateString('id-ID')}\n\n*Rincian Order:*\n`;
+       let hasPO = false; let gTot = 0;
+       for(let k in activePO) {
+           if(activePO[k].qty > 0) {
+               let sub = activePO[k].qty * activePO[k].price; gTot += sub;
+               txt += `➖ ${k} : *${activePO[k].qty} ${activePO[k].uMain}*\n`;
+               hasPO = true;
+           }
+       }
+       if(!hasPO) return Swal.fire({icon:'warning', title:'Order Kosong'});
+       txt += `\n💰 *Total Estimasi Tagihan: ${toIDR(gTot)}*\n\nMohon diproses, terima kasih.`;
+       navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Format PO Tersalin!', showConfirmButton:false, timer:2000}));
     }
   </script>
 </body>
