@@ -9,7 +9,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
   <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-material-ui/material-ui.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -153,6 +156,8 @@
     <div class="nav-item" id="nav-master" onclick="nav('master')" style="display:none;"><i class="bi bi-hdd-stack-fill"></i><span>Master</span></div>
     <div class="nav-item" id="nav-lapor" onclick="nav('lapor')"><i class="bi bi-bar-chart-fill"></i><span>Dasbor</span></div>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
     // MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
@@ -365,7 +370,7 @@
     }
 
     async function delStock(id) { 
-      if(await Swal.fire({title:'Batalkan Input?', text:'Tindakan ini akan direkam.', icon:'warning', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>r.isConfirmed)) { 
+      if(await Swal.fire({title:'Batalkan Input?', text:'Tindakan ini akan direkam (Soft Delete).', icon:'warning', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>r.isConfirmed)) { 
         document.getElementById('loading').style.display='flex'; 
         fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteStock", data: {rowIndex: id, user: activeUser.username} }) }).then(()=>fetchData()).finally(()=>document.getElementById('loading').style.display='none'); 
       } 
