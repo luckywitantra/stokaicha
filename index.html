@@ -3,16 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Ai-CHA Precision V10.0</title>
+  <title>Ai-CHA Precision V11.0</title>
   <meta name="theme-color" content="#FF2E2E">
   
   <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  
   <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-material-ui/material-ui.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -47,6 +45,7 @@
 
     .bg-grn { background: #ECFDF5; border: 2px solid #10B981; }
     .bg-wht { background: white; border: 2px solid white; }
+    .bg-danger-soft { background: #FEF2F2; border: 2px solid #EF4444; }
 
     #loading { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; backdrop-filter: blur(5px); }
     #loginScreen { position: fixed; inset: 0; background: #111827; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -64,7 +63,7 @@
       <div style="height:80px; width:80px; background:var(--primary); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; box-shadow: 0 10px 25px rgba(255,46,46,0.4);">
         <i class="bi bi-shield-lock-fill text-white fs-1"></i>
       </div>
-      <h1 class="text-white fw-bolder" style="letter-spacing:1px;">AI-CHA<span style="color:var(--primary)">V10</span></h1>
+      <h1 class="text-white fw-bolder" style="letter-spacing:1px;">AI-CHA<span style="color:var(--primary)">V11</span></h1>
       <p id="loginStatus" class="text-secondary small mt-1">Mengambil Data Server...</p>
     </div>
     <div class="d-flex gap-3 mb-5" id="pinIndicators">
@@ -140,13 +139,29 @@
 
   <div id="ownerView" style="display:none;" class="px-3">
     <div class="card-box bg-danger text-white text-center py-4 mb-3 border-0">
-      <small style="opacity:0.8; letter-spacing:1px; font-weight:700;">TOTAL NILAI ASET</small>
+      <small style="opacity:0.8; letter-spacing:1px; font-weight:700;">TOTAL NILAI ASET (ALL OUTLET)</small>
       <h1 id="assetVal" style="margin:5px 0 0 0; font-weight:800;">Rp 0</h1>
     </div>
-    <div class="card-box bg-wht mb-3" style="height:250px;">
-      <canvas id="assetChart"></canvas>
+
+    <div class="d-flex gap-2 mb-3">
+       <button class="btn btn-dark w-50 fw-bold" onclick="showOwnerTab('aset')">Data Aset</button>
+       <button class="btn btn-outline-dark w-50 fw-bold" onclick="showOwnerTab('perform')">Performa & Mutasi</button>
     </div>
-    <div id="assetList"></div>
+
+    <div id="owner-aset">
+      <div class="card-box bg-wht mb-3" style="height:250px;">
+        <canvas id="assetChart"></canvas>
+      </div>
+      <div id="assetList"></div>
+    </div>
+
+    <div id="owner-perform" style="display:none;">
+      <h6 class="fw-bold text-dark mt-2"><i class="bi bi-shuffle text-primary"></i> Rekomendasi Distribusi Cerdas</h6>
+      <div id="mutationList" class="mb-4"></div>
+
+      <h6 class="fw-bold text-dark"><i class="bi bi-exclamation-triangle text-warning"></i> Analitik Performa Outlet</h6>
+      <div id="performanceList"></div>
+    </div>
   </div>
 
   <button class="fab" id="fabBtn" onclick="copyWA()"><i class="bi bi-whatsapp"></i></button>
@@ -164,8 +179,8 @@
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzUYyLJeUchPyusCbVJU8fGl-uzYY2mhg5T9AB5YNtYE8itnLiH_pWw_6IFT-vUGnzIFw/exec";
 
     let globalData = { users: [], outlets: [], products: [], liveStock: [], inventoryStats: {}, assetPerOutlet: {} };
-    let opnameQueue = JSON.parse(localStorage.getItem('qAicha10')) || [];
-    let activeUser = JSON.parse(localStorage.getItem('uAicha10')) || null;
+    let opnameQueue = JSON.parse(localStorage.getItem('qAicha11')) || [];
+    let activeUser = JSON.parse(localStorage.getItem('uAicha11')) || null;
     let currentPin = ""; let chartInstance = null;
     const toIDR=(n)=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n);
 
@@ -173,11 +188,11 @@
 
     async function initApp() {
       updateQueueUI();
-      if(localStorage.getItem('dAicha10')) { globalData = JSON.parse(localStorage.getItem('dAicha10')); enableLogin(); }
+      if(localStorage.getItem('dAicha11')) { globalData = JSON.parse(localStorage.getItem('dAicha11')); enableLogin(); }
       try {
-        const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData" }) });
+        const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: "ALL" }) });
         const result = await res.json();
-        if(result.status === "success") { globalData = result.data; localStorage.setItem('dAicha10', JSON.stringify(globalData)); enableLogin(); }
+        if(result.status === "success") { globalData = result.data; localStorage.setItem('dAicha11', JSON.stringify(globalData)); enableLogin(); }
       } catch (e) { if(!globalData.users.length) document.getElementById('loginStatus').textContent = "Offline. Cek Internet."; }
     }
 
@@ -189,10 +204,10 @@
 
     function validatePin() {
       const u = globalData.users.find(u => u.pin === currentPin);
-      if(u) { activeUser = u; localStorage.setItem('uAicha10', JSON.stringify(u)); setTimeout(showMainApp, 300); } 
+      if(u) { activeUser = u; localStorage.setItem('uAicha11', JSON.stringify(u)); setTimeout(showMainApp, 300); } 
       else { Swal.fire({toast:true, position:'top', icon:'error', title:'PIN Salah', showConfirmButton:false, timer:1500}); setTimeout(() => { currentPin = ""; updatePinUI(); }, 500); }
     }
-    function logout() { activeUser = null; currentPin = ""; localStorage.removeItem('uAicha10'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
+    function logout() { activeUser = null; currentPin = ""; localStorage.removeItem('uAicha11'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
 
     // --- APP INIT ---
     function showMainApp() {
@@ -216,7 +231,7 @@
         let qOutlet = activeUser.role === "Owner" ? "ALL" : out;
         const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: qOutlet }) });
         const result = await res.json();
-        if(result.status === "success") { globalData = result.data; localStorage.setItem('dAicha10', JSON.stringify(globalData)); renderStockList(); renderOwner(); renderMasterList(); }
+        if(result.status === "success") { globalData = result.data; localStorage.setItem('dAicha11', JSON.stringify(globalData)); renderStockList(); renderOwner(); renderMasterList(); }
       } catch (e) { renderStockList(); renderOwner(); renderMasterList(); } 
     }
 
@@ -226,7 +241,7 @@
       document.getElementById('page-stok').style.display = 'none'; document.getElementById('page-transfer').style.display = 'none'; document.getElementById('page-master').style.display = 'none';
       
       if(p==='lapor'){
-        if(activeUser.role==='Owner') { document.getElementById('managerView').style.display='none'; document.getElementById('ownerView').style.display='block'; document.getElementById('fabBtn').style.display='none'; renderChart(); }
+        if(activeUser.role==='Owner') { document.getElementById('managerView').style.display='none'; document.getElementById('ownerView').style.display='block'; document.getElementById('fabBtn').style.display='none'; renderChart(); renderAnalytics(); }
         else { document.getElementById('managerView').style.display='block'; document.getElementById('page-stok').style.display='block'; document.getElementById('ownerView').style.display='none'; document.getElementById('fabBtn').style.display='flex'; }
       } else if(p==='master') {
         document.getElementById('managerView').style.display='block'; document.getElementById('page-master').style.display='block'; document.getElementById('ownerView').style.display='none'; document.getElementById('fabBtn').style.display='none';
@@ -236,6 +251,10 @@
     }
     function showStok(){ document.getElementById('page-stok').style.display='block'; document.getElementById('page-transfer').style.display='none'; }
     function showTransfer(){ document.getElementById('page-stok').style.display='none'; document.getElementById('page-transfer').style.display='block'; }
+    function showOwnerTab(tab){
+        document.getElementById('owner-aset').style.display = tab==='aset'?'block':'none';
+        document.getElementById('owner-perform').style.display = tab==='perform'?'block':'none';
+    }
 
     // --- RENDER VIEWS ---
     function renderStockList() {
@@ -249,19 +268,12 @@
         let currentQty = `0 ${p.uMain}`; let daysLeft = "-"; let adu = "-"; let isUpdatedToday = false; let rowIndex = null;
 
         let stats = globalData.inventoryStats[key];
-        if(stats) {
-          adu = stats.adu;
-          if(new Date(stats.lastDate).toLocaleDateString('id-ID') === todayStr) isUpdatedToday = true;
-        }
+        if(stats) { adu = stats.adu; if(new Date(stats.lastDate).toLocaleDateString('id-ID') === todayStr) isUpdatedToday = true; }
         
         if(lItems.length > 0) {
-           let totalBase = lItems.reduce((acc, curr) => acc + curr.totalBase, 0);
-           rowIndex = lItems[0].rowIndex; // Ambil ID baris target hapus (Undo)
-           let big = Math.floor(totalBase / p.isi); let small = totalBase % p.isi;
-           let str = []; if (big > 0) str.push(`${big} ${p.uMain}`); if (small > 0 || (big === 0 && small === 0)) str.push(`${small} ${p.uSub}`);
-           currentQty = str.join(' ');
-           let dailyBase = p.minStok * p.isi; daysLeft = dailyBase > 0 ? Math.floor(totalBase / dailyBase) : 99;
+           let i = lItems[0]; rowIndex = i.rowIndex; currentQty = i.displayQty; daysLeft = i.daysLeft;
            trf.add(new Option(`${p.name} (Stok: ${currentQty})`, p.name));
+           if(i.totalBase <= 0) currentQty = `<span class="text-danger">KOSONG</span>`;
         }
 
         let inQueue = opnameQueue.find(q => q.barangId === p.name && q.outletId === out);
@@ -273,7 +285,7 @@
            currentQty = str.join(' ') + ' <i class="bi bi-cloud-arrow-up text-warning"></i>';
         }
         
-        let bgClass = isUpdatedToday ? 'bg-grn' : 'bg-wht';
+        let bgClass = isUpdatedToday ? 'bg-grn' : (lItems.length > 0 && lItems[0].totalBase <= 0 ? 'bg-danger-soft' : 'bg-wht');
         let checkIcon = isUpdatedToday ? '<i class="bi bi-check-circle-fill text-success fs-5"></i>' : '<i class="bi bi-circle text-muted fs-5"></i>';
         let undoBtn = (isUpdatedToday && !inQueue && rowIndex) ? `<i class="bi bi-arrow-counterclockwise text-danger ms-3" onclick="event.stopPropagation(); delStock(${rowIndex});" title="Batalkan"></i>` : '';
 
@@ -308,6 +320,53 @@
       document.getElementById('assetList').innerHTML = h;
     }
 
+    function renderAnalytics() {
+        // Distribusi Cerdas (Balancing)
+        let overstock = []; let kritikal = [];
+        globalData.liveStock.forEach(x => {
+            if(x.stockStatus === "OVERSTOK") overstock.push(x);
+            if(x.stockStatus === "HABIS" || x.stockStatus === "KRITIS") kritikal.push(x);
+        });
+
+        let mutH = '';
+        kritikal.forEach(k => {
+            let helper = overstock.find(o => o.name === k.name);
+            if(helper) {
+                mutH += `<div class="bg-light p-3 rounded-xl border border-primary mb-2">
+                            <div class="fw-bold text-dark small mb-1">${k.name}</div>
+                            <div class="small d-flex justify-content-between align-items-center">
+                                <span class="text-danger fw-bold"><i class="bi bi-shop"></i> ${k.outlet} (Habis)</span>
+                                <i class="bi bi-arrow-right text-muted"></i>
+                                <span class="text-success fw-bold"><i class="bi bi-shop"></i> ${helper.outlet} (Sisa ${helper.daysLeft} hr)</span>
+                            </div>
+                         </div>`;
+            }
+        });
+        if(!mutH) mutH = `<div class="text-muted small">Tidak ada saran mutasi (Distribusi merata).</div>`;
+        document.getElementById('mutationList').innerHTML = mutH;
+
+        // Analitik Performa Outlet
+        let phtml = '';
+        globalData.liveStock.forEach(x => {
+            let stats = globalData.inventoryStats[x.outlet+'_'+x.name];
+            if(stats && (stats.performa === "BOROS" || x.expStatus === "EXPIRED" || x.expStatus === "WARNING")) {
+                let badge = "";
+                if(stats.performa === "BOROS") badge += `<span class="badge-soft bg-red me-1">PEMAKAIAN BOROS</span>`;
+                if(x.expStatus === "EXPIRED") badge += `<span class="badge-soft bg-red me-1">EXPIRED</span>`;
+                else if (x.expStatus === "WARNING") badge += `<span class="badge-soft bg-yel me-1">MENDEKATI EXP</span>`;
+
+                phtml += `<div class="bg-white p-3 rounded-xl border mb-2 shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="fw-bold text-dark small">[${x.outlet}] ${x.name}</div>
+                            </div>
+                            <div class="mt-1">${badge}</div>
+                          </div>`;
+            }
+        });
+        if(!phtml) phtml = `<div class="text-muted small">Semua performa outlet dalam status wajar.</div>`;
+        document.getElementById('performanceList').innerHTML = phtml;
+    }
+
     function renderChart() {
       if(chartInstance) chartInstance.destroy();
       const ctx = document.getElementById('assetChart').getContext('2d');
@@ -327,18 +386,28 @@
       }); document.getElementById('masterList').innerHTML = h;
     }
 
-    // --- SWAL INPUTS ---
+    // --- SWAL INPUTS WITH AUTO-FILL ---
     function openInputModal(itemName) {
       let p = globalData.products.find(x => x.name === itemName); if(!p) return;
+      let out = document.getElementById('outlet').value;
+      
+      // AUTO-FILL LOGIC: Get last recorded stock for this item at this outlet
+      let lItems = globalData.liveStock.filter(x => x.name === p.name && x.outlet === out);
+      let defMain = ""; let defSub = ""; let defExp = "";
+      if(lItems.length > 0) {
+          defMain = lItems[0].qtyMain; defSub = lItems[0].qtySub; 
+          if(lItems[0].expKey !== "NoDate") defExp = lItems[0].expKey;
+      }
+
       Swal.fire({
         html: `<div style="text-align:left;"><div style="font-size:1.1rem; font-weight:800; color:#1E293B; margin-bottom:15px; border-bottom:2px solid #f0f0f0; padding-bottom:10px;">${p.name}</div>
-            <div class="dual-input"><div class="inp-grp"><label class="inp-lbl text-danger">QTY (${p.uMain})</label><input id="swal-q1" type="number" class="inp-field fw-bold text-center" placeholder="0"></div>
-              <div class="inp-grp"><label class="inp-lbl text-primary">QTY (${p.uSub})</label><input id="swal-q2" type="number" class="inp-field fw-bold text-center" placeholder="0"></div></div>
-            <div class="dual-input"><div class="inp-grp"><label class="inp-lbl">KEDALUWARSA</label><input id="swal-exp" type="date" class="inp-field"></div>
+            <div class="dual-input"><div class="inp-grp"><label class="inp-lbl text-danger">QTY (${p.uMain})</label><input id="swal-q1" type="number" class="inp-field fw-bold text-center" value="${defMain}" placeholder="0"></div>
+              <div class="inp-grp"><label class="inp-lbl text-primary">QTY (${p.uSub})</label><input id="swal-q2" type="number" class="inp-field fw-bold text-center" value="${defSub}" placeholder="0"></div></div>
+            <div class="dual-input"><div class="inp-grp"><label class="inp-lbl">KEDALUWARSA</label><input id="swal-exp" type="date" class="inp-field" value="${defExp}"></div>
                <div class="inp-grp"><label class="inp-lbl">KETERANGAN</label><select id="swal-ket" class="inp-field"><option>Opname Rutin</option><option>Barang Masuk</option><option>Barang Rusak</option></select></div></div></div>`,
         confirmButtonColor: '#FF2E2E', confirmButtonText: 'Simpan', showCancelButton: true, cancelButtonText: 'Batal',
         preConfirm: () => {
-          let q1 = document.getElementById('swal-q1').value, q2 = document.getElementById('swal-q2').value; if(!q1 && !q2) return Swal.showValidationMessage('Isi kuantitas!');
+          let q1 = document.getElementById('swal-q1').value, q2 = document.getElementById('swal-q2').value; if(q1==="" && q2==="") return Swal.showValidationMessage('Isi kuantitas!');
           return { name: p.name, qtyMain: q1, qtySub: q2, exp: document.getElementById('swal-exp').value || "NoDate", ket: document.getElementById('swal-ket').value, conversion: p.isi };
         }
       }).then(r => {
@@ -377,25 +446,28 @@
     }
 
     // --- PWA SYNC ---
-    function simpanKeQueue(payload) { opnameQueue.push(payload); localStorage.setItem('qAicha10', JSON.stringify(opnameQueue)); updateQueueUI(); renderStockList(); Swal.fire({toast:true, position:'top', icon:'warning', title:'Tersimpan Offline', showConfirmButton:false, timer:1500}); }
-    async function syncOfflineData() { if(!navigator.onLine || opnameQueue.length === 0) return; document.getElementById('loading').style.display='flex'; try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [...opnameQueue] }) }); opnameQueue = []; localStorage.setItem('qAicha10', JSON.stringify([])); updateQueueUI(); fetchData(); Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500}); } catch(e) {} finally { document.getElementById('loading').style.display='none'; } }
+    function simpanKeQueue(payload) { opnameQueue.push(payload); localStorage.setItem('qAicha11', JSON.stringify(opnameQueue)); updateQueueUI(); renderStockList(); Swal.fire({toast:true, position:'top', icon:'warning', title:'Tersimpan Offline', showConfirmButton:false, timer:1500}); }
+    async function syncOfflineData() { if(!navigator.onLine || opnameQueue.length === 0) return; document.getElementById('loading').style.display='flex'; try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [...opnameQueue] }) }); opnameQueue = []; localStorage.setItem('qAicha11', JSON.stringify([])); updateQueueUI(); fetchData(); Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500}); } catch(e) {} finally { document.getElementById('loading').style.display='none'; } }
     function updateQueueUI() { document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none'; document.getElementById('queueCount').innerText = `${opnameQueue.length} Antrean`; }
 
-    // --- WA REPORT ---
+    // --- WA REPORT (ALL ITEMS) ---
     function copyWA() {
       if(opnameQueue.length>0) return Swal.fire({icon:'warning', title:'Sync Offline Dulu!'});
       let out = document.getElementById('outlet').value; let tgl = new Date().toLocaleDateString('id-ID', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
-      let txt = `📋 *LAPORAN OPNAME AI-CHA ${out.toUpperCase()}*\n📅 ${tgl}\n👤 Petugas: ${activeUser.username}\n\n📦 *UPDATE STOK TERKINI:*\n`;
-      let hasData = false;
+      let txt = `📋 *LAPORAN OPNAME AI-CHA ${out.toUpperCase()}*\n📅 ${tgl}\n👤 Petugas: ${activeUser.username}\n\n📦 *STOK GUDANG:*\n`;
+      
       globalData.products.forEach(p => {
         let lItems = globalData.liveStock.filter(x => x.name === p.name && x.outlet === out);
         if(lItems.length > 0) {
            let i = lItems[0]; let stats = globalData.inventoryStats[`${out}_${p.name}`]; let adu = stats ? stats.adu : '-';
-           let badge = i.status === "EXPIRED" ? "⛔" : (i.status === "WARNING" ? "⚠️" : "✅");
-           txt += `➖ *${p.name}*\n   └ Stok: *${i.displayQty}*\n   └ ADU: ${adu}/hr | Est: ${i.daysLeft} hr ${badge}\n`; hasData = true;
+           let badge = i.expStatus === "EXPIRED" ? "⛔" : (i.expStatus === "WARNING" ? "⚠️" : "✅");
+           txt += `➖ *${p.name}*\n   └ Stok: *${i.displayQty}*\n   └ ADU: ${adu}/hr | Est: ${i.daysLeft} hr ${badge}\n`; 
+        } else {
+           // TAMPILKAN BARANG KOSONG
+           txt += `➖ *${p.name}*\n   └ Stok: *0 ${p.uMain} 0 ${p.uSub}* (KOSONG)\n   └ ADU: - | Est: 0 hr ⛔\n`;
         }
       });
-      if(!hasData) txt += `_(Belum ada data stok)_\n`; txt += `\n_Dikirim otomatis via Ai-CHA Enterprise V10_`;
+      txt += `\n_Dikirim otomatis via Ai-CHA Enterprise V11_`;
       navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Teks WA Tersalin!', showConfirmButton:false, timer:2000})).catch(() => Swal.fire({icon:'error', title:'Gagal Copy'}));
     }
   </script>
