@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Enterprise Superapp Opname</title>
-  <meta name="theme-color" content="#1e1b4b">
+  <title>Aicha Superapp Opname</title>
+  <meta name="theme-color" content="#b91c1c">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { background-color: #f1f5f9; -webkit-tap-highlight-color: transparent; }
+    body { background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
     .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
     .pin-dot { transition: all 0.2s ease; }
     ::-webkit-scrollbar { display: none; }
@@ -16,17 +16,15 @@
 </head>
 <body class="text-slate-800 h-screen flex flex-col overflow-hidden">
 
-  <!-- ================= PIN LOGIN SCREEN ================= -->
   <div id="loginScreen" class="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center transition-opacity duration-300">
     <div class="text-center mb-10">
-      <div class="h-16 w-16 bg-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/50">
-        <i class="fa-solid fa-boxes-stacked text-3xl text-white"></i>
+      <div class="h-20 w-20 bg-red-600 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-red-600/40">
+        <i class="fa-solid fa-ice-cream text-4xl text-white"></i>
       </div>
-      <h1 class="text-2xl font-bold text-white tracking-wide">Enterprise Auth</h1>
-      <p class="text-slate-400 text-sm mt-1" id="loginStatus">Menghubungkan ke server...</p>
+      <h1 class="text-3xl font-black text-white tracking-wide">AICHA<span class="text-red-500">PRO</span></h1>
+      <p class="text-slate-400 text-sm mt-2" id="loginStatus">Menghubungkan ke server...</p>
     </div>
 
-    <!-- PIN Indicators -->
     <div class="flex space-x-4 mb-12" id="pinIndicators">
       <div class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
       <div class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
@@ -34,7 +32,6 @@
       <div class="w-4 h-4 rounded-full border-2 border-slate-600 pin-dot"></div>
     </div>
 
-    <!-- Numpad -->
     <div class="grid grid-cols-3 gap-6 max-w-[280px] w-full pointer-events-none opacity-50" id="numpad">
       <button class="num-btn h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('1')">1</button>
       <button class="num-btn h-16 w-16 rounded-full bg-slate-800 text-white text-2xl font-light hover:bg-slate-700 active:bg-slate-600 transition" onclick="enterPin('2')">2</button>
@@ -51,17 +48,15 @@
     </div>
   </div>
 
-  <!-- ================= MAIN DASHBOARD ================= -->
   <div id="mainApp" class="hidden h-full flex flex-col relative">
     
-    <!-- Header -->
-    <div class="bg-indigo-900 text-white px-6 pt-8 pb-16 rounded-b-[2.5rem] relative z-10 shrink-0 shadow-lg">
+    <div class="bg-gradient-to-br from-red-700 to-red-900 text-white px-6 pt-8 pb-16 rounded-b-[2.5rem] relative z-10 shrink-0 shadow-lg">
       <div class="flex justify-between items-center mb-2">
         <div>
-          <p class="text-indigo-200 text-xs font-semibold uppercase tracking-wider mb-1" id="roleLabel">STAFF OPERASIONAL</p>
+          <p class="text-red-200 text-xs font-semibold uppercase tracking-wider mb-1" id="roleLabel">STAFF OPERASIONAL</p>
           <h1 class="text-2xl font-bold" id="userGreeting">Halo, -</h1>
         </div>
-        <button onclick="logout()" class="h-10 w-10 bg-white/10 rounded-full flex items-center justify-center backdrop-blur text-indigo-200 hover:text-white transition">
+        <button onclick="logout()" class="h-10 w-10 bg-white/10 rounded-full flex items-center justify-center backdrop-blur text-red-100 hover:text-white transition">
           <i class="fa-solid fa-power-off"></i>
         </button>
       </div>
@@ -71,10 +66,8 @@
       </div>
     </div>
 
-    <!-- Scrollable Content -->
     <div class="px-5 -mt-10 relative z-20 flex-1 overflow-y-auto pb-24">
       
-      <!-- Outlet Selector -->
       <div class="glass-card rounded-2xl p-5 mb-5 flex items-center justify-between">
         <div>
           <p class="text-xs font-bold text-slate-400 uppercase">Lokasi Tugas</p>
@@ -82,53 +75,69 @@
             <option value="" disabled selected>Memuat outlet...</option>
           </select>
         </div>
-        <div class="h-10 w-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-500">
+        <div class="h-10 w-10 bg-red-50 rounded-xl flex items-center justify-center text-red-600">
           <i class="fa-solid fa-store"></i>
         </div>
       </div>
 
-      <!-- Offline Sync Badge -->
       <div id="syncBadge" class="hidden mb-5 bg-yellow-100 border border-yellow-200 rounded-xl p-3 flex justify-between items-center shadow-sm">
         <span class="text-xs font-bold text-yellow-700"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> <span id="queueCount">0</span> antrean lokal</span>
         <button onclick="syncOfflineData()" class="bg-yellow-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow transition active:scale-95">Sync</button>
       </div>
 
-      <!-- Input Card -->
       <div class="glass-card rounded-2xl p-6 mb-5">
         <h2 class="text-sm font-bold text-slate-800 mb-5 flex items-center border-b border-slate-100 pb-3">
-          <i class="fa-solid fa-barcode text-indigo-500 mr-2"></i> Input Stok Aktual
+          <i class="fa-solid fa-barcode text-red-600 mr-2"></i> Input Stok & Kedaluwarsa
         </h2>
         
         <form id="opnameForm" onsubmit="submitData(event)">
+          
           <div class="mb-5">
-            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Item Barang</label>
+            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Item Barang Aicha</label>
             <div class="relative">
-              <select id="barangSelect" class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-xl appearance-none focus:ring-2 focus:ring-indigo-500 font-medium" required>
+              <select id="barangSelect" class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-xl appearance-none focus:ring-2 focus:ring-red-500 font-medium" required>
                 <option value="" disabled selected>Pilih Item...</option>
               </select>
               <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-sm pointer-events-none"></i>
             </div>
           </div>
           
+          <div class="grid grid-cols-2 gap-4 mb-5">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Qty (Fisik)</label>
+              <input type="number" id="stokInput" class="w-full bg-slate-50 border border-slate-200 text-red-700 py-3.5 px-4 rounded-xl font-bold text-xl text-center focus:ring-2 focus:ring-red-500 transition shadow-inner" placeholder="0" required min="0">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Expired Date</label>
+              <input type="date" id="expDateInput" class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-3 rounded-xl font-semibold focus:ring-2 focus:ring-red-500 transition text-sm">
+            </div>
+          </div>
+
           <div class="mb-6">
-            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Jumlah Fisik (Numerik)</label>
-            <input type="number" id="stokInput" class="w-full bg-slate-50 border border-slate-200 text-indigo-600 py-4 px-4 rounded-xl font-bold text-2xl text-center focus:ring-2 focus:ring-indigo-500 transition shadow-inner" placeholder="0" required min="0">
+            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Keterangan</label>
+            <div class="relative">
+              <select id="keteranganInput" class="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3.5 px-4 rounded-xl appearance-none focus:ring-2 focus:ring-red-500 font-medium" required>
+                <option value="Opname Rutin">Opname Rutin</option>
+                <option value="Barang Masuk">Barang Masuk</option>
+                <option value="Barang Rusak / Basi">Barang Rusak / Basi</option>
+              </select>
+              <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-sm pointer-events-none"></i>
+            </div>
           </div>
           
-          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-200 flex items-center justify-center transition">
+          <button type="submit" class="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold py-4 rounded-xl shadow-lg shadow-red-200 flex items-center justify-center transition">
             <i class="fa-solid fa-check-circle mr-2"></i> Simpan ke Database
           </button>
         </form>
       </div>
 
-      <!-- Pelaporan Section -->
-      <div class="glass-card rounded-2xl p-5 border border-indigo-100 bg-gradient-to-br from-white to-indigo-50">
+      <div class="glass-card rounded-2xl p-5 border border-red-100 bg-gradient-to-br from-white to-red-50">
         <div class="flex items-start justify-between">
           <div class="pr-4">
-            <h3 class="text-sm font-bold text-indigo-900 mb-1">Akhiri Shift & Lapor</h3>
+            <h3 class="text-sm font-bold text-red-900 mb-1">Akhiri Shift & Lapor</h3>
             <p class="text-xs text-slate-500 leading-relaxed">Kirim rekapitulasi data opname yang telah diinput hari ini langsung ke WhatsApp Owner.</p>
           </div>
-          <div class="h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 shrink-0">
+          <div class="h-10 w-10 bg-red-100 rounded-full flex items-center justify-center text-red-600 shrink-0">
             <i class="fa-brands fa-whatsapp text-xl"></i>
           </div>
         </div>
@@ -139,13 +148,11 @@
 
     </div>
 
-    <!-- Bottom Navbar -->
     <div class="absolute bottom-0 w-full bg-white border-t border-slate-200 flex justify-around items-center py-4 px-6 z-30 pb-safe shrink-0 shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
-      <div class="flex flex-col items-center text-indigo-600 cursor-pointer">
+      <div class="flex flex-col items-center text-red-600 cursor-pointer">
         <i class="fa-solid fa-pen-to-square text-xl mb-1"></i>
       </div>
       <div class="flex flex-col items-center text-slate-300 cursor-pointer">
-        <div class="bg-indigo-600 h-1.5 w-1.5 rounded-full absolute -top-2"></div>
         <i class="fa-solid fa-clock-rotate-left text-xl mb-1"></i>
       </div>
       <div class="flex flex-col items-center text-slate-300 cursor-pointer">
@@ -154,12 +161,10 @@
     </div>
   </div>
 
-  <!-- Loading Overlay -->
   <div id="loadingOverlay" class="fixed inset-0 bg-slate-900/60 z-[110] hidden flex-col items-center justify-center backdrop-blur-sm">
-    <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-400 border-opacity-50 mb-4"></div>
+    <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-red-500 border-opacity-50 mb-4"></div>
   </div>
   
-  <!-- Toast -->
   <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 text-white px-6 py-3.5 rounded-full shadow-2xl z-[120] transition-all duration-300 opacity-0 pointer-events-none flex items-center w-max max-w-[90%] font-medium text-sm">
     <i id="toastIcon" class="fa-solid mr-2 text-lg"></i>
     <span id="toastMsg"></span>
@@ -184,13 +189,11 @@
       updateNetworkStatus();
       updateQueueUI();
       
-      // Load data offline fallback jika ada
       if(localStorage.getItem('sysData')) {
         globalData = JSON.parse(localStorage.getItem('sysData'));
         enableLogin();
       }
 
-      // Fetch fresh data
       try {
         const response = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData" }) });
         const result = await response.json();
@@ -216,7 +219,6 @@
       }
     }
 
-    // ================= PIN LOGIC =================
     function enterPin(num) {
       if(currentPin.length < 4) {
         currentPin += num;
@@ -273,7 +275,6 @@
       document.getElementById('loginScreen').classList.remove('hidden');
     }
 
-    // ================= MAIN APP LOGIC =================
     function showMainApp() {
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('mainApp').classList.remove('hidden');
@@ -283,7 +284,6 @@
 
       populateDropdowns();
       
-      // Auto-lock Outlet
       const outletSelect = document.getElementById('outletSelect');
       if(activeUser.role !== "Owner" && activeUser.idOutlet !== "ALL") {
         outletSelect.value = activeUser.idOutlet;
@@ -299,10 +299,13 @@
       const barangSelect = document.getElementById('barangSelect');
       
       outletSelect.innerHTML = '<option value="" disabled selected>Pilih Outlet...</option>';
-      barangSelect.innerHTML = '<option value="" disabled selected>Pilih Item...</option>';
+      barangSelect.innerHTML = '<option value="" disabled selected>Pilih Item Aicha...</option>';
 
       globalData.outlets.forEach(o => outletSelect.add(new Option(o.nama, o.id)));
-      globalData.barangs.forEach(b => barangSelect.add(new Option(`${b.nama} (${b.satuan})`, b.id)));
+      
+      // Sort barang by alphabet
+      const sortedBarang = globalData.barangs.sort((a, b) => a.nama.localeCompare(b.nama));
+      sortedBarang.forEach(b => barangSelect.add(new Option(`${b.nama} (${b.satuan})`, b.id)));
     }
 
     async function submitData(e) {
@@ -312,11 +315,14 @@
         outletId: document.getElementById('outletSelect').value,
         barangId: document.getElementById('barangSelect').value,
         stok: document.getElementById('stokInput').value,
+        expiredDate: document.getElementById('expDateInput').value,
+        keterangan: document.getElementById('keteranganInput').value,
         timestamp: new Date().toISOString()
       };
 
       if(!payload.outletId || !payload.barangId || !payload.stok) return;
       document.getElementById('stokInput').value = '';
+      document.getElementById('expDateInput').value = '';
 
       if (navigator.onLine) {
         showLoading(true);
@@ -324,7 +330,7 @@
           const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) });
           const result = await res.json();
           showLoading(false);
-          if(result.status === "success") showToast("Tersimpan di DB", "bg-indigo-600", "fa-check");
+          if(result.status === "success") showToast("Tersimpan di DB", "bg-green-600", "fa-check");
         } catch (err) {
           showLoading(false);
           simpanKeQueue(payload); 
@@ -334,7 +340,6 @@
       }
     }
 
-    // ================= LAPORAN WA MANUAL =================
     async function kirimLaporanWA() {
       const outletId = document.getElementById('outletSelect').value;
       if(!outletId) { showToast("Pilih outlet terlebih dahulu!", "bg-red-500", "fa-circle-xmark"); return; }
@@ -365,7 +370,6 @@
       }
     }
 
-    // ================= OFFLINE & UTILS =================
     function simpanKeQueue(payload) {
       opnameQueue.push(payload);
       localStorage.setItem('opnameQueue', JSON.stringify(opnameQueue));
