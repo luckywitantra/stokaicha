@@ -101,7 +101,7 @@
             <div class="grid grid-cols-2 gap-4 mb-4">
               <div>
                 <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Qty (Fisik)</label>
-                <input type="number" id="stokInput" class="w-full bg-slate-50 border border-slate-200 text-red-700 py-3.5 px-4 rounded-xl font-bold text-xl text-center shadow-inner" placeholder="0" required min="0">
+                <input type="number" id="stokInput" class="w-full bg-slate-50 border border-slate-200 text-red-700 py-3.5 px-4 rounded-xl font-bold text-xl text-center shadow-inner" placeholder="0" required min="0" step="any">
               </div>
               <div>
                 <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Expired Date</label>
@@ -182,7 +182,7 @@
           </div>
           <div class="w-2/3">
             <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Harga (Rp)</label>
-            <input type="number" id="mHarga" class="w-full bg-slate-50 border border-slate-200 py-3 px-4 rounded-xl font-bold text-indigo-600 text-sm" required min="0">
+            <input type="number" id="mHarga" class="w-full bg-slate-50 border border-slate-200 py-3 px-4 rounded-xl font-bold text-indigo-600 text-sm" required min="0" step="any">
           </div>
         </div>
         <div class="flex space-x-3">
@@ -212,8 +212,8 @@
 
     async function initApp() {
       updateQueueUI();
-      if(localStorage.getItem('sysDataV3')) {
-        globalData = JSON.parse(localStorage.getItem('sysDataV3'));
+      if(localStorage.getItem('sysDataV4')) {
+        globalData = JSON.parse(localStorage.getItem('sysDataV4'));
         enableLogin();
       }
       try {
@@ -221,7 +221,7 @@
         const result = await response.json();
         if(result.status === "success") {
           globalData = result.data;
-          localStorage.setItem('sysDataV3', JSON.stringify(globalData));
+          localStorage.setItem('sysDataV4', JSON.stringify(globalData));
           enableLogin();
         }
       } catch (e) {
@@ -301,7 +301,6 @@
 
       globalData.outlets.forEach(o => outletSelect.add(new Option(o.nama, o.id)));
       
-      // FIX STRING LOCALE COMPARE BUG
       const sortedBarang = globalData.barangs.sort((a, b) => String(a.nama).localeCompare(String(b.nama)));
       sortedBarang.forEach(b => barangSelect.add(new Option(`${b.nama} (${b.satuan})`, b.id)));
     }
@@ -320,7 +319,6 @@
           document.getElementById('txtHabis').textContent = stats.sisaHari;
           box.classList.remove('hidden');
         } else {
-          // Belum ada riwayat
           document.getElementById('txtAdu').textContent = "-";
           document.getElementById('txtHabis').textContent = "-";
           box.classList.remove('hidden');
@@ -348,8 +346,7 @@
           await res.json();
           showLoading(false);
           showToast("Tersimpan di DB", "bg-green-600", "fa-check");
-          // Refresh data analytics di background
-          initApp(); 
+          initApp(); // Refresh data analytics di background
         } catch (err) { showLoading(false); simpanKeQueue(payload); }
       } else simpanKeQueue(payload);
     }
