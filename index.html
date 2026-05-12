@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Ai-CHA Precision V26.0</title>
+  <title>Ai-CHA Precision V27.0</title>
   <meta name="theme-color" content="#FF2E2E">
   <meta name="apple-mobile-web-app-capable" content="yes">
   
@@ -78,7 +78,7 @@
   </div>
 
   <div id="loginScreen" style="position:fixed; inset:0; background:#111827; z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-    <div class="text-center mb-5"><div style="height:80px; width:80px; background:var(--primary); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px;"><i class="bi bi-rocket-takeoff-fill text-white fs-1"></i></div><h1 class="text-white fw-bolder">AI-CHA V26</h1><p id="loginStatus" class="text-secondary small mt-1">Sistem Keamanan & Eksekutif Aktif</p></div>
+    <div class="text-center mb-5"><div style="height:80px; width:80px; background:var(--primary); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px;"><i class="bi bi-rocket-takeoff-fill text-white fs-1"></i></div><h1 class="text-white fw-bolder">AI-CHA V27</h1><p id="loginStatus" class="text-secondary small mt-1">Sistem Keamanan & Eksekutif Aktif</p></div>
     <div class="d-flex gap-3 mb-5" id="pinIndicators"><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div></div>
     <div id="numpad" class="row g-4" style="max-width:280px; opacity:0.5; pointer-events:none;">
       <div class="col-4 d-flex justify-content-center" onclick="enterPin('1')"><button class="btn btn-dark rounded-circle" style="width:70px; height:70px; font-size:1.5rem;">1</button></div>
@@ -118,8 +118,9 @@
       <div class="d-flex justify-content-between align-items-center mb-2 mt-1">
         <h6 class="fw-bold m-0 text-dark">Daftar Inventaris</h6>
         <div class="d-flex gap-2">
-           <button class="btn btn-sm btn-primary fw-bold text-white" onclick="openReceiveModal()"><i class="bi bi-box-arrow-in-down"></i> Masuk</button>
-           <button class="btn btn-sm btn-light border fw-bold text-dark" onclick="showTransfer()"><i class="bi bi-arrow-left-right"></i> Trf</button>
+           <button class="btn btn-sm btn-primary fw-bold text-white" onclick="openReceiveModal()" title="Terima Barang Masuk"><i class="bi bi-box-arrow-in-down"></i></button>
+           <button class="btn btn-sm btn-danger fw-bold text-white" onclick="openWasteModal()" title="Lapor Barang Rusak / Waste"><i class="bi bi-trash3-fill"></i></button>
+           <button class="btn btn-sm btn-light border fw-bold text-dark" onclick="showTransfer()" title="Transfer"><i class="bi bi-arrow-left-right"></i></button>
         </div>
       </div>
       
@@ -158,14 +159,6 @@
         <button class="btn-act bg-light text-secondary border mt-2" style="box-shadow:none;" onclick="showStok()">Kembali</button>
       </div>
     </div>
-    
-    <div class="px-3" id="page-master" style="display:none; height:calc(100vh - 220px); overflow-y:auto;">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h6 class="fw-bold m-0"><i class="bi bi-database me-2"></i>Master Barang</h6>
-        <button class="btn btn-sm btn-dark rounded-pill fw-bold px-3" onclick="openMasterModal()"><i class="bi bi-plus"></i> Baru</button>
-      </div>
-      <div id="masterList"></div>
-    </div>
   </div>
 
   <div id="ownerView" style="display:none;" class="px-3">
@@ -185,6 +178,7 @@
        <button class="btn btn-outline-dark fw-bold px-3" style="font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('dist')">Distribusi</button>
        <button class="btn btn-outline-dark fw-bold px-3" style="font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('trend')">Tren</button>
        <button class="btn btn-outline-dark fw-bold px-3" style="font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('po')">PO Calc</button>
+       <button class="btn btn-outline-dark fw-bold px-3" style="font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('master')">Master</button>
     </div>
 
     <div id="owner-aset" style="height:calc(100vh - 400px); overflow-y:auto;">
@@ -210,13 +204,21 @@
     <div id="owner-po" style="display:none; height:calc(100vh - 400px); overflow-y:auto;">
       <div class="card-box bg-wht"><h6 class="fw-bold text-dark mb-3"><i class="bi bi-calculator text-primary"></i> Kalkulator Purchase Order</h6><div id="poList"></div><div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center"><span class="fw-bold text-secondary">Estimasi Tagihan:</span><span class="fw-bold text-danger fs-5" id="poGrandTotal">Rp 0</span></div><button class="btn-act mt-3" onclick="copyPOWA()"><i class="bi bi-whatsapp"></i> Copy Format PO</button></div>
     </div>
+
+    <div id="owner-master" style="display:none; height:calc(100vh - 400px); overflow-y:auto;">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-bold m-0"><i class="bi bi-database me-2"></i>Master Barang</h6>
+        <button class="btn btn-sm btn-dark rounded-pill fw-bold px-3" onclick="openMasterModal()"><i class="bi bi-plus"></i> Baru</button>
+      </div>
+      <div id="masterList"></div>
+    </div>
+
   </div>
 
   <button class="fab" id="fabBtn" onclick="copyWA()"><i class="bi bi-whatsapp"></i></button>
 
   <div class="nav-bot">
     <div class="nav-item active" id="nav-gudang" onclick="nav('gudang')"><i class="bi bi-box-seam-fill"></i><span>Input</span></div>
-    <div class="nav-item" id="nav-master" onclick="nav('master')" style="display:none;"><i class="bi bi-hdd-stack-fill"></i><span>Master</span></div>
     <div class="nav-item" id="nav-lapor" onclick="nav('lapor')"><i class="bi bi-bar-chart-fill"></i><span>Dasbor</span></div>
   </div>
 
@@ -238,9 +240,9 @@
     localforage.config({ name:'AiCHA_DB', storeName:'aicha_store' });
 
     document.addEventListener("DOMContentLoaded", async () => { 
-        opnameQueue = (await localforage.getItem('qAicha26')) || [];
-        activeUser = (await localforage.getItem('uAicha26')) || null;
-        let cache = await localforage.getItem('dAicha26');
+        opnameQueue = (await localforage.getItem('qAicha27')) || [];
+        activeUser = (await localforage.getItem('uAicha27')) || null;
+        let cache = await localforage.getItem('dAicha27');
         
         showSkeletonLoader();
         if(cache) { globalData = cache; enableLogin(); }
@@ -249,7 +251,7 @@
           const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: "ALL" }) });
           const result = await res.json();
           if(result.status === "success") { 
-              globalData = result.data; await localforage.setItem('dAicha26', globalData); 
+              globalData = result.data; await localforage.setItem('dAicha27', globalData); 
               document.getElementById('loginStatus').textContent = "Sistem Keamanan & Eksekutif Aktif";
               enableLogin(); if(activeUser) showMainApp(); 
           } else {
@@ -276,10 +278,10 @@
     function updatePinUI() { document.querySelectorAll('.pin-dot').forEach((d, i) => d.style.background = i < currentPin.length ? 'white' : 'transparent'); }
     async function validatePin() {
         const u = globalData.users.find(u => u.pin === currentPin);
-        if(u) { activeUser = u; await localforage.setItem('uAicha26', u); showMainApp(); }
+        if(u) { activeUser = u; await localforage.setItem('uAicha27', u); showMainApp(); }
         else { Swal.fire('PIN Salah','','error'); currentPin = ""; updatePinUI(); }
     }
-    async function logout() { activeUser = null; currentPin = ""; window.hasShownFocus = false; await localforage.removeItem('uAicha26'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
+    async function logout() { activeUser = null; currentPin = ""; window.hasShownFocus = false; await localforage.removeItem('uAicha27'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
     window.doLogout = logout;
 
     function showMainApp() {
@@ -306,6 +308,10 @@
         if(result.status === "success") { 
             globalData = result.data; 
             renderStockList(); 
+            if(activeUser && activeUser.role === "Owner") {
+                renderOwner(); renderAnalytics(); renderPO(); renderMasterList();
+                if(document.getElementById('owner-trend').style.display === 'block') renderChart();
+            }
             showDailyFocusPopup(); 
         } else {
             Swal.fire('Peringatan Server', result.message, 'warning');
@@ -326,7 +332,7 @@
             
             Swal.fire({
                 title: '<div class="fs-4 text-warning">Fokus Hari Ini</div>',
-                html: `<div class="text-start small fw-bold">Harap segera cek fisik barang berikut karena Kritis / Mendekati Expired:<ul class="mt-2 text-danger lh-lg">${itemsHTML}</ul></div>`,
+                html: `<div class="text-start small fw-bold">Harap cek fisik barang berikut karena Kritis/Mendekati Expired:<ul class="mt-2 text-danger lh-lg">${itemsHTML}</ul></div>`,
                 confirmButtonColor: '#1E293B', confirmButtonText: 'Baik, Saya Cek'
             });
             window.hasShownFocus = true;
@@ -335,12 +341,10 @@
 
     function nav(p) {
       document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active')); document.getElementById('nav-'+p).classList.add('active');
-      document.getElementById('page-stok').style.display = 'none'; document.getElementById('page-transfer').style.display = 'none'; document.getElementById('page-master').style.display = 'none';
+      document.getElementById('page-stok').style.display = 'none'; document.getElementById('page-transfer').style.display = 'none'; 
       if(p==='lapor'){
-        if(activeUser.role==='Owner') { document.getElementById('managerView').style.display='none'; document.getElementById('ownerView').style.display='block'; document.getElementById('fabBtn').style.display='none'; renderChart(); renderAnalytics(); renderPO(); renderOwner(); }
+        if(activeUser.role==='Owner') { document.getElementById('managerView').style.display='none'; document.getElementById('ownerView').style.display='block'; document.getElementById('fabBtn').style.display='none'; renderOwner(); renderAnalytics(); renderPO(); renderMasterList(); }
         else { document.getElementById('managerView').style.display='block'; document.getElementById('page-stok').style.display='block'; document.getElementById('ownerView').style.display='none'; document.getElementById('fabBtn').style.display='flex'; }
-      } else if(p==='master') {
-        document.getElementById('managerView').style.display='block'; document.getElementById('page-master').style.display='block'; document.getElementById('ownerView').style.display='none'; document.getElementById('fabBtn').style.display='none';
       } else {
         document.getElementById('managerView').style.display='block'; document.getElementById('page-stok').style.display='block'; document.getElementById('ownerView').style.display='none'; document.getElementById('fabBtn').style.display='flex';
       }
@@ -355,7 +359,7 @@
         }
         event.target.className = 'btn btn-dark fw-bold px-3';
 
-        ['aset','rank','dist','trend','po'].forEach(t => { document.getElementById('owner-'+t).style.display = tab===t?'block':'none'; });
+        ['aset','rank','dist','trend','po','master'].forEach(t => { document.getElementById('owner-'+t).style.display = tab===t?'block':'none'; });
         if(tab==='trend') renderChart();
     }
 
@@ -445,7 +449,7 @@
       else clusterizeInstance.update(rowsHTML);
     }
 
-    // --- FITUR TERIMA BARANG MASUK DENGAN INFO KONVERSI ---
+    // --- TERIMA BARANG MASUK ---
     window.openReceiveModal = function() {
         let options = globalData.products.map(p => `<option value="${p.name}">${p.name}</option>`).join("");
         Swal.fire({
@@ -474,9 +478,41 @@
     }
 
     window.updateRcvInfo = function() {
-        let name = document.getElementById('rcv-name').value;
-        let p = globalData.products.find(x => x.name === name);
+        let name = document.getElementById('rcv-name').value; let p = globalData.products.find(x => x.name === name);
         if(p) document.getElementById('rcv-info').innerHTML = `<i class="bi bi-info-circle"></i> Info: 1 ${p.uMain} = ${p.isi} ${p.uSub}`;
+    }
+
+    // --- LAPOR WASTE ---
+    window.openWasteModal = async function() {
+        let options = globalData.products.map(p => `<option value="${p.name}">${p.name}</option>`).join("");
+        Swal.fire({
+            title: '<div class="text-danger">🗑️ Lapor Barang Rusak</div>', 
+            html: `
+            <div class="text-start">
+                <label class="inp-lbl">Pilih Nama Barang</label>
+                <select id="wst-name" class="inp-field mb-3" onchange="updateWstInfo()">${options}</select>
+                <div id="wst-info" class="small fw-bold text-danger mb-2 text-center bg-light p-2 rounded border"></div>
+                <div class="dual-input">
+                    <div class="inp-grp"><label class="inp-lbl">Qty Besar</label><input id="wst-q1" type="number" class="inp-field" placeholder="0"></div>
+                    <div class="inp-grp"><label class="inp-lbl">Qty Kecil</label><input id="wst-q2" type="number" class="inp-field" placeholder="0"></div>
+                </div>
+                <label class="inp-lbl">Tanggal Expired Barang yg Rusak (Opsional)</label>
+                <input id="wst-exp" type="date" class="inp-field">
+            </div>`,
+            confirmButtonColor: '#DC2626', confirmButtonText: 'Lapor Rusak',
+            didOpen: () => { window.updateWstInfo(); },
+            preConfirm: () => {
+                let name = document.getElementById('wst-name').value; let p = globalData.products.find(x => x.name === name);
+                let q1 = document.getElementById('wst-q1').value; let q2 = document.getElementById('wst-q2').value;
+                if(!q1 && !q2) return Swal.showValidationMessage('Isi jumlah barang!');
+                return { user: activeUser.username, outletId: document.getElementById('outlet').value, barangId: name, qtyMain: q1||0, qtySub: q2||0, conversion: p.isi, expiredDate: document.getElementById('wst-exp').value || "NoDate", keterangan: "Barang Rusak" };
+            }
+        }).then(r => { if(r.isConfirmed) submitSingle(r.value); });
+    }
+
+    window.updateWstInfo = function() {
+        let name = document.getElementById('wst-name').value; let p = globalData.products.find(x => x.name === name);
+        if(p) document.getElementById('wst-info').innerHTML = `<i class="bi bi-info-circle"></i> Info: 1 ${p.uMain} = ${p.isi} ${p.uSub}`;
     }
 
     window.openDetailModal = function(itemName) {
@@ -518,16 +554,14 @@
         if(p.hasExpiry === false) batchOpt = `<option value="Non-Expiry" data-qm="${lItem ? Math.floor(lItem.totalBase/p.isi) : 0}" data-qs="${lItem ? lItem.totalBase%p.isi : 0}">Non-Expiry Item</option>`;
 
         Swal.fire({
-            title: `<div class="fs-5 fw-bold text-danger text-start">${itemName}</div>`,
+            title: `<div class="fs-5 fw-bold text-success text-start">${itemName}</div>`,
             html: `
             <div class="text-start">
-                <div class="alert alert-danger p-2 small mb-3"><i class="bi bi-info-circle-fill"></i> Jika ada barang datang, <b>JANGAN</b> diinput di sini. Gunakan tombol biru <b>"Masuk"</b> di menu utama.</div>
-                
                 <label class="inp-lbl">Pilih Batch Yang Dihitung</label>
                 <select id="op-batch" class="inp-field mb-3" onchange="changeBatchOpname()">${batchOpt}</select>
                 
                 <div class="bg-light p-2 rounded mb-3 text-center border">
-                    <span class="small fw-bold text-primary"><i class="bi bi-info-circle"></i> Info: 1 ${p.uMain} = ${p.isi} ${p.uSub}</span>
+                    <span class="small fw-bold text-primary"><i class="bi bi-info-circle"></i> 1 ${p.uMain} isinya = ${p.isi} ${p.uSub}</span>
                 </div>
 
                 <label class="inp-lbl text-success fw-bold">Sisa Fisik Akhir</label>
@@ -560,7 +594,7 @@
     window.undoLocal = async function(barang, outlet) {
       if(await Swal.fire({title:'Batalkan Antrean?', text:'Hapus dari memori offline.', icon:'warning', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>r.isConfirmed)) {
          opnameQueue = opnameQueue.filter(q => !(q.barangId === barang && q.outletId === outlet));
-         await localforage.setItem('qAicha26', opnameQueue); updateQueueUI(); renderStockList();
+         await localforage.setItem('qAicha27', opnameQueue); updateQueueUI(); renderStockList();
       }
     }
     window.delStock = async function(id) { 
@@ -569,8 +603,8 @@
       } 
     }
 
-    async function submitSingle(payload) { showSkeletonLoader(); try { let res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) }); let result = await res.json(); if(result.status !== "success") throw new Error(result.message); fetchData(); } catch (e) { opnameQueue.push(payload); await localforage.setItem('qAicha26', opnameQueue); updateQueueUI(); renderStockList(); } }
-    async function syncOfflineData() { if(!navigator.onLine || opnameQueue.length === 0) return; showSkeletonLoader(); try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: opnameQueue }) }); opnameQueue = []; await localforage.setItem('qAicha26', []); updateQueueUI(); fetchData(); Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500}); } catch(e) { renderStockList(); } }
+    async function submitSingle(payload) { showSkeletonLoader(); try { let res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) }); let result = await res.json(); if(result.status !== "success") throw new Error(result.message); fetchData(); } catch (e) { opnameQueue.push(payload); await localforage.setItem('qAicha27', opnameQueue); updateQueueUI(); renderStockList(); } }
+    async function syncOfflineData() { if(!navigator.onLine || opnameQueue.length === 0) return; showSkeletonLoader(); try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: opnameQueue }) }); opnameQueue = []; await localforage.setItem('qAicha27', []); updateQueueUI(); fetchData(); Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500}); } catch(e) { renderStockList(); } }
     function updateQueueUI() { document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none'; document.getElementById('queueCount').innerText = `${opnameQueue.length} Antrean`; }
     
     function copyWA() {
@@ -606,7 +640,7 @@
       
       if(alertItems !== "") txt += `🚨 *PERHATIAN KHUSUS (Habis/Expired):*\n${alertItems}\n`;
       txt += `📦 *STOK AMAN:*\n${safeItems}`;
-      txt += `\n_Dikirim via Ai-CHA Enterprise V26.0_`;
+      txt += `\n_Dikirim via Ai-CHA Enterprise V27.0_`;
       
       navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Teks WA Tersalin!', showConfirmButton:false, timer:2000})).catch(() => Swal.fire({icon:'error', title:'Gagal Copy'}));
     }
@@ -675,7 +709,6 @@
       renderLeaderboard();
     }
 
-    // --- MASTER BARANG CRUD (UPDATE & DELETE) ---
     function renderMasterList() { 
         let h=''; 
         globalData.products.forEach(b => { 
@@ -710,7 +743,6 @@
     window.showHistory = function(itemName) { let out = document.getElementById('outlet').value; let lItem = globalData.liveStock.find(x => x.name === itemName && x.outlet === out); if(!lItem || !lItem.history || lItem.history.length === 0) return Swal.fire({toast:true, position:'top', icon:'info', title:'Belum ada riwayat transaksi.', showConfirmButton:false, timer:2000}); let histHTML = `<div style="text-align:left; font-size:0.8rem; max-height: 300px; overflow-y:auto;">`; lItem.history.forEach(h => { let dateStr = new Date(h.date).toLocaleString('id-ID', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}); let qtyStr = ""; let big = Math.floor(Math.abs(h.qtyBase) / lItem.isi); let small = Math.abs(h.qtyBase) % lItem.isi; if(big>0) qtyStr += `${big} ${lItem.uMain} `; if(small>0) qtyStr += `${small} ${lItem.uSub}`; let color = "text-success"; let sign = "+"; if(h.type === "Opname Rutin") { color = "text-primary"; sign = "•"; } else if(h.type === "Barang Rusak" || h.type.includes("Kirim")) { color = "text-danger"; sign = "-"; } let undoHtml = ""; if(h.type === "Opname Rutin") undoHtml = `<span class="text-danger ms-2" style="cursor:pointer;" onclick="delStock(${h.rowIndex})"><i class="bi bi-trash"></i></span>`; histHTML += `<div class="border-bottom py-2"><div class="d-flex justify-content-between fw-bold text-dark"><span>${dateStr}</span><span class="${color}">${sign}${qtyStr} ${undoHtml}</span></div><div class="text-muted d-flex justify-content-between"><span>${h.type}</span><span>${h.user}</span></div></div>`; }); histHTML += `</div>`; Swal.fire({ title: `<div style="font-size:1.1rem; color:#E31E24; font-weight:bold;">Riwayat ${itemName}</div>`, html: histHTML, confirmButtonColor: '#1E293B', confirmButtonText: 'Tutup' }); }
     function reqItem() { Swal.fire({title:'Request Barang', input:'text', inputPlaceholder:'Misal: Sedotan Besar', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>{ if(r.isConfirmed&&r.value) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "requestBarang", data: { outlet: document.getElementById('outlet').value, item: r.value, user: activeUser.username } }) }).then(()=>Swal.fire({toast:true,position:'top',icon:'success',title:'Terkirim',showConfirmButton:false,timer:1500})).finally(()=>document.getElementById('loading').style.display='none'); } }); }
     
-    // AUTO CALC MASTER
     function openMasterModal(nm="", uM="", pM="", isi="", uS="", pS="", hasExp=true) { 
         let chk = hasExp ? "checked" : ""; 
         Swal.fire({ 
