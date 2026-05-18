@@ -2,10 +2,10 @@
 <html lang="id">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Ai-CHA Precision V31.0</title>
-  <meta name="theme-color" content="#FF2E2E">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Ai-CHA Precision V33.0</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
   <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -17,6 +17,35 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.18.0/clusterize.min.js"></script>
+
+  <script>
+    // ==========================================
+    // ⬇️ UBAH LINK GAMBAR DI BAWAH INI DENGAN LINK RAW GITHUB ANDA ⬇️
+    // ==========================================
+    const APP_LOGO = "https://raw.githubusercontent.com/luckywitantra/stokaicha/main/logo.jpg"; // Ganti dengan link raw Github Anda
+    const APP_NAME = "Ai-STOK";
+    // ==========================================
+
+    const manifestData = {
+      "name": APP_NAME,
+      "short_name": "Ai-CHA",
+      "start_url": ".",
+      "display": "standalone",
+      "background_color": "#111827",
+      "theme_color": "#FF2E2E",
+      "icons": [{"src": APP_LOGO, "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}]
+    };
+    const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+    document.write(`<link rel="manifest" href="${URL.createObjectURL(manifestBlob)}">`);
+    document.write(`<link rel="apple-touch-icon" href="${APP_LOGO}">`);
+    document.write(`<meta name="apple-mobile-web-app-title" content="${APP_NAME}">`);
+
+    // DUMMY SERVICE WORKER AGAR TERDETEKSI SEBAGAI PWA
+    if ('serviceWorker' in navigator) {
+        const swBlob = new Blob([`self.addEventListener('fetch', function(e) { });`], {type: 'application/javascript'});
+        navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+    }
+  </script>
 
   <style>
     :root { 
@@ -58,7 +87,9 @@
     .btn-act { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 14px; font-weight: 800; margin-top: 5px; }
     
     .fab { position: fixed; bottom: 85px; right: 20px; background: #25D366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3); z-index: 99; transition: 0.3s; border: none; }
-    .nav-bot { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); height: 75px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); z-index: 100; }
+    .fab:active { transform: scale(0.9); }
+    
+    .nav-bot { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); height: 75px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
     .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--gray); transition: 0.2s; width: 60px; cursor: pointer; }
     .nav-item.active { color: var(--primary); }
     
@@ -78,7 +109,13 @@
 <body>
 
   <div id="loginScreen" style="position:fixed; inset:0; background:#111827; z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-    <div class="text-center mb-5"><div style="height:80px; width:80px; background:var(--primary); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px;"><i class="bi bi-rocket-takeoff-fill text-white fs-1"></i></div><h1 class="text-white fw-bolder">AI-CHA V31</h1><p id="loginStatus" class="text-secondary small mt-1">Super App Initializing...</p></div>
+    <div class="text-center mb-5">
+        <div style="height:80px; width:80px; background:white; border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; overflow:hidden;">
+            <img id="loginLogoImg" src="" style="width:100%; height:100%; object-fit:contain;" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2890/2890580.png'">
+        </div>
+        <h1 class="text-white fw-bolder" id="loginTitleApp">APP V33</h1>
+        <p id="loginStatus" class="text-secondary small mt-1">Super App Initializing...</p>
+    </div>
     <div class="d-flex gap-3 mb-5" id="pinIndicators"><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div></div>
     <div id="numpad" class="row g-4" style="max-width:280px; opacity:0.5; pointer-events:none;">
       <div class="col-4 d-flex justify-content-center" onclick="enterPin('1')"><button class="btn btn-dark rounded-circle" style="width:70px; height:70px; font-size:1.5rem;">1</button></div>
@@ -96,8 +133,9 @@
   </div>
 
   <div class="glass-header">
-    <div class="brand"><i class="bi bi-grid-fill me-2"></i>Ai-CHA</div>
+    <div class="brand" id="headerTitleApp">Ai-CHA</div>
     <div class="d-flex gap-2 align-items-center">
+        <button id="headerInstallBtn" class="btn btn-sm border rounded-circle d-none" style="background:var(--input-bg); color:var(--primary);" onclick="showInstallPopup()"><i class="bi bi-download"></i></button>
         <button id="themeToggleBtn" class="btn btn-sm border rounded-circle" style="background:var(--input-bg); color:var(--text);" onclick="toggleTheme()"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
         <div class="role-btn" id="roleLabel" onclick="doLogout()"><i class="bi bi-power text-danger me-1"></i>Logout</div>
     </div>
@@ -109,6 +147,11 @@
       <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-big"></div></div>
       <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-big"></div></div>
       <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-big"></div></div>
+  </div>
+
+  <div id="syncBadge" class="sync-badge" style="display:none;">
+    <div><i class="bi bi-cloud-arrow-up-fill text-warning me-1"></i><span class="fw-bold text-dark" id="queueCount">0 Antrean</span></div>
+    <button class="btn btn-sm btn-warning fw-bold text-white rounded-pill px-3" onclick="syncOfflineData()">Sync</button>
   </div>
 
   <div id="managerView" class="px-3">
@@ -219,14 +262,73 @@
 
   <script>
     // MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzw1NUa922TPLdt-RhA3_nlcZIPIr4vYFUraOqyyIJGLli_tp9EyiYXyTarkPiA97FGmA/exec";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzg-m_7Foz577fMEgFJ_FyOx3hGXgB_7a6HjvZuLef1CiDEpDM4zy0zdJ5uT9XUjsYbiA/exec";
     
+    document.getElementById('loginLogoImg').src = APP_LOGO;
+    document.getElementById('loginTitleApp').innerText = APP_NAME;
+    document.getElementById('headerTitleApp').innerText = APP_NAME.split(" ")[0];
+
     let globalData = { users:[], outlets:[], products:[], liveStock:[], inventoryStats:{}, assetPerOutlet:{}, expiredAssetPerOutlet:{}, wastePerOutlet:{}, hppPerOutlet:{} };
     let opnameQueue = []; let activeUser = null; let currentPin = ""; let chartInstance = null; let activePO = {}; let searchTimeout;
     let clusterizeInstance = null; let isCompactView = false; window.hasShownFocus = false; 
+    let deferredPrompt;
+    
     const toIDR=(n)=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n);
 
     localforage.config({ name:'AiCHA_DB', storeName:'aicha_store' });
+
+    // --- PWA INSTALLATION LOGIC (POPUP EDITION) ---
+    const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+    const isStandalone = () => ('standalone' in window.navigator) && window.navigator.standalone;
+
+    window.addEventListener('beforeinstallprompt', (e) => { 
+        e.preventDefault(); 
+        deferredPrompt = e; 
+        document.getElementById('headerInstallBtn').classList.remove('d-none');
+        
+        // Show Popup nicely after 3 seconds if not dismissed previously
+        if(!localStorage.getItem('hideInstallPopup')) {
+            setTimeout(showInstallPopup, 3000);
+        }
+    });
+
+    function showInstallPopup() {
+        if (deferredPrompt) {
+            Swal.fire({
+                title: `<div class="fw-bold" style="color:var(--text)">Instal ${APP_NAME}</div>`,
+                html: `<div class="small text-muted mb-2">Instal aplikasi ini di layar utama HP Anda untuk akses yang lebih cepat, responsif, dan tanpa gangguan browser!</div>`,
+                imageUrl: APP_LOGO,
+                imageWidth: 80,
+                showCancelButton: true,
+                confirmButtonColor: '#FF2E2E',
+                cancelButtonColor: '#64748B',
+                confirmButtonText: 'Instal Sekarang',
+                cancelButtonText: 'Nanti Saja'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(() => { deferredPrompt = null; document.getElementById('headerInstallBtn').classList.add('d-none'); });
+                } else {
+                    localStorage.setItem('hideInstallPopup', 'true');
+                }
+            });
+        } else if (isIos() && !isStandalone()) {
+            Swal.fire({
+                title: `<div class="fw-bold" style="color:var(--text)">Instal di iPhone</div>`,
+                html: `<div class="small text-start mt-2" style="color:var(--text)">Untuk menginstal aplikasi ini ke layar utama iPhone Anda:<br><br>1. Tekan tombol <b>Share</b> <i class="bi bi-box-arrow-up border rounded p-1"></i> di menu bawah Safari.<br><br>2. Geser ke atas dan pilih <b>"Add to Home Screen"</b> <i class="bi bi-plus-square border rounded p-1"></i>.</div>`,
+                imageUrl: APP_LOGO,
+                imageWidth: 80,
+                confirmButtonColor: '#FF2E2E',
+                confirmButtonText: 'Mengerti'
+            });
+        }
+    }
+    
+    // Fallback for iOS button
+    if (isIos() && !isStandalone()) {
+        document.getElementById('headerInstallBtn').classList.remove('d-none');
+        if(!localStorage.getItem('hideInstallPopup')) setTimeout(showInstallPopup, 3000);
+    }
 
     // --- THEME LOGIC ---
     function applyTheme(theme) {
@@ -253,9 +355,9 @@
         let savedTheme = localStorage.getItem('aicha_theme') || 'auto';
         applyTheme(savedTheme);
 
-        opnameQueue = (await localforage.getItem('qAicha31')) || [];
-        activeUser = (await localforage.getItem('uAicha31')) || null;
-        let cache = await localforage.getItem('dAicha31');
+        opnameQueue = (await localforage.getItem('qAicha33')) || [];
+        activeUser = (await localforage.getItem('uAicha33')) || null;
+        let cache = await localforage.getItem('dAicha33');
         
         showSkeletonLoader();
         if(cache) { globalData = cache; enableLogin(); }
@@ -264,7 +366,7 @@
           const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: "ALL" }) });
           const result = await res.json();
           if(result.status === "success") { 
-              globalData = result.data; await localforage.setItem('dAicha31', globalData); 
+              globalData = result.data; await localforage.setItem('dAicha33', globalData); 
               document.getElementById('loginStatus').textContent = "Sistem Keamanan Aktif";
               enableLogin(); if(activeUser) showMainApp(); 
           }
@@ -279,11 +381,11 @@
     function updatePinUI() { document.querySelectorAll('.pin-dot').forEach((d, i) => d.style.background = i < currentPin.length ? 'white' : 'transparent'); }
     async function validatePin() {
         const u = globalData.users.find(u => u.pin === currentPin);
-        if(u) { activeUser = u; await localforage.setItem('uAicha31', u); showMainApp(); }
+        if(u) { activeUser = u; await localforage.setItem('uAicha33', u); showMainApp(); }
         else { Swal.fire('PIN Salah','','error'); currentPin = ""; updatePinUI(); }
     }
     function enableLogin() { document.getElementById('numpad').style.opacity = 1; document.getElementById('numpad').style.pointerEvents = 'auto'; if(activeUser) showMainApp(); }
-    async function doLogout() { activeUser = null; currentPin = ""; window.hasShownFocus = false; await localforage.removeItem('uAicha31'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
+    async function doLogout() { activeUser = null; currentPin = ""; window.hasShownFocus = false; await localforage.removeItem('uAicha33'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
     window.doLogout = doLogout;
 
     function showMainApp() {
@@ -520,7 +622,31 @@
         if(p) document.getElementById('wst-info').innerHTML = `<i class="bi bi-info-circle"></i> Info: 1 ${p.uMain} = ${p.isi} ${p.uSub}`;
     }
 
-    // --- FULL RIWAYAT STOK (RESTORED) ---
+    window.openDetailModal = function(itemName) {
+        let out = document.getElementById('outlet').value; let p = globalData.products.find(x => x.name === itemName); let lItem = globalData.liveStock.find(x => x.name === itemName && x.outlet === out);
+        let chartHtml = `<canvas id="detailChart" height="150"></canvas>`; let expHtml = "";
+        if(lItem && lItem.batches && lItem.batches.length > 0) {
+            lItem.batches.forEach(b => {
+                let bdg = `<span class="badge bg-success">Aman</span>`;
+                if(b.status === "EXPIRED") bdg = `<span class="badge bg-danger">EXPIRED</span>`; else if(b.status === "WARNING") bdg = `<span class="badge bg-warning text-dark">Mendekati Exp</span>`; else if(b.expKey === "NoDate" || b.expKey === "Non-Expiry") bdg = "";
+                expHtml += `<div class="d-flex justify-content-between border-bottom py-1 small" style="color:var(--text)"><span>Exp: <b>${b.displayExp}</b></span><span>Stok: ${b.displayQty} ${bdg}</span></div>`;
+            });
+        }
+        let adu = globalData.inventoryStats[`${out}_${itemName}`]?.adu || '-'; let est = lItem ? (lItem.daysLeft === 999?"Aman":lItem.daysLeft) : '-';
+        let html = `<div class="text-start"><div class="mb-3">${chartHtml}</div><div class="row text-center mb-3"><div class="col-6"><div class="border rounded p-2"><div class="small text-muted">Pemakaian (ADU)</div><div class="fw-bold text-primary">${adu} / hr</div></div></div><div class="col-6"><div class="border rounded p-2"><div class="small text-muted">Est. Habis</div><div class="fw-bold text-danger">${est} hr</div></div></div></div><h6 class="fw-bold mb-2" style="color:var(--text)">Rincian Batch / Expired:</h6><div class="p-2 mb-3 border" style="background:var(--input-bg); border-radius:8px;">${expHtml || '<div class="text-muted small">Belum ada data stok.</div>'}</div></div>`;
+
+        Swal.fire({
+            title: `<div class="fs-5 fw-bold text-start" style="color:var(--text)">${itemName}</div>`, html: html, showCancelButton: true, showDenyButton: true, confirmButtonColor: '#FF2E2E', cancelButtonColor: '#64748B', denyButtonColor: '#1E293B', confirmButtonText: '<i class="bi bi-pencil-square"></i> Input Opname', denyButtonText: '<i class="bi bi-clock-history"></i> Riwayat', cancelButtonText: 'Tutup',
+            didOpen: () => {
+                if(lItem && lItem.history && lItem.history.length > 0) {
+                    let ctx = document.getElementById('detailChart').getContext('2d');
+                    let chartData = lItem.history.slice().reverse(); let labels = chartData.map(h => { let d = new Date(h.date); return d.getDate() + '/' + (d.getMonth()+1); }); let dataPoints = chartData.map(h => h.qtyBase / lItem.isi); 
+                    new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Tren Stok ('+lItem.uMain+')', data: dataPoints, borderColor: '#FF2E2E', backgroundColor: 'rgba(255, 46, 46, 0.1)', fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
+                }
+            }
+        }).then((result) => { if (result.isConfirmed) { setTimeout(() => openOpnameModal(itemName), 300); } else if (result.isDenied) { setTimeout(() => showHistory(itemName), 300); } });
+    }
+
     window.showHistory = function(itemName) { 
         let out = document.getElementById('outlet').value; 
         let lItem = globalData.liveStock.find(x => x.name === itemName && x.outlet === out); 
@@ -545,25 +671,7 @@
         Swal.fire({ title: `<div style="font-size:1.1rem; color:#E31E24; font-weight:bold;">Riwayat ${itemName}</div>`, html: histHTML, confirmButtonColor: '#1E293B', confirmButtonText: 'Tutup' }); 
     }
 
-    // --- OPNAME RUTIN ---
-    window.openDetailModal = function(itemName) {
-        let out = document.getElementById('outlet').value; let p = globalData.products.find(x => x.name === itemName); let lItem = globalData.liveStock.find(x => x.name === itemName && x.outlet === out);
-        let expHtml = "";
-        if(lItem && lItem.batches && lItem.batches.length > 0) {
-            lItem.batches.forEach(b => {
-                let bdg = `<span class="badge bg-success">Aman</span>`;
-                if(b.status === "EXPIRED") bdg = `<span class="badge bg-danger">EXPIRED</span>`; else if(b.status === "WARNING") bdg = `<span class="badge bg-warning text-dark">Mendekati Exp</span>`; else if(b.expKey === "NoDate" || b.expKey === "Non-Expiry") bdg = "";
-                expHtml += `<div class="d-flex justify-content-between border-bottom py-1 small" style="color:var(--text)"><span>Exp: <b>${b.displayExp}</b></span><span>Stok: ${b.displayQty} ${bdg}</span></div>`;
-            });
-        }
-        let adu = globalData.inventoryStats[`${out}_${itemName}`]?.adu || '-'; let est = lItem ? (lItem.daysLeft === 999?"Aman":lItem.daysLeft) : '-';
-        let html = `<div class="text-start"><div class="row text-center mb-3"><div class="col-6"><div class="border rounded p-2"><div class="small text-muted">Pemakaian (ADU)</div><div class="fw-bold text-primary">${adu} / hr</div></div></div><div class="col-6"><div class="border rounded p-2"><div class="small text-muted">Est. Habis</div><div class="fw-bold text-danger">${est} hr</div></div></div></div><h6 class="fw-bold mb-2" style="color:var(--text)">Rincian Batch / Expired:</h6><div class="p-2 mb-3 border" style="background:var(--input-bg); border-radius:8px;">${expHtml || '<div class="text-muted small">Belum ada data stok.</div>'}</div></div>`;
-
-        Swal.fire({
-            title: `<div class="fs-5 fw-bold text-start" style="color:var(--text)">${itemName}</div>`, html: html, showCancelButton: true, showDenyButton: true, confirmButtonColor: '#FF2E2E', cancelButtonColor: '#64748B', denyButtonColor: '#1E293B', confirmButtonText: '<i class="bi bi-pencil-square"></i> Input Opname', denyButtonText: '<i class="bi bi-clock-history"></i> Riwayat', cancelButtonText: 'Tutup'
-        }).then((result) => { if (result.isConfirmed) { setTimeout(() => openOpnameModal(itemName), 300); } else if (result.isDenied) { setTimeout(() => showHistory(itemName), 300); } });
-    }
-
+    // --- AUTO-FILL STOCK OPNAME ---
     window.openOpnameModal = function(itemName) {
         let p = globalData.products.find(x => x.name === itemName); let out = document.getElementById('outlet').value;
         let lItem = globalData.liveStock.find(x => x.name === itemName && x.outlet === out);
@@ -605,13 +713,21 @@
         if(opt) { document.getElementById('op-q1').value = opt.dataset.qm || ""; document.getElementById('op-q2').value = opt.dataset.qs || ""; }
     }
 
+    window.undoLocal = async function(barang, outlet) {
+      if(await Swal.fire({title:'Batalkan Antrean?', text:'Hapus dari memori offline.', icon:'warning', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>r.isConfirmed)) {
+         opnameQueue = opnameQueue.filter(q => !(q.barangId === barang && q.outletId === outlet));
+         await localforage.setItem('qAicha33', opnameQueue); updateQueueUI(); renderStockList();
+      }
+    }
     window.delStock = async function(id) { 
       if(await Swal.fire({title:'Batalkan Input?', icon:'warning', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>r.isConfirmed)) { 
         showSkeletonLoader(); fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteStock", data: {rowIndex: id, user: activeUser.username} }) }).then(()=>fetchData()); 
       } 
     }
 
-    async function submitSingle(payload) { showSkeletonLoader(); try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) }); fetchData(); } catch (e) { Swal.fire('Tersimpan Offline','Akan dikirim otomatis saat sinyal bagus','info'); } }
+    async function submitSingle(payload) { showSkeletonLoader(); try { let res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) }); let result = await res.json(); if(result.status !== "success") throw new Error(result.message); fetchData(); } catch (e) { opnameQueue.push(payload); await localforage.setItem('qAicha33', opnameQueue); updateQueueUI(); renderStockList(); Swal.fire('Tersimpan Offline','Akan dikirim otomatis saat sinyal bagus','info'); } }
+    async function syncOfflineData() { if(!navigator.onLine || opnameQueue.length === 0) return; showSkeletonLoader(); try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: opnameQueue }) }); opnameQueue = []; await localforage.setItem('qAicha33', []); updateQueueUI(); fetchData(); Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500}); } catch(e) { renderStockList(); } }
+    function updateQueueUI() { document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none'; document.getElementById('queueCount').innerText = `${opnameQueue.length} Antrean`; }
     
     // --- Laporan WA PWA Konsolidasi & Rekap ---
     function copyWA() {
@@ -641,11 +757,10 @@
            allItemsStr += `   └ ADU: ${adu}/hr | Est: ${lItem.daysLeft === 999 ? "Aman" : lItem.daysLeft + " hr"}\n\n`; 
         } else { allItemsStr += `➖ *${p.name}* 🔴\n   └ Stok: *KOSONG*\n\n`; }
       });
-      txt += allItemsStr + `_Ket: ✅ Aman | 📉 Kritis | 📈 Over | ⚠️ Dekat Exp | ⛔ Expired | 🔴 Kosong_\n\n_Generated via V31.0 Enterprise_`;
+      txt += allItemsStr + `_Ket: ✅ Aman | 📉 Kritis | 📈 Over | ⚠️ Dekat Exp | ⛔ Expired | 🔴 Kosong_\n\n_Generated via V33.0 Enterprise_`;
       navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Laporan Tersalin!', showConfirmButton:false, timer:2000}));
     }
     
-    // --- KONSOLIDASI LINTAS CABANG DENGAN EXP DATE ---
     window.copyKonsolidasiWA = function() {
         let tgl = new Date().toLocaleDateString('id-ID', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
         let txt = `🏢 *LAPORAN KONSOLIDASI AI-CHA*\n📅 ${tgl}\n\n`;
@@ -666,29 +781,8 @@
             });
             txt += `➖ *${p.name}*\n${detailStr}\n`;
         });
-        txt += `_Generated via V31.0 Enterprise_`;
+        txt += `_Generated via V33.0 Enterprise_`;
         navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Laporan Konsolidasi Tersalin!', showConfirmButton:false, timer:3000}));
-    }
-
-    // --- KLIK STATS DASHBOARD OWNER ---
-    window.showStatDetails = function(type) {
-        let outFilter = document.getElementById('outlet').value;
-        let filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter);
-        
-        let title = ""; let items = [];
-        if(type === 'kritis') { title = "Item Kritis / Habis"; items = filteredStock.filter(x => x.stockStatus === "KRITIS" || x.stockStatus === "HABIS"); } 
-        else if (type === 'over') { title = "Item Overstok"; items = filteredStock.filter(x => x.stockStatus === "OVERSTOK"); } 
-        else { title = "Total Item Aktif"; items = filteredStock; }
-
-        let html = `<div style="max-height: 60vh; overflow-y:auto; text-align:left; font-size:0.85rem;">`;
-        if(items.length === 0) html += `<div class="text-center text-muted py-3">Tidak ada data.</div>`;
-        items.forEach(i => {
-            let outName = outFilter === "ALL" ? `[${i.outlet}] ` : "";
-            let color = i.stockStatus === "HABIS" ? "text-danger" : (i.stockStatus === "KRITIS" ? "text-warning" : "text-success");
-            html += `<div class="border-bottom py-2 d-flex justify-content-between"><span class="fw-bold" style="color:var(--text)">${outName}${i.name}</span><span class="${color} fw-bold">${i.displayQty}</span></div>`;
-        });
-        html += `</div>`;
-        Swal.fire({ title: `<div class="fs-5 fw-bold" style="color:var(--text)">${title}</div>`, html: html, confirmButtonColor: '#1E293B', confirmButtonText: 'Tutup' });
     }
 
     function renderOwner() { 
@@ -714,7 +808,6 @@
       document.getElementById('assetList').innerHTML = h; 
     }
     
-    // --- MASTER BARANG ---
     function renderMasterList() { let h=''; globalData.products.forEach(b => { h+=`<div class="card-box p-3"><div class="d-flex justify-content-between align-items-center"><div><div class="fw-bold" style="font-size:0.9rem; color:var(--text)">${b.name}</div><div class="small text-secondary mt-1">1 ${b.uMain} = ${b.isi} ${b.uSub}</div></div><div class="d-flex gap-1"><button onclick="openMasterModal('${b.name}', '${b.uMain}', '${b.pMain}', '${b.isi}', '${b.uSub}', '${b.pSub}', ${b.hasExpiry})" class="btn btn-sm border" style="background:var(--input-bg)"><i class="bi bi-pencil-fill text-primary"></i></button><button onclick="deleteMasterItem('${b.name}')" class="btn btn-sm border" style="background:var(--input-bg)"><i class="bi bi-trash-fill text-danger"></i></button></div></div></div>`; }); document.getElementById('masterList').innerHTML = h; }
     window.deleteMasterItem = function(nama) { Swal.fire({ title: 'Hapus Item?', text: `Anda yakin ingin menghapus ${nama}?`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33' }).then(r => { if(r.isConfirmed) { showSkeletonLoader(); fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteMasterBarang", data: { nama: nama, user: activeUser.username } }) }).then(()=>fetchData()); } }); }
     function openMasterModal(nm="", uM="", pM="", isi="", uS="", pS="", hasExp=true) { 
@@ -728,7 +821,6 @@
     window.updateMasterLabel = function() { let val = document.getElementById('muMain').value || "Besar"; document.getElementById('lbl-big').innerText = val; }
     window.calcMaster = function() { let pMain = Number(document.getElementById('mpMain').value) || 0; let isi = Number(document.getElementById('mIsi').value) || 1; let result = pMain / isi; document.getElementById('mpSub').value = result.toFixed(0); document.getElementById('mCalcBadge').innerText = "= Rp " + toIDR(result); }
 
-    // --- LAINNYA ---
     function renderPO() { let poMap = {}; activePO = {}; let grandTotal = 0; let outFilter = document.getElementById('outlet').value; let filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter); filteredStock.forEach(x => { if(x.poNeed > 0) { if(!poMap[x.name]) poMap[x.name] = { name: x.name, uMain: x.uMain, pMain: x.pMain, qty: 0 }; poMap[x.name].qty += x.poNeed; } }); let h = ''; for(let key in poMap) { let item = poMap[key]; activePO[item.name] = { qty: item.qty, price: item.pMain, uMain: item.uMain }; let sub = item.qty * item.pMain; grandTotal += sub; h += `<div class="d-flex justify-content-between align-items-center border-bottom py-2"><div style="width:50%"><div class="fw-bold small" style="color:var(--text)">${item.name}</div><div class="text-muted" style="font-size:0.6rem;">${toIDR(item.pMain)} / ${item.uMain}</div></div><div><input type="number" class="po-input" value="${item.qty}" onchange="updatePO('${item.name}', this.value)"></div><div class="text-end fw-bold text-success" style="font-size:0.8rem; width:30%;" id="po_sub_${item.name.replace(/[^a-zA-Z0-9]/g, '')}">${toIDR(sub)}</div></div>`; } document.getElementById('poList').innerHTML = h || `<div class="text-muted text-center small py-3">Tidak ada rekomendasi order. Stok aman.</div>`; document.getElementById('poGrandTotal').innerText = toIDR(grandTotal); }
     window.updatePO = function(name, newQty) { let qty = Number(newQty) || 0; activePO[name].qty = qty; let sub = qty * activePO[name].price; document.getElementById('po_sub_'+name.replace(/[^a-zA-Z0-9]/g, '')).innerText = toIDR(sub); let grand = 0; for(let k in activePO) grand += activePO[k].qty * activePO[k].price; document.getElementById('poGrandTotal').innerText = toIDR(grand); }
     window.copyPOWA = function() { let out = document.getElementById('outlet').value; let txt = `🛒 *FORM PURCHASE ORDER (PO) AI-CHA*\n🏢 Target: ${out==='ALL'?'SELURUH OUTLET':out}\n📅 ${new Date().toLocaleDateString('id-ID')}\n\n*Rincian Order:*\n`; let hasPO = false; let gTot = 0; for(let k in activePO) { if(activePO[k].qty > 0) { let sub = activePO[k].qty * activePO[k].price; gTot += sub; txt += `➖ ${k} : *${activePO[k].qty} ${activePO[k].uMain}*\n`; hasPO = true; } } if(!hasPO) return Swal.fire({icon:'warning', title:'Order Kosong'}); txt += `\n💰 *Total Estimasi Tagihan: ${toIDR(gTot)}*\n\nMohon diproses, terima kasih.`; navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Format PO Tersalin!', showConfirmButton:false, timer:2000})); }
