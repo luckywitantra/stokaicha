@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Ai-CHA Precision V30.0</title>
+  <title>Ai-CHA Precision V31.0</title>
   <meta name="theme-color" content="#FF2E2E">
   <meta name="apple-mobile-web-app-capable" content="yes">
   
@@ -19,7 +19,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.18.0/clusterize.min.js"></script>
 
   <style>
-    /* CSS VARIABLES FOR THEME SWITCHING */
     :root { 
       --primary: #FF2E2E; --bg: #F8F9FD; --text: #1E293B; --gray: #64748B; 
       --card-bg: #FFFFFF; --border: #eeeeee; --input-bg: #fafafa; --radius: 16px; 
@@ -34,24 +33,20 @@
     button, .card-box, .nav-item, .fab, select, input { touch-action: manipulation; }
     .swal2-popup { will-change: transform, opacity; background: var(--card-bg) !important; color: var(--text) !important; }
 
-    /* UI COMPONENTS */
     .glass-header { background: rgba(var(--card-bg), 0.95); backdrop-filter: blur(10px); padding: 15px 20px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .brand { font-weight: 800; font-size: 1.3rem; color: var(--primary); }
     .role-btn { font-size: 0.8rem; background: var(--input-bg); padding: 6px 14px; border-radius: 50px; font-weight: 700; cursor: pointer; border: 1px solid var(--border); color: var(--text); }
     .outlet-wrap { padding: 0 20px; }
     .outlet-sel { width: 100%; border: 1px solid var(--border); background: var(--card-bg); font-weight: 800; font-size: 1rem; outline: none; padding: 12px 15px; border-radius: 12px; margin: 15px 0; color: var(--text); }
     
-    /* SWIPE CONTAINER & CARD */
     .swipe-container { position: relative; margin-bottom: 12px; border-radius: var(--radius); overflow: hidden; background: #e5e7eb; }
     body.dark-mode .swipe-container { background: #374151; }
-    
     .swipe-bg-left { position: absolute; left: 0; top: 0; bottom: 0; width: 50%; background: #10B981; display: flex; align-items: center; padding-left: 20px; color: white; font-weight: bold; font-size: 1.2rem; z-index: 1; }
     .swipe-bg-right { position: absolute; right: 0; top: 0; bottom: 0; width: 50%; background: #EF4444; display: flex; justify-content: flex-end; align-items: center; padding-right: 20px; color: white; font-weight: bold; font-size: 1.2rem; z-index: 1; }
     
     .card-box { background: var(--card-bg); border-radius: var(--radius); padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); position: relative; z-index: 2; transition: transform 0.2s; border-left: 5px solid transparent; }
     body.dark-mode .card-box { box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
     
-    /* COMPACT MODE MODIFIERS */
     .compact-mode .card-box { padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .compact-mode .card-box .hide-compact { display: none !important; }
     .compact-mode .card-box .fs-4 { font-size: 1.1rem !important; margin: 0 !important; }
@@ -70,10 +65,9 @@
     .bg-grn { border-left-color: #10B981 !important; }
     .bg-danger-soft { border-left-color: #EF4444 !important; }
     
-    .history-btn { position: absolute; top: 15px; right: 15px; background: var(--input-bg); color: var(--gray); border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; z-index: 10; border: none; }
+    .history-btn { position: absolute; top: 15px; right: 15px; background: var(--input-bg); color: var(--gray); border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid var(--border); }
     #scrollArea { max-height: calc(100vh - 280px); overflow-y: auto; overflow-x: hidden; padding-bottom: 20px; }
     
-    /* SKELETON */
     .skeleton { background: #e2e5e7; background-image: linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,0.5) 20px, rgba(255,255,255,0) 40px); background-size: 150px 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
     body.dark-mode .skeleton { background: #374151; background-image: linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,0.1) 20px, rgba(255,255,255,0) 40px); }
     @keyframes shimmer { 0% { background-position: -150px 0; } 100% { background-position: 100% 0; } }
@@ -84,7 +78,7 @@
 <body>
 
   <div id="loginScreen" style="position:fixed; inset:0; background:#111827; z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-    <div class="text-center mb-5"><div style="height:80px; width:80px; background:var(--primary); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px;"><i class="bi bi-rocket-takeoff-fill text-white fs-1"></i></div><h1 class="text-white fw-bolder">AI-CHA V30</h1><p id="loginStatus" class="text-secondary small mt-1">Super App Initializing...</p></div>
+    <div class="text-center mb-5"><div style="height:80px; width:80px; background:var(--primary); border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px;"><i class="bi bi-rocket-takeoff-fill text-white fs-1"></i></div><h1 class="text-white fw-bolder">AI-CHA V31</h1><p id="loginStatus" class="text-secondary small mt-1">Super App Initializing...</p></div>
     <div class="d-flex gap-3 mb-5" id="pinIndicators"><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div></div>
     <div id="numpad" class="row g-4" style="max-width:280px; opacity:0.5; pointer-events:none;">
       <div class="col-4 d-flex justify-content-center" onclick="enterPin('1')"><button class="btn btn-dark rounded-circle" style="width:70px; height:70px; font-size:1.5rem;">1</button></div>
@@ -103,7 +97,10 @@
 
   <div class="glass-header">
     <div class="brand"><i class="bi bi-grid-fill me-2"></i>Ai-CHA</div>
-    <div class="role-btn" id="roleLabel" onclick="doLogout()"><i class="bi bi-power text-danger me-1"></i>Logout</div>
+    <div class="d-flex gap-2 align-items-center">
+        <button id="themeToggleBtn" class="btn btn-sm border rounded-circle" style="background:var(--input-bg); color:var(--text);" onclick="toggleTheme()"><i class="bi bi-moon-fill" id="themeIcon"></i></button>
+        <div class="role-btn" id="roleLabel" onclick="doLogout()"><i class="bi bi-power text-danger me-1"></i>Logout</div>
+    </div>
   </div>
 
   <div class="outlet-wrap"><select id="outlet" class="outlet-sel" onchange="fetchData()"></select></div>
@@ -133,10 +130,10 @@
           <select id="sortSelect" class="inp-field" style="width: 100px; font-size:0.75rem;" onchange="renderStockList()">
               <option value="az">A - Z</option><option value="za">Z - A</option><option value="stok_desc">Terbanyak</option><option value="stok_asc">Sedikit</option>
           </select>
-          <button class="btn border-0 rounded-3 px-3" style="background:var(--input-bg); color:var(--text); border:1px solid var(--border)!important;" onclick="toggleCompactView()" title="Ubah Tampilan"><i class="bi bi-list-task"></i></button>
+          <button class="btn border rounded-3 px-3" style="background:var(--input-bg); color:var(--text);" onclick="toggleCompactView()" title="Ubah Tampilan"><i class="bi bi-list-task"></i></button>
       </div>
       
-      <div class="small text-muted mb-2 text-center"><i class="bi bi-arrows-collapse"></i> Geser kartu ke <b>Kanan (Masuk)</b> atau <b>Kiri (Waste)</b></div>
+      <div class="small text-muted mb-2 text-center" style="font-size:0.7rem;"><i class="bi bi-arrows-collapse"></i> Geser kartu ke <b>Kanan (Masuk)</b> atau <b>Kiri (Waste)</b></div>
       
       <div id="scrollArea" class="clusterize-scroll"><div id="liveBody" class="clusterize-content"></div></div>
     </div>
@@ -161,9 +158,9 @@
 
   <div id="ownerView" style="display:none;" class="px-3">
     <div class="row g-2 mb-3">
-        <div class="col-4"><div class="card-box text-center py-2 mb-0 border shadow-sm"><h5 id="qs-item" class="mb-0 fw-bolder" style="color:var(--text)">0</h5><small style="font-size:0.6rem; font-weight:700;" class="text-secondary">AKTIF</small></div></div>
-        <div class="col-4"><div class="card-box text-center py-2 mb-0 border border-danger shadow-sm"><h5 id="qs-kritis" class="mb-0 fw-bolder text-danger">0</h5><small style="font-size:0.6rem; font-weight:700;" class="text-secondary">KRITIS</small></div></div>
-        <div class="col-4"><div class="card-box text-center py-2 mb-0 border border-warning shadow-sm"><h5 id="qs-over" class="mb-0 fw-bolder text-warning">0</h5><small style="font-size:0.6rem; font-weight:700;" class="text-secondary">OVERSTOK</small></div></div>
+        <div class="col-4"><div class="card-box text-center py-2 mb-0 border shadow-sm" onclick="showStatDetails('aktif')"><h5 id="qs-item" class="mb-0 fw-bolder" style="color:var(--text)">0</h5><small style="font-size:0.6rem; font-weight:700;" class="text-secondary">AKTIF</small></div></div>
+        <div class="col-4"><div class="card-box text-center py-2 mb-0 border border-danger shadow-sm" onclick="showStatDetails('kritis')"><h5 id="qs-kritis" class="mb-0 fw-bolder text-danger">0</h5><small style="font-size:0.6rem; font-weight:700;" class="text-secondary">KRITIS</small></div></div>
+        <div class="col-4"><div class="card-box text-center py-2 mb-0 border border-warning shadow-sm" onclick="showStatDetails('over')"><h5 id="qs-over" class="mb-0 fw-bolder text-warning">0</h5><small style="font-size:0.6rem; font-weight:700;" class="text-secondary">OVERSTOK</small></div></div>
     </div>
     <div class="row g-2 mb-3">
         <div class="col-6"><div class="card-box bg-dark text-white text-center py-3 mb-0 border-0 h-100 d-flex flex-column justify-content-center"><small style="opacity:0.9; font-weight:700; font-size:0.6rem;">HPP HARIAN (EST)</small><h5 id="hppVal" style="margin:2px 0 0 0; font-weight:800; font-size:1.1rem; color:#6EE7B7;">Rp 0</h5></div></div>
@@ -186,7 +183,7 @@
     
     <div id="owner-rank" style="display:none; height:calc(100vh - 400px); overflow-y:auto;">
       <h6 class="fw-bold mt-1" style="color:var(--text)"><i class="bi bi-trophy-fill text-warning"></i> Leaderboard Outlet</h6><div id="leaderboardList" class="mb-4"></div>
-      <button class="btn-act bg-primary mb-4" onclick="copyKonsolidasiWA()"><i class="bi bi-whatsapp"></i> Cetak Laporan Konsolidasi 4 Cabang</button>
+      <button class="btn-act bg-primary mb-4" onclick="copyKonsolidasiWA()"><i class="bi bi-whatsapp"></i> Cetak Laporan Konsolidasi</button>
     </div>
     
     <div id="owner-dist" style="display:none; height:calc(100vh - 400px); overflow-y:auto;">
@@ -218,27 +215,47 @@
     <div class="nav-item" id="nav-lapor" onclick="nav('lapor')"><i class="bi bi-bar-chart-fill"></i><span>Dasbor</span></div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
     // MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxyiTGoGA4dKEf0kCc-0-_WqYOQZrHHhrDmeGIQ7fKfPsfrR38SNP07tCKsEoVAXzCEhA/exec";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzw1NUa922TPLdt-RhA3_nlcZIPIr4vYFUraOqyyIJGLli_tp9EyiYXyTarkPiA97FGmA/exec";
     
     let globalData = { users:[], outlets:[], products:[], liveStock:[], inventoryStats:{}, assetPerOutlet:{}, expiredAssetPerOutlet:{}, wastePerOutlet:{}, hppPerOutlet:{} };
-    let activeUser = null; let chartInstance = null; let activePO = {}; let searchTimeout;
-    let clusterizeInstance = null; let isCompactView = false;
+    let opnameQueue = []; let activeUser = null; let currentPin = ""; let chartInstance = null; let activePO = {}; let searchTimeout;
+    let clusterizeInstance = null; let isCompactView = false; window.hasShownFocus = false; 
     const toIDR=(n)=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n);
 
     localforage.config({ name:'AiCHA_DB', storeName:'aicha_store' });
 
-    function applyTheme() {
-        let h = new Date().getHours();
-        if(h >= 18 || h < 6) document.body.classList.add('dark-mode');
-        else document.body.classList.remove('dark-mode');
+    // --- THEME LOGIC ---
+    function applyTheme(theme) {
+        let icon = document.getElementById('themeIcon');
+        if (theme === 'dark') { 
+            document.body.classList.add('dark-mode'); 
+            if(icon) { icon.classList.remove('bi-moon-fill'); icon.classList.add('bi-sun-fill'); }
+        } else if (theme === 'light') { 
+            document.body.classList.remove('dark-mode'); 
+            if(icon) { icon.classList.remove('bi-sun-fill'); icon.classList.add('bi-moon-fill'); }
+        } else {
+            let h = new Date().getHours();
+            if(h >= 18 || h < 6) applyTheme('dark'); else applyTheme('light');
+        }
+    }
+    function toggleTheme() {
+        let isDark = document.body.classList.contains('dark-mode');
+        let newTheme = isDark ? 'light' : 'dark';
+        localStorage.setItem('aicha_theme', newTheme);
+        applyTheme(newTheme);
     }
 
     document.addEventListener("DOMContentLoaded", async () => { 
-        applyTheme(); setInterval(applyTheme, 3600000); // Check per hour
-        activeUser = (await localforage.getItem('uAicha30')) || null;
-        let cache = await localforage.getItem('dAicha30');
+        let savedTheme = localStorage.getItem('aicha_theme') || 'auto';
+        applyTheme(savedTheme);
+
+        opnameQueue = (await localforage.getItem('qAicha31')) || [];
+        activeUser = (await localforage.getItem('uAicha31')) || null;
+        let cache = await localforage.getItem('dAicha31');
         
         showSkeletonLoader();
         if(cache) { globalData = cache; enableLogin(); }
@@ -247,7 +264,7 @@
           const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: "ALL" }) });
           const result = await res.json();
           if(result.status === "success") { 
-              globalData = result.data; await localforage.setItem('dAicha30', globalData); 
+              globalData = result.data; await localforage.setItem('dAicha31', globalData); 
               document.getElementById('loginStatus').textContent = "Sistem Keamanan Aktif";
               enableLogin(); if(activeUser) showMainApp(); 
           }
@@ -257,17 +274,16 @@
         }
     });
 
-    let currentPin = "";
     function enterPin(n) { if(currentPin.length < 4) { currentPin += n; updatePinUI(); if(currentPin.length===4) validatePin(); } }
     function deletePin() { if(currentPin.length > 0) { currentPin = currentPin.slice(0, -1); updatePinUI(); } }
     function updatePinUI() { document.querySelectorAll('.pin-dot').forEach((d, i) => d.style.background = i < currentPin.length ? 'white' : 'transparent'); }
     async function validatePin() {
         const u = globalData.users.find(u => u.pin === currentPin);
-        if(u) { activeUser = u; await localforage.setItem('uAicha30', u); showMainApp(); }
+        if(u) { activeUser = u; await localforage.setItem('uAicha31', u); showMainApp(); }
         else { Swal.fire('PIN Salah','','error'); currentPin = ""; updatePinUI(); }
     }
     function enableLogin() { document.getElementById('numpad').style.opacity = 1; document.getElementById('numpad').style.pointerEvents = 'auto'; if(activeUser) showMainApp(); }
-    async function doLogout() { activeUser = null; currentPin = ""; await localforage.removeItem('uAicha30'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
+    async function doLogout() { activeUser = null; currentPin = ""; window.hasShownFocus = false; await localforage.removeItem('uAicha31'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
     window.doLogout = doLogout;
 
     function showMainApp() {
@@ -356,8 +372,6 @@
       let rowsHTML = [];
       if(enrichedProducts.length === 0) rowsHTML.push('<div class="text-center py-5 text-muted small">Barang tidak ditemukan.</div>');
 
-      let todayStr = new Date().toLocaleDateString('id-ID');
-
       enrichedProducts.forEach(ep => {
         let p = ep; let lItem = ep.lItem; let key = `${out}_${p.name}`; 
         let updatedToday = globalData.inventoryStats[key]?.lastDate > new Date().setHours(0,0,0,0);
@@ -434,20 +448,12 @@
     });
 
     window.openReceiveModalFromSwipe = function(itemName) {
-        document.getElementById('searchInput').value = ""; renderStockList(); // Reset search if any
-        setTimeout(() => {
-            openReceiveModal();
-            let sel = document.getElementById('rcv-name');
-            if(sel) { sel.value = itemName; updateRcvInfo(); }
-        }, 100);
+        document.getElementById('searchInput').value = ""; renderStockList();
+        setTimeout(() => { openReceiveModal(); let sel = document.getElementById('rcv-name'); if(sel) { sel.value = itemName; updateRcvInfo(); } }, 100);
     }
     window.openWasteModalFromSwipe = function(itemName) {
         document.getElementById('searchInput').value = ""; renderStockList();
-        setTimeout(() => {
-            openWasteModal();
-            let sel = document.getElementById('wst-name');
-            if(sel) { sel.value = itemName; updateWstInfo(); }
-        }, 100);
+        setTimeout(() => { openWasteModal(); let sel = document.getElementById('wst-name'); if(sel) { sel.value = itemName; updateWstInfo(); } }, 100);
     }
 
     // --- TERIMA BARANG MASUK ---
@@ -459,7 +465,7 @@
             <div class="text-start">
                 <label class="inp-lbl">Pilih Nama Barang</label>
                 <select id="rcv-name" class="inp-field mb-3" onchange="updateRcvInfo()">${options}</select>
-                <div id="rcv-info" class="small fw-bold text-primary mb-2 text-center bg-light p-2 rounded border"></div>
+                <div id="rcv-info" class="small fw-bold text-primary mb-2 text-center p-2 rounded border" style="background:var(--input-bg);"></div>
                 <div class="dual-input">
                     <div class="inp-grp"><label class="inp-lbl">Qty Besar</label><input id="rcv-q1" type="number" class="inp-field" placeholder="0"></div>
                     <div class="inp-grp"><label class="inp-lbl">Qty Kecil</label><input id="rcv-q2" type="number" class="inp-field" placeholder="0"></div>
@@ -491,7 +497,7 @@
             <div class="text-start">
                 <label class="inp-lbl">Pilih Nama Barang</label>
                 <select id="wst-name" class="inp-field mb-3" onchange="updateWstInfo()">${options}</select>
-                <div id="wst-info" class="small fw-bold text-danger mb-2 text-center bg-light p-2 rounded border"></div>
+                <div id="wst-info" class="small fw-bold text-danger mb-2 text-center p-2 rounded border" style="background:var(--input-bg);"></div>
                 <div class="dual-input">
                     <div class="inp-grp"><label class="inp-lbl">Qty Besar</label><input id="wst-q1" type="number" class="inp-field" placeholder="0"></div>
                     <div class="inp-grp"><label class="inp-lbl">Qty Kecil</label><input id="wst-q2" type="number" class="inp-field" placeholder="0"></div>
@@ -514,32 +520,50 @@
         if(p) document.getElementById('wst-info').innerHTML = `<i class="bi bi-info-circle"></i> Info: 1 ${p.uMain} = ${p.isi} ${p.uSub}`;
     }
 
+    // --- FULL RIWAYAT STOK (RESTORED) ---
+    window.showHistory = function(itemName) { 
+        let out = document.getElementById('outlet').value; 
+        let lItem = globalData.liveStock.find(x => x.name === itemName && x.outlet === out); 
+        if(!lItem || !lItem.history || lItem.history.length === 0) return Swal.fire({toast:true, position:'top', icon:'info', title:'Belum ada riwayat transaksi.', showConfirmButton:false, timer:2000}); 
+        
+        let histHTML = `<div style="text-align:left; font-size:0.8rem; max-height: 300px; overflow-y:auto; overflow-x:hidden;">`; 
+        lItem.history.forEach(h => { 
+            let dateStr = new Date(h.date).toLocaleString('id-ID', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}); 
+            let qtyStr = ""; let big = Math.floor(Math.abs(h.qtyBase) / lItem.isi); let small = Math.abs(h.qtyBase) % lItem.isi; 
+            if(big>0) qtyStr += `${big} ${lItem.uMain} `; if(small>0) qtyStr += `${small} ${lItem.uSub}`; 
+            
+            let color = "text-success"; let sign = "+"; 
+            if(h.type === "Opname Rutin") { color = "text-primary"; sign = "•"; } 
+            else if(h.type === "Barang Rusak" || h.type.includes("Kirim")) { color = "text-danger"; sign = "-"; } 
+            
+            let undoHtml = ""; 
+            if(h.type === "Opname Rutin") undoHtml = `<span class="text-danger ms-2" style="cursor:pointer;" onclick="delStock(${h.rowIndex})"><i class="bi bi-trash"></i></span>`; 
+            
+            histHTML += `<div class="border-bottom py-2"><div class="d-flex justify-content-between fw-bold" style="color:var(--text)"><span>${dateStr}</span><span class="${color}">${sign}${qtyStr} ${undoHtml}</span></div><div class="text-muted d-flex justify-content-between"><span>${h.type}</span><span>${h.user}</span></div></div>`; 
+        }); 
+        histHTML += `</div>`; 
+        Swal.fire({ title: `<div style="font-size:1.1rem; color:#E31E24; font-weight:bold;">Riwayat ${itemName}</div>`, html: histHTML, confirmButtonColor: '#1E293B', confirmButtonText: 'Tutup' }); 
+    }
+
+    // --- OPNAME RUTIN ---
     window.openDetailModal = function(itemName) {
         let out = document.getElementById('outlet').value; let p = globalData.products.find(x => x.name === itemName); let lItem = globalData.liveStock.find(x => x.name === itemName && x.outlet === out);
-        let chartHtml = `<canvas id="detailChart" height="150"></canvas>`; let expHtml = "";
+        let expHtml = "";
         if(lItem && lItem.batches && lItem.batches.length > 0) {
             lItem.batches.forEach(b => {
                 let bdg = `<span class="badge bg-success">Aman</span>`;
                 if(b.status === "EXPIRED") bdg = `<span class="badge bg-danger">EXPIRED</span>`; else if(b.status === "WARNING") bdg = `<span class="badge bg-warning text-dark">Mendekati Exp</span>`; else if(b.expKey === "NoDate" || b.expKey === "Non-Expiry") bdg = "";
-                expHtml += `<div class="d-flex justify-content-between border-bottom py-1 small"><span>Exp: <b>${b.displayExp}</b></span><span>Stok: ${b.displayQty} ${bdg}</span></div>`;
+                expHtml += `<div class="d-flex justify-content-between border-bottom py-1 small" style="color:var(--text)"><span>Exp: <b>${b.displayExp}</b></span><span>Stok: ${b.displayQty} ${bdg}</span></div>`;
             });
         }
         let adu = globalData.inventoryStats[`${out}_${itemName}`]?.adu || '-'; let est = lItem ? (lItem.daysLeft === 999?"Aman":lItem.daysLeft) : '-';
-        let html = `<div class="text-start"><div class="mb-3">${chartHtml}</div><div class="row text-center mb-3"><div class="col-6"><div class="border rounded p-2"><div class="small text-muted">Pemakaian (ADU)</div><div class="fw-bold text-primary">${adu} / hr</div></div></div><div class="col-6"><div class="border rounded p-2"><div class="small text-muted">Est. Habis</div><div class="fw-bold text-danger">${est} hr</div></div></div></div><h6 class="fw-bold text-dark mb-2">Rincian Batch / Expired:</h6><div class="p-2 mb-3" style="background:var(--input-bg); border-radius:8px;">${expHtml || '<div class="text-muted small">Belum ada data stok.</div>'}</div></div>`;
+        let html = `<div class="text-start"><div class="row text-center mb-3"><div class="col-6"><div class="border rounded p-2"><div class="small text-muted">Pemakaian (ADU)</div><div class="fw-bold text-primary">${adu} / hr</div></div></div><div class="col-6"><div class="border rounded p-2"><div class="small text-muted">Est. Habis</div><div class="fw-bold text-danger">${est} hr</div></div></div></div><h6 class="fw-bold mb-2" style="color:var(--text)">Rincian Batch / Expired:</h6><div class="p-2 mb-3 border" style="background:var(--input-bg); border-radius:8px;">${expHtml || '<div class="text-muted small">Belum ada data stok.</div>'}</div></div>`;
 
         Swal.fire({
-            title: `<div class="fs-5 fw-bold text-start" style="color:var(--text)">${itemName}</div>`, html: html, showCancelButton: true, showDenyButton: true, confirmButtonColor: '#FF2E2E', cancelButtonColor: '#64748B', denyButtonColor: '#1E293B', confirmButtonText: '<i class="bi bi-pencil-square"></i> Input Opname', denyButtonText: '<i class="bi bi-clock-history"></i> Riwayat', cancelButtonText: 'Tutup',
-            didOpen: () => {
-                if(lItem && lItem.history && lItem.history.length > 0) {
-                    let ctx = document.getElementById('detailChart').getContext('2d');
-                    let chartData = lItem.history.slice().reverse(); let labels = chartData.map(h => { let d = new Date(h.date); return d.getDate() + '/' + (d.getMonth()+1); }); let dataPoints = chartData.map(h => h.qtyBase / lItem.isi); 
-                    new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Tren Stok ('+lItem.uMain+')', data: dataPoints, borderColor: '#FF2E2E', backgroundColor: 'rgba(255, 46, 46, 0.1)', fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
-                }
-            }
+            title: `<div class="fs-5 fw-bold text-start" style="color:var(--text)">${itemName}</div>`, html: html, showCancelButton: true, showDenyButton: true, confirmButtonColor: '#FF2E2E', cancelButtonColor: '#64748B', denyButtonColor: '#1E293B', confirmButtonText: '<i class="bi bi-pencil-square"></i> Input Opname', denyButtonText: '<i class="bi bi-clock-history"></i> Riwayat', cancelButtonText: 'Tutup'
         }).then((result) => { if (result.isConfirmed) { setTimeout(() => openOpnameModal(itemName), 300); } else if (result.isDenied) { setTimeout(() => showHistory(itemName), 300); } });
     }
 
-    // --- AUTO-FILL STOCK OPNAME ---
     window.openOpnameModal = function(itemName) {
         let p = globalData.products.find(x => x.name === itemName); let out = document.getElementById('outlet').value;
         let lItem = globalData.liveStock.find(x => x.name === itemName && x.outlet === out);
@@ -547,9 +571,7 @@
         let batchOpt = "";
         if(lItem?.batches && lItem.batches.length > 0) {
             lItem.batches.forEach(b => batchOpt += `<option value="${b.expKey}" data-qm="${b.qtyMain}" data-qs="${b.qtySub}">Exp: ${b.displayExp} (Sisa ${b.displayQty})</option>`);
-        } else {
-            batchOpt = `<option value="NoDate" data-qm="0" data-qs="0">Belum Ada Batch Tersedia</option>`;
-        }
+        } else { batchOpt = `<option value="NoDate" data-qm="0" data-qs="0">Belum Ada Batch Tersedia</option>`; }
         if(p.hasExpiry === false) batchOpt = `<option value="Non-Expiry" data-qm="${lItem ? Math.floor(lItem.totalBase/p.isi) : 0}" data-qs="${lItem ? lItem.totalBase%p.isi : 0}">Non-Expiry Item</option>`;
 
         Swal.fire({
@@ -558,11 +580,9 @@
             <div class="text-start">
                 <label class="inp-lbl">Pilih Batch Yang Dihitung</label>
                 <select id="op-batch" class="inp-field mb-3" onchange="changeBatchOpname()">${batchOpt}</select>
-                
                 <div class="p-2 mb-3 text-center border" style="background:var(--input-bg); border-radius:8px;">
                     <span class="small fw-bold text-primary"><i class="bi bi-info-circle"></i> 1 ${p.uMain} isinya = ${p.isi} ${p.uSub}</span>
                 </div>
-
                 <label class="inp-lbl text-success fw-bold">Sisa Fisik Akhir</label>
                 <div class="dual-input">
                     <div class="inp-grp"><label class="inp-lbl text-muted">${p.uMain}</label><input id="op-q1" type="number" class="inp-field fw-bold text-center" placeholder="${p.uMain}"></div>
@@ -581,30 +601,25 @@
     }
 
     window.changeBatchOpname = function() {
-        let sel = document.getElementById('op-batch');
-        let opt = sel.options[sel.selectedIndex];
-        if(opt) {
-            document.getElementById('op-q1').value = opt.dataset.qm || "";
-            document.getElementById('op-q2').value = opt.dataset.qs || "";
-        }
+        let sel = document.getElementById('op-batch'); let opt = sel.options[sel.selectedIndex];
+        if(opt) { document.getElementById('op-q1').value = opt.dataset.qm || ""; document.getElementById('op-q2').value = opt.dataset.qs || ""; }
     }
 
-    async function submitSingle(payload) { showSkeletonLoader(); try { let res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) }); let result = await res.json(); if(result.status !== "success") throw new Error(result.message); fetchData(); } catch (e) { Swal.fire('Tersimpan Offline','Akan dikirim otomatis saat sinyal bagus','info'); renderStockList(); } }
+    window.delStock = async function(id) { 
+      if(await Swal.fire({title:'Batalkan Input?', icon:'warning', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>r.isConfirmed)) { 
+        showSkeletonLoader(); fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteStock", data: {rowIndex: id, user: activeUser.username} }) }).then(()=>fetchData()); 
+      } 
+    }
+
+    async function submitSingle(payload) { showSkeletonLoader(); try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) }); fetchData(); } catch (e) { Swal.fire('Tersimpan Offline','Akan dikirim otomatis saat sinyal bagus','info'); } }
     
-    // --- PENYEMPURNAAN LAPORAN WA (EXECUTIVE SUMMARY & DAFTAR UNIFIED) ---
+    // --- Laporan WA PWA Konsolidasi & Rekap ---
     function copyWA() {
       let out = document.getElementById('outlet').value; let tgl = new Date().toLocaleDateString('id-ID', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
-      
-      let totHPP = globalData.hppPerOutlet ? (globalData.hppPerOutlet[out] || 0) : 0;
-      let totWaste = globalData.wastePerOutlet ? (globalData.wastePerOutlet[out] || 0) : 0;
-      let totLoss = globalData.expiredAssetPerOutlet ? (globalData.expiredAssetPerOutlet[out] || 0) : 0;
-      let totalKerugian = totWaste + totLoss;
+      let totHPP = globalData.hppPerOutlet ? (globalData.hppPerOutlet[out] || 0) : 0; let totWaste = globalData.wastePerOutlet ? (globalData.wastePerOutlet[out] || 0) : 0; let totLoss = globalData.expiredAssetPerOutlet ? (globalData.expiredAssetPerOutlet[out] || 0) : 0;
       
       let txt = `📋 *LAPORAN OPNAME AI-CHA ${out.toUpperCase()}*\n📅 ${tgl}\n👤 Petugas: ${activeUser.username}\n\n`;
-      txt += `📊 *RINGKASAN EKSEKUTIF*\n`;
-      txt += `💰 Estimasi HPP: *${toIDR(totHPP)}*\n`;
-      txt += `🗑️ Kerugian (Waste): *${toIDR(totalKerugian)}*\n\n`;
-      txt += `📦 *RINCIAN STOK BARANG:*\n`;
+      txt += `📊 *RINGKASAN EKSEKUTIF*\n💰 Estimasi HPP: *${toIDR(totHPP)}*\n🗑️ Kerugian (Waste): *${toIDR(totWaste + totLoss)}*\n\n📦 *RINCIAN STOK BARANG:*\n`;
       
       let sortedProducts = [...globalData.products].sort((a,b) => a.name.localeCompare(b.name));
       let allItemsStr = "";
@@ -612,66 +627,73 @@
       sortedProducts.forEach(p => {
         let lItem = globalData.liveStock.find(x => x.name === p.name && x.outlet === out);
         let stats = globalData.inventoryStats[`${out}_${p.name}`]; let adu = stats ? stats.adu : '-';
-        
         if(lItem && lItem.totalBase > 0) { 
-           let statusIcon = "✅";
-           if(lItem.stockStatus === "KRITIS") { statusIcon = "📉"; } else if(lItem.stockStatus === "OVERSTOK") { statusIcon = "📈"; }
-
+           let statusIcon = "✅"; if(lItem.stockStatus === "KRITIS") statusIcon = "📉"; else if(lItem.stockStatus === "OVERSTOK") statusIcon = "📈";
            let batchStr = "";
            if(lItem.batches.length > 0) { 
                lItem.batches.forEach(b => { 
                    let bdg = b.status==="EXPIRED" ? "⛔" : (b.status==="WARNING" ? "⚠️" : ""); 
-                   if(b.expKey !== "NoDate" && b.expKey !== "Non-Expiry") {
-                       batchStr += `     • Exp ${b.displayExp}: ${b.displayQty} ${bdg}\n`; 
-                       if(b.status === "EXPIRED") statusIcon = "⛔"; else if(b.status === "WARNING" && statusIcon === "✅") statusIcon = "⚠️";
-                   }
+                   if(b.expKey !== "NoDate" && b.expKey !== "Non-Expiry") { batchStr += `     • Exp ${b.displayExp}: ${b.displayQty} ${bdg}\n`; if(b.status === "EXPIRED") statusIcon = "⛔"; else if(b.status === "WARNING" && statusIcon === "✅") statusIcon = "⚠️"; }
                }); 
            } 
            allItemsStr += `➖ *${p.name}* ${statusIcon}\n   └ Stok: *${lItem.displayQty}*\n`; 
            if (batchStr !== "") allItemsStr += batchStr;
            allItemsStr += `   └ ADU: ${adu}/hr | Est: ${lItem.daysLeft === 999 ? "Aman" : lItem.daysLeft + " hr"}\n\n`; 
-        } else { 
-           allItemsStr += `➖ *${p.name}* 🔴\n   └ Stok: *KOSONG*\n\n`; 
-        }
+        } else { allItemsStr += `➖ *${p.name}* 🔴\n   └ Stok: *KOSONG*\n\n`; }
       });
-      
-      txt += allItemsStr;
-      txt += `_Ket: ✅ Aman | 📉 Kritis | 📈 Over | ⚠️ Dekat Exp | ⛔ Expired | 🔴 Kosong_\n`;
-      txt += `\n_Generated via V30.0 Enterprise_`;
-      
+      txt += allItemsStr + `_Ket: ✅ Aman | 📉 Kritis | 📈 Over | ⚠️ Dekat Exp | ⛔ Expired | 🔴 Kosong_\n\n_Generated via V31.0 Enterprise_`;
       navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Laporan Tersalin!', showConfirmButton:false, timer:2000}));
     }
     
-    // --- LAPORAN KONSOLIDASI (CROSS-OUTLET REPORT) ---
+    // --- KONSOLIDASI LINTAS CABANG DENGAN EXP DATE ---
     window.copyKonsolidasiWA = function() {
         let tgl = new Date().toLocaleDateString('id-ID', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
-        let txt = `🏢 *LAPORAN KONSOLIDASI AI-CHA 4 CABANG*\n📅 ${tgl}\n\n`;
-        
+        let txt = `🏢 *LAPORAN KONSOLIDASI AI-CHA*\n📅 ${tgl}\n\n`;
         let sortedProducts = [...globalData.products].sort((a,b) => a.name.localeCompare(b.name));
         let targetOutlets = globalData.outlets.filter(o => o.id !== "ALL");
         
         sortedProducts.forEach(p => {
-            let details = [];
+            let detailStr = "";
             targetOutlets.forEach(o => {
                 let lItem = globalData.liveStock.find(x => x.name === p.name && x.outlet === o.id);
                 if(lItem && lItem.totalBase > 0) {
-                    let status = lItem.stockStatus === "KRITIS" ? "📉" : (lItem.stockStatus === "OVERSTOK" ? "📈" : "");
-                    details.push(`*${o.nama}*: ${lItem.displayQty} ${status}`);
-                } else {
-                    details.push(`*${o.nama}*: Kosong 🔴`);
-                }
+                    let status = lItem.stockStatus === "KRITIS" ? "📉" : (lItem.stockStatus === "OVERSTOK" ? "📈" : "✅");
+                    let expInfo = [];
+                    if(lItem.batches && lItem.batches.length > 0) { lItem.batches.forEach(b => { if(b.expKey !== "NoDate" && b.expKey !== "Non-Expiry") expInfo.push(b.displayExp); }); }
+                    let expTxt = expInfo.length > 0 ? ` (Exp: ${expInfo.join(', ')})` : "";
+                    detailStr += `   📍 *${o.nama}*: ${lItem.displayQty}${expTxt} ${status}\n`;
+                } else { detailStr += `   📍 *${o.nama}*: KOSONG 🔴\n`; }
             });
-            txt += `➖ *${p.name}*\n   └ ${details.join(' | ')}\n\n`;
+            txt += `➖ *${p.name}*\n${detailStr}\n`;
         });
+        txt += `_Generated via V31.0 Enterprise_`;
+        navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Laporan Konsolidasi Tersalin!', showConfirmButton:false, timer:3000}));
+    }
+
+    // --- KLIK STATS DASHBOARD OWNER ---
+    window.showStatDetails = function(type) {
+        let outFilter = document.getElementById('outlet').value;
+        let filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter);
         
-        txt += `_Generated via V30.0 Enterprise_`;
-        navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Konsolidasi Lintas Cabang Tersalin!', showConfirmButton:false, timer:3000}));
+        let title = ""; let items = [];
+        if(type === 'kritis') { title = "Item Kritis / Habis"; items = filteredStock.filter(x => x.stockStatus === "KRITIS" || x.stockStatus === "HABIS"); } 
+        else if (type === 'over') { title = "Item Overstok"; items = filteredStock.filter(x => x.stockStatus === "OVERSTOK"); } 
+        else { title = "Total Item Aktif"; items = filteredStock; }
+
+        let html = `<div style="max-height: 60vh; overflow-y:auto; text-align:left; font-size:0.85rem;">`;
+        if(items.length === 0) html += `<div class="text-center text-muted py-3">Tidak ada data.</div>`;
+        items.forEach(i => {
+            let outName = outFilter === "ALL" ? `[${i.outlet}] ` : "";
+            let color = i.stockStatus === "HABIS" ? "text-danger" : (i.stockStatus === "KRITIS" ? "text-warning" : "text-success");
+            html += `<div class="border-bottom py-2 d-flex justify-content-between"><span class="fw-bold" style="color:var(--text)">${outName}${i.name}</span><span class="${color} fw-bold">${i.displayQty}</span></div>`;
+        });
+        html += `</div>`;
+        Swal.fire({ title: `<div class="fs-5 fw-bold" style="color:var(--text)">${title}</div>`, html: html, confirmButtonColor: '#1E293B', confirmButtonText: 'Tutup' });
     }
 
     function renderOwner() { 
       let outFilter = document.getElementById('outlet').value; 
       let totAset = 0; let totLoss = 0; let totHPP = 0; let totWaste = 0; let totalAktif = 0; let totalKritis = 0; let totalOver = 0;
-
       let filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter); 
       filteredStock.forEach(x => { totalAktif++; if(x.stockStatus === "KRITIS" || x.stockStatus === "HABIS") totalKritis++; if(x.stockStatus === "OVERSTOK") totalOver++; });
 
@@ -692,17 +714,9 @@
       document.getElementById('assetList').innerHTML = h; 
     }
     
-    function renderChart() { 
-        if(chartInstance) chartInstance.destroy(); const ctx = document.getElementById('trendChart').getContext('2d'); 
-        let hppData = Object.values(globalData.hppPerOutlet || {}); let wasteData = Object.values(globalData.wastePerOutlet || {});
-        chartInstance = new Chart(ctx, { type: 'bar', data: { labels: Object.keys(globalData.hppPerOutlet || {}), datasets: [ { label: 'HPP Harian (Rp)', data: hppData, backgroundColor: '#10B981', borderRadius: 4 }, { label: 'Waste (Rp)', data: wasteData, backgroundColor: '#EF4444', borderRadius: 4 } ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } }); 
-    }
-
-    // --- REUSE OTHER OWNER MODULES (Master Barang, Transfer, Delete) ---
+    // --- MASTER BARANG ---
     function renderMasterList() { let h=''; globalData.products.forEach(b => { h+=`<div class="card-box p-3"><div class="d-flex justify-content-between align-items-center"><div><div class="fw-bold" style="font-size:0.9rem; color:var(--text)">${b.name}</div><div class="small text-secondary mt-1">1 ${b.uMain} = ${b.isi} ${b.uSub}</div></div><div class="d-flex gap-1"><button onclick="openMasterModal('${b.name}', '${b.uMain}', '${b.pMain}', '${b.isi}', '${b.uSub}', '${b.pSub}', ${b.hasExpiry})" class="btn btn-sm border" style="background:var(--input-bg)"><i class="bi bi-pencil-fill text-primary"></i></button><button onclick="deleteMasterItem('${b.name}')" class="btn btn-sm border" style="background:var(--input-bg)"><i class="bi bi-trash-fill text-danger"></i></button></div></div></div>`; }); document.getElementById('masterList').innerHTML = h; }
     window.deleteMasterItem = function(nama) { Swal.fire({ title: 'Hapus Item?', text: `Anda yakin ingin menghapus ${nama}?`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33' }).then(r => { if(r.isConfirmed) { showSkeletonLoader(); fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteMasterBarang", data: { nama: nama, user: activeUser.username } }) }).then(()=>fetchData()); } }); }
-    window.showHistory = function(itemName) { /* LOGIC HELD, REUSE EXISTING*/ }
-    function reqItem() { /* REUSE EXISTING */ }
     function openMasterModal(nm="", uM="", pM="", isi="", uS="", pS="", hasExp=true) { 
         let chk = hasExp ? "checked" : ""; 
         Swal.fire({ 
@@ -713,11 +727,13 @@
     }
     window.updateMasterLabel = function() { let val = document.getElementById('muMain').value || "Besar"; document.getElementById('lbl-big').innerText = val; }
     window.calcMaster = function() { let pMain = Number(document.getElementById('mpMain').value) || 0; let isi = Number(document.getElementById('mIsi').value) || 1; let result = pMain / isi; document.getElementById('mpSub').value = result.toFixed(0); document.getElementById('mCalcBadge').innerText = "= Rp " + toIDR(result); }
-    function updTrfLbl() { /* REUSE EXISTING */ }
-    async function processTransfer() { /* REUSE EXISTING */ }
+
+    // --- LAINNYA ---
     function renderPO() { let poMap = {}; activePO = {}; let grandTotal = 0; let outFilter = document.getElementById('outlet').value; let filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter); filteredStock.forEach(x => { if(x.poNeed > 0) { if(!poMap[x.name]) poMap[x.name] = { name: x.name, uMain: x.uMain, pMain: x.pMain, qty: 0 }; poMap[x.name].qty += x.poNeed; } }); let h = ''; for(let key in poMap) { let item = poMap[key]; activePO[item.name] = { qty: item.qty, price: item.pMain, uMain: item.uMain }; let sub = item.qty * item.pMain; grandTotal += sub; h += `<div class="d-flex justify-content-between align-items-center border-bottom py-2"><div style="width:50%"><div class="fw-bold small" style="color:var(--text)">${item.name}</div><div class="text-muted" style="font-size:0.6rem;">${toIDR(item.pMain)} / ${item.uMain}</div></div><div><input type="number" class="po-input" value="${item.qty}" onchange="updatePO('${item.name}', this.value)"></div><div class="text-end fw-bold text-success" style="font-size:0.8rem; width:30%;" id="po_sub_${item.name.replace(/[^a-zA-Z0-9]/g, '')}">${toIDR(sub)}</div></div>`; } document.getElementById('poList').innerHTML = h || `<div class="text-muted text-center small py-3">Tidak ada rekomendasi order. Stok aman.</div>`; document.getElementById('poGrandTotal').innerText = toIDR(grandTotal); }
     window.updatePO = function(name, newQty) { let qty = Number(newQty) || 0; activePO[name].qty = qty; let sub = qty * activePO[name].price; document.getElementById('po_sub_'+name.replace(/[^a-zA-Z0-9]/g, '')).innerText = toIDR(sub); let grand = 0; for(let k in activePO) grand += activePO[k].qty * activePO[k].price; document.getElementById('poGrandTotal').innerText = toIDR(grand); }
     window.copyPOWA = function() { let out = document.getElementById('outlet').value; let txt = `🛒 *FORM PURCHASE ORDER (PO) AI-CHA*\n🏢 Target: ${out==='ALL'?'SELURUH OUTLET':out}\n📅 ${new Date().toLocaleDateString('id-ID')}\n\n*Rincian Order:*\n`; let hasPO = false; let gTot = 0; for(let k in activePO) { if(activePO[k].qty > 0) { let sub = activePO[k].qty * activePO[k].price; gTot += sub; txt += `➖ ${k} : *${activePO[k].qty} ${activePO[k].uMain}*\n`; hasPO = true; } } if(!hasPO) return Swal.fire({icon:'warning', title:'Order Kosong'}); txt += `\n💰 *Total Estimasi Tagihan: ${toIDR(gTot)}*\n\nMohon diproses, terima kasih.`; navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Format PO Tersalin!', showConfirmButton:false, timer:2000})); }
+    function updTrfLbl() { let s=document.getElementById('trfItem').value; let out=document.getElementById('outlet').value; let i=globalData.liveStock.find(x=>x.name===s && x.outlet===out); if(i) { document.getElementById('trfMax').innerText=i.displayQty; document.getElementById('lbl-trf-1').innerText=`QTY (${i.uMain})`; document.getElementById('lbl-trf-2').innerText=`QTY (${i.uSub})`; } }
+    async function processTransfer() { let d={ from: document.getElementById('outlet').value, to: document.getElementById('trfDest').value, item: document.getElementById('trfItem').value, q1: document.getElementById('trf-q1').value, q2: document.getElementById('trf-q2').value, user: activeUser.username }; if(!d.from||!d.to||!d.item||(!d.q1&&!d.q2)) return Swal.fire({icon:'error', title:'Lengkapi Data!'}); document.getElementById('loading').style.display='flex'; try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "processTransfer", data: d }) }); Swal.fire({toast:true, position:'top', icon:'success', title:'Transfer Sukses', showConfirmButton:false, timer:1500}); document.getElementById('trf-q1').value=''; document.getElementById('trf-q2').value=''; fetchData(); showStok(); } catch(e){} finally { document.getElementById('loading').style.display='none'; } }
   </script>
 </body>
 </html>
