@@ -22,7 +22,7 @@
     // ==========================================
     // ⬇️ UBAH LINK GAMBAR DI BAWAH INI DENGAN LINK RAW GITHUB ANDA ⬇️
     // ==========================================
-    const APP_LOGO = "https://raw.githubusercontent.com/luckywitantra/stokaicha/main/logo.png"; // Ganti dengan link raw Github Anda
+    const APP_LOGO = "https://raw.githubusercontent.com/luckywitantra/stokaicha/main/logo.png"; 
     const APP_NAME = "Ai-STOK";
     // ==========================================
 
@@ -40,7 +40,6 @@
     document.write(`<link rel="apple-touch-icon" href="${APP_LOGO}">`);
     document.write(`<meta name="apple-mobile-web-app-title" content="${APP_NAME}">`);
 
-    // DUMMY SERVICE WORKER AGAR TERDETEKSI SEBAGAI PWA
     if ('serviceWorker' in navigator) {
         const swBlob = new Blob([`self.addEventListener('fetch', function(e) { });`], {type: 'application/javascript'});
         navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
@@ -104,6 +103,10 @@
     @keyframes shimmer { 0% { background-position: -150px 0; } 100% { background-position: 100% 0; } }
     .skeleton-card { padding: 15px; background: var(--card-bg); border-radius: var(--radius); margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px; border: 1px solid var(--border); }
     .sk-title { height: 20px; width: 70%; } .sk-big { height: 35px; width: 40%; }
+    
+    /* Efek hover/klik pada foto */
+    .zoomable-img { transition: transform 0.2s; cursor: pointer; }
+    .zoomable-img:active { transform: scale(0.9); }
   </style>
 </head>
 <body>
@@ -149,7 +152,7 @@
       <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-big"></div></div>
   </div>
 
-  <div id="syncBadge" class="sync-badge" style="display:none;">
+  <div id="syncBadge" class="sync-badge" style="display:none; justify-content:space-between; align-items:center; background:var(--card-bg); padding:10px 20px; border-bottom:1px solid var(--border);">
     <div><i class="bi bi-cloud-arrow-up-fill text-warning me-1"></i><span class="fw-bold text-dark" id="queueCount">0 Antrean</span></div>
     <button class="btn btn-sm btn-warning fw-bold text-white rounded-pill px-3" onclick="syncOfflineData()">Sync</button>
   </div>
@@ -286,7 +289,6 @@
         deferredPrompt = e; 
         document.getElementById('headerInstallBtn').classList.remove('d-none');
         
-        // Show Popup nicely after 3 seconds if not dismissed previously
         if(!localStorage.getItem('hideInstallPopup')) {
             setTimeout(showInstallPopup, 3000);
         }
@@ -451,6 +453,26 @@
         return `<svg width="${w}" height="${h}" style="overflow:visible;"><polyline points="${pts.join(' ')}" fill="none" stroke="#FF2E2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     }
 
+    // ==========================================
+    // FUNGSI ZOOM FOTO PRODUK (LIGHTBOX)
+    // ==========================================
+    window.zoomFoto = function(event, url, nama) {
+        event.stopPropagation(); // Mencegah klik menyebar ke kartu (agar detail modal tidak terbuka)
+        Swal.fire({
+            title: `<div class="fs-6 text-white text-center mt-2">${nama}</div>`,
+            imageUrl: url,
+            imageAlt: nama,
+            background: 'transparent',
+            backdrop: 'rgba(0,0,0,0.85)',
+            showConfirmButton: false,
+            showCloseButton: true,
+            padding: '1em',
+            customClass: {
+                closeButton: 'text-white'
+            }
+        });
+    }
+
     function renderStockList() {
       let out = document.getElementById('outlet').value;
       if(out === "ALL") { document.getElementById('liveBody').innerHTML = '<div class="text-center py-5 text-muted small">Pilih outlet spesifik di atas.</div>'; if(clusterizeInstance) { clusterizeInstance.destroy(); clusterizeInstance = null; } return; }
@@ -494,20 +516,31 @@
         
         let sparkline = isCompactView ? '' : generateSparkline(lItem?.history, p.isi);
 
+        // FOTO DIBERIKAN FUNGSI ONCLICK ZOOM
+        let fotoUrl = p.fotoUrl || "https://cdn-icons-png.flaticon.com/512/1170/1170577.png";
+
         rowsHTML.push(`
         <div class="swipe-container ${isCompactView ? 'compact-mode' : ''}">
             <div class="swipe-bg-left"><i class="bi bi-box-arrow-in-down"></i> Masuk</div>
             <div class="swipe-bg-right">Waste <i class="bi bi-trash3-fill ms-2"></i></div>
             <div class="card-box swipe-card ${bgClass}" data-item="${p.name}" onclick="openDetailModal('${p.name}')">
                 <button class="history-btn hide-compact" onclick="event.stopPropagation(); showHistory('${p.name}')"><i class="bi bi-clock-history"></i></button>
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <div class="fw-bold w-75" style="font-size:0.95rem; color:var(--text);">${p.name}</div>
-                    <div class="d-flex align-items-center hide-compact">${updatedToday ? '<i class="bi bi-check-circle-fill text-success fs-5"></i>' : ''}</div>
+                
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <img src="${fotoUrl}" onclick="zoomFoto(event, '${fotoUrl}', '${p.name}')" class="zoomable-img" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); background:white;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1170/1170577.png'">
+                    
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <div class="fw-bold w-100" style="font-size:0.95rem; color:var(--text);">${p.name}</div>
+                            <div class="d-flex align-items-center hide-compact">${updatedToday ? '<i class="bi bi-check-circle-fill text-success fs-5"></i>' : ''}</div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-end">
+                            <div class="text-danger fw-bold fs-4 my-1">${currentQty}</div>
+                            <div class="hide-compact">${sparkline}</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="d-flex justify-content-between align-items-end">
-                    <div class="text-danger fw-bold fs-4 my-1">${currentQty}</div>
-                    <div class="hide-compact">${sparkline}</div>
-                </div>
+                
                 <div class="d-flex justify-content-between small text-secondary hide-compact">
                     <div><i class="bi bi-graph-up-arrow"></i> ADU: ${adu}/hr</div>
                     <div class="fw-bold">Est Habis: ${daysLeft}</div>
@@ -625,6 +658,10 @@
     window.openDetailModal = function(itemName) {
         let out = document.getElementById('outlet').value; let p = globalData.products.find(x => x.name === itemName); let lItem = globalData.liveStock.find(x => x.name === itemName && x.outlet === out);
         let chartHtml = `<canvas id="detailChart" height="150"></canvas>`; let expHtml = "";
+        
+        // FOTO DETAIL BISA DI KLIK UNTUK ZOOM
+        let fotoHtml = p.fotoUrl ? `<div class="text-center mb-3"><img src="${p.fotoUrl}" onclick="zoomFoto(event, '${p.fotoUrl}', '${p.name}')" class="zoomable-img" style="max-height: 150px; border-radius: 8px; border: 1px solid var(--border);"></div>` : '';
+
         if(lItem && lItem.batches && lItem.batches.length > 0) {
             lItem.batches.forEach(b => {
                 let bdg = `<span class="badge bg-success">Aman</span>`;
@@ -633,7 +670,16 @@
             });
         }
         let adu = globalData.inventoryStats[`${out}_${itemName}`]?.adu || '-'; let est = lItem ? (lItem.daysLeft === 999?"Aman":lItem.daysLeft) : '-';
-        let html = `<div class="text-start"><div class="mb-3">${chartHtml}</div><div class="row text-center mb-3"><div class="col-6"><div class="border rounded p-2"><div class="small text-muted">Pemakaian (ADU)</div><div class="fw-bold text-primary">${adu} / hr</div></div></div><div class="col-6"><div class="border rounded p-2"><div class="small text-muted">Est. Habis</div><div class="fw-bold text-danger">${est} hr</div></div></div></div><h6 class="fw-bold mb-2" style="color:var(--text)">Rincian Batch / Expired:</h6><div class="p-2 mb-3 border" style="background:var(--input-bg); border-radius:8px;">${expHtml || '<div class="text-muted small">Belum ada data stok.</div>'}</div></div>`;
+        let html = `<div class="text-start">
+                      ${fotoHtml}
+                      <div class="mb-3">${chartHtml}</div>
+                      <div class="row text-center mb-3">
+                        <div class="col-6"><div class="border rounded p-2"><div class="small text-muted">Pemakaian (ADU)</div><div class="fw-bold text-primary">${adu} / hr</div></div></div>
+                        <div class="col-6"><div class="border rounded p-2"><div class="small text-muted">Est. Habis</div><div class="fw-bold text-danger">${est} hr</div></div></div>
+                      </div>
+                      <h6 class="fw-bold mb-2" style="color:var(--text)">Rincian Batch / Expired:</h6>
+                      <div class="p-2 mb-3 border" style="background:var(--input-bg); border-radius:8px;">${expHtml || '<div class="text-muted small">Belum ada data stok.</div>'}</div>
+                    </div>`;
 
         Swal.fire({
             title: `<div class="fs-5 fw-bold text-start" style="color:var(--text)">${itemName}</div>`, html: html, showCancelButton: true, showDenyButton: true, confirmButtonColor: '#FF2E2E', cancelButtonColor: '#64748B', denyButtonColor: '#1E293B', confirmButtonText: '<i class="bi bi-pencil-square"></i> Input Opname', denyButtonText: '<i class="bi bi-clock-history"></i> Riwayat', cancelButtonText: 'Tutup',
@@ -725,7 +771,7 @@
       } 
     }
 
-    async function submitSingle(payload) { showSkeletonLoader(); try { let res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) }); let result = await res.json(); if(result.status !== "success") throw new Error(result.message); fetchData(); } catch (e) { opnameQueue.push(payload); await localforage.setItem('qAicha33', opnameQueue); updateQueueUI(); renderStockList(); Swal.fire('Tersimpan Offline','Akan dikirim otomatis saat sinyal bagus','info'); } }
+    async function submitSingle(payload) { showSkeletonLoader(); try { let res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) }); let result = await res.json(); if(result.status !== "success") throw new Error(result.message); fetchData(); } catch (e) { opnameQueue.push(payload); await localforage.setItem('qAicha33', opnameQueue); updateQueueUI(); renderStockList(); Swal.fire({title:'Tersimpan Offline', text:'Akan dikirim otomatis saat sinyal bagus', icon:'info', confirmButtonColor: '#FF2E2E'}); } }
     async function syncOfflineData() { if(!navigator.onLine || opnameQueue.length === 0) return; showSkeletonLoader(); try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: opnameQueue }) }); opnameQueue = []; await localforage.setItem('qAicha33', []); updateQueueUI(); fetchData(); Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500}); } catch(e) { renderStockList(); } }
     function updateQueueUI() { document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none'; document.getElementById('queueCount').innerText = `${opnameQueue.length} Antrean`; }
     
@@ -808,18 +854,137 @@
       document.getElementById('assetList').innerHTML = h; 
     }
     
-    function renderMasterList() { let h=''; globalData.products.forEach(b => { h+=`<div class="card-box p-3"><div class="d-flex justify-content-between align-items-center"><div><div class="fw-bold" style="font-size:0.9rem; color:var(--text)">${b.name}</div><div class="small text-secondary mt-1">1 ${b.uMain} = ${b.isi} ${b.uSub}</div></div><div class="d-flex gap-1"><button onclick="openMasterModal('${b.name}', '${b.uMain}', '${b.pMain}', '${b.isi}', '${b.uSub}', '${b.pSub}', ${b.hasExpiry})" class="btn btn-sm border" style="background:var(--input-bg)"><i class="bi bi-pencil-fill text-primary"></i></button><button onclick="deleteMasterItem('${b.name}')" class="btn btn-sm border" style="background:var(--input-bg)"><i class="bi bi-trash-fill text-danger"></i></button></div></div></div>`; }); document.getElementById('masterList').innerHTML = h; }
-    window.deleteMasterItem = function(nama) { Swal.fire({ title: 'Hapus Item?', text: `Anda yakin ingin menghapus ${nama}?`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33' }).then(r => { if(r.isConfirmed) { showSkeletonLoader(); fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteMasterBarang", data: { nama: nama, user: activeUser.username } }) }).then(()=>fetchData()); } }); }
-    function openMasterModal(nm="", uM="", pM="", isi="", uS="", pS="", hasExp=true) { 
+    function renderMasterList() { 
+        let h=''; 
+        globalData.products.forEach(b => { 
+            // FOTO LIST MASTER BISA DI KLIK UNTUK ZOOM
+            let fotoHtml = b.fotoUrl ? `<img src="${b.fotoUrl}" onclick="zoomFoto(event, '${b.fotoUrl}', '${b.name}')" class="zoomable-img" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border);" onerror="this.style.display='none'">` : '';
+            h+=`<div class="card-box p-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        ${fotoHtml}
+                        <div>
+                            <div class="fw-bold" style="font-size:0.9rem; color:var(--text)">${b.name}</div>
+                            <div class="small text-secondary mt-1">1 ${b.uMain} = ${b.isi} ${b.uSub}</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-1">
+                        <button onclick="openMasterModal('${b.name}', '${b.uMain}', '${b.pMain}', '${b.isi}', '${b.uSub}', '${b.pSub}', ${b.hasExpiry}, '${b.fotoUrl || ''}')" class="btn btn-sm border" style="background:var(--input-bg)"><i class="bi bi-pencil-fill text-primary"></i></button>
+                        <button onclick="deleteMasterItem('${b.name}')" class="btn btn-sm border" style="background:var(--input-bg)"><i class="bi bi-trash-fill text-danger"></i></button>
+                    </div>
+                  </div>
+                </div>`; 
+        }); 
+        document.getElementById('masterList').innerHTML = h; 
+    }
+    window.deleteMasterItem = function(nama) { Swal.fire({ title: 'Hapus Item?', text: `Anda yakin ingin menghapus ${nama}?`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#FF2E2E' }).then(r => { if(r.isConfirmed) { showSkeletonLoader(); fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteMasterBarang", data: { nama: nama, user: activeUser.username } }) }).then(()=>fetchData()); } }); }
+    
+    // --- MODIFIKASI MODAL MASTER BARANG UNTUK UPLOAD FOTO (Bisa dari Galeri) ---
+    window.openMasterModal = function(nm="", uM="", pM="", isi="", uS="", pS="", hasExp=true, fUrl="") { 
         let chk = hasExp ? "checked" : ""; 
+        let fotoPreview = fUrl ? `<img id="mFotoPreview" src="${fUrl}" style="max-height: 120px; border-radius: 8px; display: block; margin: 0 auto;">` : `<img id="mFotoPreview" src="" style="max-height: 120px; border-radius: 8px; display: none; margin: 0 auto;">`;
+        
         Swal.fire({ 
             title: nm ? 'Edit Barang' : 'Barang Baru', 
-            html:`<div style="text-align:left;"><label class="inp-lbl">Nama Barang</label><input id="mNama" class="inp-field mb-2" value="${nm}"><div class="p-2 mb-2 rounded border" style="background:var(--input-bg)"><div class="dual-input mb-2"><div class="inp-grp"><label class="inp-lbl">Satuan Besar</label><input id="muMain" class="inp-field" value="${uM}" onkeyup="updateMasterLabel()"></div><div class="inp-grp"><label class="inp-lbl">Harga (Per Besar)</label><input id="mpMain" type="number" class="inp-field" value="${pM}" onkeyup="calcMaster()"></div></div><div class="inp-grp"><label class="inp-lbl text-primary">Isi per <span id="lbl-big">Dus</span></label><input id="mIsi" type="number" class="inp-field border-primary" value="${isi}" onkeyup="calcMaster()"></div></div><div class="dual-input"><div class="inp-grp"><label class="inp-lbl">Satuan Kecil</label><input id="muSub" class="inp-field" value="${uS}"></div><div class="inp-grp"><label class="inp-lbl text-success">Harga (Per Kecil)</label><input id="mpSub" type="number" class="inp-field bg-white" value="${pS}" readonly><div class="calc-badge mt-1" id="mCalcBadge">Auto-Calc</div></div></div><div class="form-check form-switch mt-3"><input class="form-check-input" type="checkbox" id="mExp" ${chk}><label class="form-check-label fw-bold small" style="color:var(--text)" for="mExp">Barang Memiliki Kadaluwarsa</label></div></div>`, 
-            confirmButtonColor:'#FF2E2E', showCancelButton:true, didOpen: () => { window.updateMasterLabel(); }, preConfirm:()=>{ return { namaLama: nm, nama: document.getElementById('mNama').value, uMain: document.getElementById('muMain').value, pMain: document.getElementById('mpMain').value, isi: document.getElementById('mIsi').value, uSub: document.getElementById('muSub').value, pSub: document.getElementById('mpSub').value, hasExpiry: document.getElementById('mExp').checked, user: activeUser.username } } 
-        }).then(r=>{ if(r.isConfirmed) { document.getElementById('loading').style.display='flex'; fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "saveMasterBarang", data: r.value }) }).then(()=>fetchData()).finally(()=>document.getElementById('loading').style.display='none'); } }); 
+            html:`<div style="text-align:left;">
+                    <label class="inp-lbl">Nama Barang</label>
+                    <input id="mNama" class="inp-field mb-2" value="${nm}">
+                    
+                    <div class="p-2 mb-2 rounded border" style="background:var(--input-bg)">
+                        <div class="dual-input mb-2">
+                            <div class="inp-grp"><label class="inp-lbl">Satuan Besar</label><input id="muMain" class="inp-field" value="${uM}" onkeyup="updateMasterLabel()"></div>
+                            <div class="inp-grp"><label class="inp-lbl">Harga (Per Besar)</label><input id="mpMain" type="number" class="inp-field" value="${pM}" onkeyup="calcMaster()"></div>
+                        </div>
+                        <div class="inp-grp"><label class="inp-lbl text-primary">Isi per <span id="lbl-big">Dus</span></label><input id="mIsi" type="number" class="inp-field border-primary" value="${isi}" onkeyup="calcMaster()"></div>
+                    </div>
+                    
+                    <div class="dual-input">
+                        <div class="inp-grp"><label class="inp-lbl">Satuan Kecil</label><input id="muSub" class="inp-field" value="${uS}"></div>
+                        <div class="inp-grp"><label class="inp-lbl text-success">Harga (Per Kecil)</label><input id="mpSub" type="number" class="inp-field bg-white" value="${pS}" readonly><div class="calc-badge mt-1" id="mCalcBadge">Auto-Calc</div></div>
+                    </div>
+                    
+                    <div class="form-check form-switch mt-3">
+                        <input class="form-check-input" type="checkbox" id="mExp" ${chk}>
+                        <label class="form-check-label fw-bold small" style="color:var(--text)" for="mExp">Barang Memiliki Kadaluwarsa</label>
+                    </div>
+
+                    <!-- INPUT FOTO PRODUK (Tanpa capture="environment" agar bisa dari galeri) -->
+                    <div class="mt-3 p-2 rounded border text-center" style="background:var(--input-bg)">
+                        <label class="inp-lbl text-start"><i class="bi bi-images me-1"></i> Foto Produk (Kamera/Galeri)</label>
+                        <input type="file" id="mFoto" accept="image/*" class="inp-field mb-2" style="font-size:0.8rem; padding:8px;" onchange="previewDanKompresFoto(event)">
+                        <input type="hidden" id="mFotoBase64">
+                        ${fotoPreview}
+                    </div>
+
+                  </div>`, 
+            confirmButtonColor:'#FF2E2E', showCancelButton:true, 
+            didOpen: () => { window.updateMasterLabel(); }, 
+            preConfirm:() => { 
+                return { 
+                    namaLama: nm, 
+                    nama: document.getElementById('mNama').value, 
+                    uMain: document.getElementById('muMain').value, 
+                    pMain: document.getElementById('mpMain').value, 
+                    isi: document.getElementById('mIsi').value, 
+                    uSub: document.getElementById('muSub').value, 
+                    pSub: document.getElementById('mpSub').value, 
+                    hasExpiry: document.getElementById('mExp').checked, 
+                    fotoBase64: document.getElementById('mFotoBase64').value, // Ambil base64 dari input hidden
+                    user: activeUser.username 
+                } 
+            } 
+        }).then(r=>{ 
+            if(r.isConfirmed) { 
+                Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } }); 
+                fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "saveMasterBarang", data: r.value }) })
+                .then(()=> { Swal.close(); fetchData(); })
+                .catch(() => { Swal.fire('Error', 'Gagal menyimpan', 'error'); }); 
+            } 
+        }); 
     }
     window.updateMasterLabel = function() { let val = document.getElementById('muMain').value || "Besar"; document.getElementById('lbl-big').innerText = val; }
     window.calcMaster = function() { let pMain = Number(document.getElementById('mpMain').value) || 0; let isi = Number(document.getElementById('mIsi').value) || 1; let result = pMain / isi; document.getElementById('mpSub').value = result.toFixed(0); document.getElementById('mCalcBadge').innerText = "= Rp " + toIDR(result); }
+
+    // --- FUNGSI KOMPRESI FOTO ---
+    window.previewDanKompresFoto = function(event) {
+        let file = event.target.files[0];
+        if (!file) return;
+
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function(e) {
+            let img = new Image();
+            img.src = e.target.result;
+            img.onload = function() {
+                let MAX_WIDTH = 600;
+                let MAX_HEIGHT = 600;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                } else {
+                    if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                }
+
+                let canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                let ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Ubah kembali ke Base64 dengan kualitas 0.7 (70%)
+                let dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                
+                // Tampilkan di UI
+                document.getElementById('mFotoPreview').src = dataUrl;
+                document.getElementById('mFotoPreview').style.display = 'block';
+                
+                // Simpan ke hidden input untuk dikirim ke GAS
+                document.getElementById('mFotoBase64').value = dataUrl;
+            }
+        }
+    }
 
     function renderPO() { let poMap = {}; activePO = {}; let grandTotal = 0; let outFilter = document.getElementById('outlet').value; let filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter); filteredStock.forEach(x => { if(x.poNeed > 0) { if(!poMap[x.name]) poMap[x.name] = { name: x.name, uMain: x.uMain, pMain: x.pMain, qty: 0 }; poMap[x.name].qty += x.poNeed; } }); let h = ''; for(let key in poMap) { let item = poMap[key]; activePO[item.name] = { qty: item.qty, price: item.pMain, uMain: item.uMain }; let sub = item.qty * item.pMain; grandTotal += sub; h += `<div class="d-flex justify-content-between align-items-center border-bottom py-2"><div style="width:50%"><div class="fw-bold small" style="color:var(--text)">${item.name}</div><div class="text-muted" style="font-size:0.6rem;">${toIDR(item.pMain)} / ${item.uMain}</div></div><div><input type="number" class="po-input" value="${item.qty}" onchange="updatePO('${item.name}', this.value)"></div><div class="text-end fw-bold text-success" style="font-size:0.8rem; width:30%;" id="po_sub_${item.name.replace(/[^a-zA-Z0-9]/g, '')}">${toIDR(sub)}</div></div>`; } document.getElementById('poList').innerHTML = h || `<div class="text-muted text-center small py-3">Tidak ada rekomendasi order. Stok aman.</div>`; document.getElementById('poGrandTotal').innerText = toIDR(grandTotal); }
     window.updatePO = function(name, newQty) { let qty = Number(newQty) || 0; activePO[name].qty = qty; let sub = qty * activePO[name].price; document.getElementById('po_sub_'+name.replace(/[^a-zA-Z0-9]/g, '')).innerText = toIDR(sub); let grand = 0; for(let k in activePO) grand += activePO[k].qty * activePO[k].price; document.getElementById('poGrandTotal').innerText = toIDR(grand); }
