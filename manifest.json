@@ -1,10 +1,10 @@
 {
-  "name": "Ai-STOK Enterprise",
+  "name": "Ai-STOK V35 Enterprise",
   "short_name": "Ai-STOK",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#F8F9FD",
-  "theme_color": "#E31E24",
-  "description": "Manajemen persediaan multi-outlet Ai-CHA"
+  "theme_color": "#D9232E",
+  "description": "Manajemen persediaan multi-outlet Ai-CHA dengan login PIN otomatis"
 }
