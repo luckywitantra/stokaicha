@@ -757,6 +757,7 @@
     }
 
     function renderStockList(options = {}) {
+      // V38: Keep inventory list rendering deterministic; do not replace a focused list while the user is interacting with it.
       let out = document.getElementById('outlet').value;
       const scrollArea = document.getElementById('scrollArea');
       const liveBody = document.getElementById('liveBody');
@@ -835,7 +836,7 @@
         </div>`);
       });
 
-      // V37: render to native DOM. Clusterize virtual scrolling occasionally produced a blank
+      // V38: render to native DOM. Clusterize virtual scrolling occasionally produced a blank
       // viewport on mobile when card heights changed during image loading / scroll gestures.
       liveBody.innerHTML = rowsHTML.join('');
       liveBody.removeAttribute('aria-busy');
@@ -1335,7 +1336,7 @@
       const history=document.getElementById('poHistory');
       if (history) {
         const orders=(globalData.purchaseOrders||[]).slice().sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,30);
-        history.innerHTML=orders.length ? orders.map(po=>`<div class="border-bottom py-2"><div class="d-flex justify-content-between gap-2"><strong>${po.id}</strong><span class="badge ${po.status==='APPROVED'?'bg-success':po.status==='RECEIVED'?'bg-primary':po.status==='CANCELLED'?'bg-secondary':'bg-warning text-dark'}">${po.status}</span></div><div class="small text-secondary">${po.outlet} · ${po.supplierName||'Tanpa pemasok'} · ${toIDR(Number(po.total)||0)}</div><div class="small text-secondary">${po.createdAt||''} · ${po.createdBy||''}</div><div class="d-flex gap-2 mt-2">${po.status==='DRAFT'?`<button class="btn btn-sm btn-success" onclick="updatePOStatus('${po.id}','APPROVED')">Setujui</button><button class="btn btn-sm btn-outline-secondary" onclick="updatePOStatus('${po.id}','CANCELLED')">Batalkan</button>`:''}${po.status==='APPROVED'?`<button class="btn btn-sm btn-primary" onclick="updatePOStatus('${po.id}','RECEIVED')">Tandai Diterima</button>`:''}</div></div>`).join('') : '<div class="small text-secondary">Belum ada PO tersimpan.</div>';
+        history.innerHTML=orders.length ? orders.map(po=>`<div class="border-bottom py-2"><div class="d-flex justify-content-between gap-2"><strong>${po.id}</strong><span class="badge ${po.status==='APPROVED'?'bg-success':po.status==='RECEIVED'?'bg-primary':po.status==='CANCELLED'?'bg-secondary':'bg-warning text-dark'}">${po.status}</span></div><div class="small text-secondary">${po.outlet} · ${po.supplierName||'Tanpa pemasok'} · ${toIDR(Number(po.total)||0)}</div><div class="small text-secondary">${po.createdAt||''} · ${po.createdBy||''}</div><div class="d-flex gap-2 mt-2">${po.status==='DRAFT'?`<button class="btn btn-sm btn-success" onclick="updatePOStatus('${po.id}','APPROVED')">Setujui</button><button class="btn btn-sm btn-outline-secondary" onclick="updatePOStatus('${po.id}','CANCELLED')">Batalkan</button>`:''}${po.status==='APPROVED'?`<button class="btn btn-sm btn-primary" onclick="receivePO('${po.id}')">Terima Barang</button>`:''}</div></div>`).join('') : '<div class="small text-secondary">Belum ada PO tersimpan.</div>';
       }
     }
     async function savePODraft() {
@@ -1352,14 +1353,27 @@
       } catch(e) { Swal.fire('Gagal menyimpan PO',e.message||'Periksa koneksi dan sesi.','error'); }
     }
     async function updatePOStatus(id,status) {
-      const labels={APPROVED:'menyetujui',RECEIVED:'menandai diterima',CANCELLED:'membatalkan'};
+      if(status==='RECEIVED') return receivePO(id);
+      const labels={APPROVED:'menyetujui',CANCELLED:'membatalkan'};
       const ok=await Swal.fire({title:`Konfirmasi ${labels[status]||'memperbarui'} PO?`,text:id,icon:'question',showCancelButton:true,confirmButtonText:'Ya, lanjutkan'});
       if(!ok.isConfirmed)return;
       try { const res=await fetch(GAS_API_URL,{method:'POST',body:JSON.stringify({action:'updatePurchaseOrderStatus',data:{id,status}})}); const result=await res.json(); if(result.status!=='success')throw new Error(result.message||'Gagal memperbarui status'); await fetchData(); renderPO(); }
       catch(e){Swal.fire('Gagal memperbarui PO',e.message||'Periksa koneksi.','error');}
     }
-    window.savePODraft=savePODraft; window.updatePOStatus=updatePOStatus;
+    async function receivePO(id) {
+      const po=(globalData.purchaseOrders||[]).find(x=>String(x.id)===String(id));
+      if(!po) return Swal.fire('PO tidak ditemukan','Muat ulang data lalu coba kembali.','error');
+      let items=[]; try { items=Array.isArray(po.items)?po.items:JSON.parse(po.itemsJson||'[]'); } catch(_) {}
+      if(!items.length) return Swal.fire('Rincian kosong','PO tidak memiliki rincian item yang dapat diterima.','error');
+      const html=items.map((it,i)=>`<div class="text-start border-bottom py-2"><label class="form-label small fw-bold">${escapeHTML(it.name)} · pesanan ${Number(it.qty)||0} ${escapeHTML(it.unit||'unit')}</label><input class="swal2-input" style="margin:0;width:100%" type="number" min="0" max="${Number(it.qty)||0}" step="any" id="rcvpo_qty_${i}" value="${Number(it.qty)||0}" aria-label="Jumlah diterima ${escapeHTML(it.name)}">${(globalData.products||[]).some(p=>p.name===it.name&&p.hasExpiry)?`<label class="form-label small mt-2">Tanggal kedaluwarsa</label><input class="swal2-input" style="margin:0;width:100%" type="date" id="rcvpo_exp_${i}" aria-label="Tanggal kedaluwarsa ${escapeHTML(it.name)}">`:''}</div>`).join('');
+      const result=await Swal.fire({title:'Penerimaan barang',html:`<div class="small text-secondary mb-2">${escapeHTML(id)} · Periksa jumlah aktual dan tanggal kedaluwarsa.</div>${html}`,width:560,showCancelButton:true,confirmButtonText:'Simpan penerimaan',cancelButtonText:'Batal',focusConfirm:false,preConfirm:()=>{const received=[];for(let i=0;i<items.length;i++){const qty=Number(document.getElementById('rcvpo_qty_'+i)?.value||0);const exp=document.getElementById('rcvpo_exp_'+i)?.value||'';if(!Number.isFinite(qty)||qty<0||qty>Number(items[i].qty)) {Swal.showValidationMessage('Jumlah diterima harus antara 0 dan jumlah pesanan.');return false;}if(qty>0&&(globalData.products||[]).some(p=>p.name===items[i].name&&p.hasExpiry)&&!exp){Swal.showValidationMessage('Tanggal kedaluwarsa wajib diisi.');return false;}received.push({name:items[i].name,qty,expiredDate:exp});}if(!received.some(x=>x.qty>0)){Swal.showValidationMessage('Isi jumlah aktual yang diterima.');return false;}return received;}});
+      if(!result.isConfirmed)return;
+      try {const res=await fetch(GAS_API_URL,{method:'POST',body:JSON.stringify({action:'receivePurchaseOrder',token:authToken,data:{id,items:result.value}})});const json=await res.json();if(json.status!=='success')throw new Error(json.message||'Penerimaan gagal');await fetchData();renderPO();await Swal.fire('Penerimaan tersimpan',`${json.data.receivedItems} item dicatat ke stok.`, 'success');}
+      catch(e){Swal.fire('Penerimaan gagal',e.message||'Periksa koneksi lalu coba lagi.','error');}
+    }
+    window.savePODraft=savePODraft; window.updatePOStatus=updatePOStatus; window.receivePO=receivePO;
 
+    function escapeHTML(value) { return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
     function csvEscape(value) { const s=String(value ?? ''); return '"'+s.replace(/"/g,'""')+'"'; }
     function exportStockCSV() {
       const rows=[['Outlet','Barang','Stok Base','Tampilan Stok','Status','Estimasi Hari','Nilai Aset','Batch Expired','ADU']];
