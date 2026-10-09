@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>Ai-STOK V34.0 Enterprise</title>
+  <title>Ai-STOK V35.0 Enterprise</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
@@ -104,6 +104,44 @@
     /* Efek hover/klik pada foto */
     .zoomable-img { transition: transform 0.2s; cursor: pointer; }
     .zoomable-img:active { transform: scale(0.9); }
+
+    /* V35: refreshed enterprise UI and PIN-only login */
+    :root { --primary:#D9232E; --primary-rgb:217,35,46; --bg:#F4F7FB; --text:#172033; --gray:#667085; --card-bg:#FFFFFF; --border:#E5EAF2; --input-bg:#F8FAFC; --radius:18px; }
+    body { font-family:'Urbanist',sans-serif; letter-spacing:.005em; }
+    .login-screen { position:fixed; inset:0; z-index:10000; display:flex; align-items:center; justify-content:center; padding:22px; overflow-y:auto; background:radial-gradient(ellipse at 20% 10%,rgba(217,35,46,.25),transparent 42%),radial-gradient(ellipse at 100% 100%,rgba(59,130,246,.22),transparent 38%),#0B1220; }
+    .login-panel { width:min(100%,390px); padding:28px 26px 22px; border:1px solid rgba(255,255,255,.13); border-radius:28px; background:rgba(17,27,45,.88); box-shadow:0 28px 80px rgba(0,0,0,.35); backdrop-filter:blur(18px); color:#F8FAFC; }
+    .login-brand-mark { width:70px;height:70px;margin:0 auto 18px;padding:8px;display:flex;align-items:center;justify-content:center;border-radius:22px;background:#fff;box-shadow:0 10px 28px rgba(0,0,0,.22); }
+    .login-brand-mark img { width:100%;height:100%;object-fit:contain; }
+    .login-eyebrow { color:#FCA5A5;font-size:.65rem;font-weight:800;letter-spacing:.16em; }
+    .login-title { margin:5px 0 2px;font-size:2rem;font-weight:800;letter-spacing:-.04em;color:#fff; }
+    .login-subtitle { margin:0;color:#AAB6C8;font-size:.9rem; }
+    .login-status { min-height:36px;margin:18px 0 14px;padding:9px 11px;border-radius:11px;background:rgba(255,255,255,.06);color:#CBD5E1;text-align:center;font-size:.76rem; }
+    .pin-entry-label { margin-bottom:12px;text-align:center;color:#AAB6C8;font-size:.68rem;font-weight:800;letter-spacing:.17em; }
+    .pin-dot { width:13px;height:13px;border-radius:50%;border:1.5px solid #607089;background:transparent;transition:background .16s,border-color .16s,transform .16s; }
+    .pin-dot.filled { background:#F87171;border-color:#F87171;transform:scale(1.08); }
+    .numpad-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:278px;margin:0 auto;opacity:.45;pointer-events:none;transition:opacity .2s; }
+    .numpad-grid.ready { opacity:1;pointer-events:auto; }
+    .pin-key { height:58px;border:1px solid rgba(255,255,255,.09);border-radius:16px;background:rgba(255,255,255,.075);color:#F8FAFC;font-size:1.25rem;font-weight:700;box-shadow:inset 0 1px rgba(255,255,255,.04);transition:background .15s,transform .15s; }
+    .pin-key:hover,.pin-key:focus-visible { background:rgba(255,255,255,.15); }
+    .pin-key:active { transform:scale(.96); }
+    .pin-key-utility { color:#AAB6C8;font-size:1rem; }
+    .login-footer { margin-top:22px;padding-top:15px;border-top:1px solid rgba(255,255,255,.09);display:flex;gap:8px;align-items:center;justify-content:center;color:#8290A5;font-size:.68rem;text-align:center; }
+    .login-footer i { color:#F87171;font-size:.9rem; }
+    .glass-header { padding:13px 20px; }
+    .brand { letter-spacing:-.025em; }
+    .card-box { border-radius:18px;box-shadow:0 5px 18px rgba(15,23,42,.035); }
+    .card-box:hover { box-shadow:0 8px 24px rgba(15,23,42,.065); }
+    .outlet-sel,.inp-field { border-color:#DFE5EE; }
+    .outlet-sel:focus,.inp-field:focus { border-color:var(--primary);box-shadow:0 0 0 3px rgba(var(--primary-rgb),.1); }
+    .btn,.btn-act,.role-btn { transition:transform .14s,box-shadow .14s,background .14s; }
+    .btn:active,.btn-act:active { transform:translateY(1px); }
+    .nav-bot { box-shadow:0 -6px 24px rgba(15,23,42,.045); }
+    .nav-item { gap:3px; }
+    .nav-item i { font-size:1.15rem; }
+    .sync-badge { backdrop-filter:blur(10px); }
+    @media(max-width:420px) { .login-panel { padding:23px 18px 19px;border-radius:24px; } .pin-key { height:54px; } }
+    @media(min-width:992px) { .glass-header { border-radius:0 0 16px 16px; } }
+
     /* V34: konsistensi visual, responsif, aksesibilitas */
     :focus-visible { outline: 3px solid rgba(var(--primary-rgb),.42); outline-offset: 2px; }
     .glass-header { background: var(--card-bg); box-shadow: 0 2px 12px rgba(15,23,42,.04); }
@@ -120,31 +158,32 @@
 </head>
 <body>
 
-  <div id="loginScreen" style="position:fixed; inset:0; background:#111827; z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-    <div class="text-center mb-5">
-        <div style="height:80px; width:80px; background:white; border-radius:24px; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; overflow:hidden;">
-            <img id="loginLogoImg" src="" style="width:100%; height:100%; object-fit:contain;" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2890/2890580.png'">
-        </div>
-        <h1 class="text-white fw-bolder" id="loginTitleApp">APP V33</h1>
-        <p id="loginStatus" class="text-secondary small mt-1">Menyiapkan keamanan...</p>
-        <label for="loginUsername" class="text-white small fw-bold mt-3 mb-1">PENGGUNA</label>
-        <select id="loginUsername" class="form-select text-center fw-bold" style="width:250px;border-radius:12px" aria-label="Pilih pengguna">
-          <option value="">Memuat pengguna...</option>
-        </select>
-    </div>
-    <div class="d-flex gap-3 mb-5" id="pinIndicators"><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div></div>
-    <div id="numpad" class="row g-4" style="max-width:280px; opacity:0.5; pointer-events:none;">
-      <div class="col-4 d-flex justify-content-center" onclick="enterPin('1')"><button class="btn btn-dark rounded-circle" style="width:70px; height:70px; font-size:1.5rem;">1</button></div>
-      <div class="col-4 d-flex justify-content-center" onclick="enterPin('2')"><button class="btn btn-dark rounded-circle" style="width:70px; height:70px; font-size:1.5rem;">2</button></div>
-      <div class="col-4 d-flex justify-content-center" onclick="enterPin('3')"><button class="btn btn-dark rounded-circle" style="width:70px; height:70px; font-size:1.5rem;">3</button></div>
-      <div class="col-4 d-flex justify-content-center" onclick="enterPin('4')"><button class="btn btn-dark rounded-circle" style="width:70px; height:70px; font-size:1.5rem;">4</button></div>
-      <div class="col-4 d-flex justify-content-center" onclick="enterPin('5')"><button class="btn btn-dark rounded-circle" style="width:70px; height:70px; font-size:1.5rem;">5</button></div>
-      <div class="col-4 d-flex justify-content-center" onclick="enterPin('6')"><button class="btn btn-dark rounded-circle" style="width:70px; height:70px; font-size:1.5rem;">6</button></div>
-      <div class="col-4 d-flex justify-content-center" onclick="enterPin('7')"><button class="btn btn-dark rounded-circle" style="width:70px; height:70px; font-size:1.5rem;">7</button></div>
-      <div class="col-4 d-flex justify-content-center" onclick="enterPin('8')"><button class="btn btn-dark rounded-circle" style="width:70px; height:70px; font-size:1.5rem;">8</button></div>
-      <div class="col-4 d-flex justify-content-center" onclick="enterPin('9')"><button class="btn btn-dark rounded-circle" style="width:70px; height:70px; font-size:1.5rem;">9</button></div>
-      <div class="col-4"></div><div class="col-4 d-flex justify-content-center" onclick="enterPin('0')"><button class="btn btn-dark rounded-circle" style="width:70px; height:70px; font-size:1.5rem;">0</button></div>
-      <div class="col-4 d-flex justify-content-center" onclick="deletePin()"><button class="btn btn-transparent text-secondary fs-3"><i class="bi bi-backspace-fill"></i></button></div>
+  <div id="loginScreen" class="login-screen">
+    <div class="login-panel">
+      <div class="login-brand-mark"><img id="loginLogoImg" src="" alt="Logo Ai-STOK" onerror="this.style.display='none'"></div>
+      <div class="text-center">
+        <div class="login-eyebrow">INVENTORY MANAGEMENT SYSTEM</div>
+        <h1 class="login-title" id="loginTitleApp">Ai-STOK</h1>
+        <p class="login-subtitle">Masukkan PIN untuk melanjutkan</p>
+      </div>
+      <div id="loginStatus" class="login-status" role="status" aria-live="polite">Menyiapkan keamanan...</div>
+      <div class="pin-entry-label">PIN AKSES</div>
+      <div class="d-flex gap-3 justify-content-center mb-4" id="pinIndicators" aria-label="PIN empat digit"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
+      <div id="numpad" class="numpad-grid" aria-label="Papan angka PIN">
+        <button type="button" class="pin-key" onclick="enterPin('1')">1</button>
+        <button type="button" class="pin-key" onclick="enterPin('2')">2</button>
+        <button type="button" class="pin-key" onclick="enterPin('3')">3</button>
+        <button type="button" class="pin-key" onclick="enterPin('4')">4</button>
+        <button type="button" class="pin-key" onclick="enterPin('5')">5</button>
+        <button type="button" class="pin-key" onclick="enterPin('6')">6</button>
+        <button type="button" class="pin-key" onclick="enterPin('7')">7</button>
+        <button type="button" class="pin-key" onclick="enterPin('8')">8</button>
+        <button type="button" class="pin-key" onclick="enterPin('9')">9</button>
+        <button type="button" class="pin-key pin-key-utility" onclick="deletePin()" aria-label="Hapus angka"><i class="bi bi-backspace"></i></button>
+        <button type="button" class="pin-key" onclick="enterPin('0')">0</button>
+        <button type="button" class="pin-key pin-key-utility" onclick="clearPin()" aria-label="Hapus semua PIN"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="login-footer"><i class="bi bi-shield-lock-fill"></i> Identitas dan hak akses ditentukan otomatis oleh sistem</div>
     </div>
   </div>
 
@@ -157,7 +196,7 @@
     </div>
   </div>
 
-  <div class="outlet-wrap"><select id="outlet" class="outlet-sel" onchange="fetchData()" aria-label="Pilih outlet"></select><div id="connectionStatus" class="small text-muted mb-2" role="status">Ai-STOK V34 · memeriksa koneksi</div></div>
+  <div class="outlet-wrap"><select id="outlet" class="outlet-sel" onchange="fetchData()" aria-label="Pilih outlet"></select><div id="connectionStatus" class="small text-muted mb-2" role="status">Ai-STOK V35 · memeriksa koneksi</div></div>
 
   <div id="skeletonTemplate" style="display:none;">
       <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-big"></div></div>
@@ -301,7 +340,7 @@
       if (String(url) === GAS_API_URL && options && options.body) {
         let payload;
         try { payload = JSON.parse(options.body); } catch (_) { return nativeFetch(url, options); }
-        if (!['authenticate', 'getLoginOptions'].includes(payload.action)) payload.token = authToken;
+        if (payload.action !== 'authenticate') payload.token = authToken;
         const response = await nativeFetch(url, { ...options, body: JSON.stringify(payload) });
         try {
           const parsed = await response.clone().json();
@@ -409,23 +448,18 @@
       return (crypto.randomUUID ? crypto.randomUUID() : `tx-${Date.now()}-${Math.random().toString(36).slice(2)}`);
     }
     async function loadLoginOptions() {
-      const select = document.getElementById('loginUsername');
+      // Tidak ada daftar pengguna pada layar login; identitas dicari server dari PIN unik.
       try {
-        const res = await nativeFetch(GAS_API_URL, { method:'POST', body:JSON.stringify({action:'getLoginOptions'}) });
+        const res = await nativeFetch(GAS_API_URL, { method:'POST', body:JSON.stringify({action:'loginHealthCheck'}) });
         const result = await res.json();
-        if (result.status !== 'success') throw new Error(result.message || 'Tidak dapat memuat pengguna');
-        select.innerHTML = '<option value="">Pilih pengguna...</option>';
-        (result.data.users || []).forEach(u => select.add(new Option(u.username, u.username)));
-        const last = await localforage.getItem('lastUserAicha34');
-        if (last && (result.data.users || []).some(u => u.username === last.username)) select.value = last.username;
-        document.getElementById('loginStatus').textContent = 'Masuk dengan pengguna dan PIN';
+        if (result.status !== 'success') throw new Error(result.message || 'Layanan login belum siap');
+        document.getElementById('loginStatus').textContent = 'Sistem siap · PIN menentukan akses secara otomatis';
         return true;
       } catch (e) {
         const last = await localforage.getItem('lastUserAicha34');
-        select.innerHTML = '';
-        if (last && last.username) select.add(new Option(`${last.username} (Mode Offline)`, last.username, true, true));
-        else select.add(new Option('Tidak tersedia saat offline', ''));
-        document.getElementById('loginStatus').innerHTML = '<span class="text-warning fw-bold">Offline — hanya perangkat yang pernah login</span>';
+        document.getElementById('loginStatus').innerHTML = last
+          ? '<span class="text-warning">Mode offline tersedia untuk perangkat yang pernah login</span>'
+          : '<span class="text-warning">Koneksi belum tersedia · login pertama perlu internet</span>';
         return false;
       }
     }
@@ -446,18 +480,19 @@
       if (currentPin.length < 4) { currentPin += n; updatePinUI(); if (currentPin.length === 4) validatePin(); }
     }
     function deletePin() { if (currentPin.length > 0) { currentPin = currentPin.slice(0, -1); updatePinUI(); } }
-    function updatePinUI() { document.querySelectorAll('.pin-dot').forEach((d, i) => d.style.background = i < currentPin.length ? 'white' : 'transparent'); }
+    function clearPin() { currentPin = ''; updatePinUI(); }
+    function updatePinUI() { document.querySelectorAll('.pin-dot').forEach((d, i) => { d.classList.toggle('filled', i < currentPin.length); }); }
     async function validatePin() {
-      const username = document.getElementById('loginUsername').value;
-      if (!username) { currentPin = ''; updatePinUI(); return Swal.fire('Pilih pengguna terlebih dahulu','','warning'); }
+      if (currentPin.length !== 4) return;
+      const attemptedPin = currentPin;
       try {
-        const res = await nativeFetch(GAS_API_URL, {method:'POST', body:JSON.stringify({action:'authenticate', username, pin:currentPin})});
+        const res = await nativeFetch(GAS_API_URL, {method:'POST', body:JSON.stringify({action:'authenticate', pin:attemptedPin})});
         const result = await res.json();
         if (result.status !== 'success') throw new Error(result.message || 'PIN tidak valid');
         authToken = result.data.token; activeUser = result.data.user; offlineMode = false; document.getElementById('connectionStatus').textContent = 'Online · data tersinkron';
         await localforage.setItem('lastUserAicha34', {username:activeUser.username, role:activeUser.role, idOutlet:activeUser.idOutlet});
         const salt = makeId();
-        await localforage.setItem('offlineAuthAicha34', {username, salt, verifier: await digestPin(salt, currentPin)});
+        await localforage.setItem('offlineAuthAicha34', {username:activeUser.username, salt, verifier: await digestPin(salt, attemptedPin)});
         currentPin = ''; updatePinUI();
         await fetchData();
         if (!globalData.outlets || !globalData.outlets.length) throw new Error('Data outlet tidak tersedia');
@@ -467,20 +502,19 @@
         try {
           const offline = await localforage.getItem('offlineAuthAicha34');
           const last = await localforage.getItem('lastUserAicha34');
-          if (!navigator.onLine && offline && last && offline.username === username && await digestPin(offline.salt, currentPin) === offline.verifier && globalData && globalData.outlets) {
+          if (!navigator.onLine && offline && last && offline.username === last.username && await digestPin(offline.salt, attemptedPin) === offline.verifier && globalData && globalData.outlets) {
             activeUser = last; authToken = null; offlineMode = true; document.getElementById('connectionStatus').textContent = 'Offline · data cache, transaksi akan mengantre'; currentPin = ''; updatePinUI();
             Swal.fire({toast:true,position:'top',icon:'warning',title:'Mode offline: transaksi akan mengantre',showConfirmButton:false,timer:2200});
             showMainApp(); return;
           }
         } catch (_) {}
         currentPin = ''; updatePinUI();
-        Swal.fire('Gagal masuk', err.message || 'Periksa koneksi dan PIN.','error');
+        const msg = err.message || 'Periksa koneksi dan PIN.';
+        document.getElementById('loginStatus').textContent = msg;
+        Swal.fire('Gagal masuk', msg,'error');
       }
     }
-    function enableLogin() {
-      document.getElementById('numpad').style.opacity = 1;
-      document.getElementById('numpad').style.pointerEvents = 'auto';
-    }
+    function enableLogin() { document.getElementById('numpad').classList.add('ready'); }
     async function doLogout() {
       try { if (authToken) await nativeFetch(GAS_API_URL, {method:'POST',body:JSON.stringify({action:'logout',token:authToken})}); } catch (_) {}
       activeUser = null; authToken = null; offlineMode = false; currentPin = ''; window.hasShownFocus = false;
@@ -490,6 +524,9 @@
 
     function showMainApp() {
         document.getElementById('loginScreen').style.display = 'none';
+        const roleLabel = document.getElementById('roleLabel');
+        roleLabel.innerHTML = `<i class="bi bi-person-check-fill me-1"></i>${activeUser.role === 'Owner' ? 'Owner' : 'Petugas'} <span class="opacity-50 mx-1">·</span><i class="bi bi-power text-danger"></i>`;
+        roleLabel.setAttribute('aria-label', `Akun ${activeUser.role}. Tekan untuk keluar`);
         const out = document.getElementById('outlet'); out.innerHTML = '';
         if(activeUser.role === "Owner") out.add(new Option("Semua Outlet (ALL)", "ALL"));
         globalData.outlets.forEach(o => out.add(new Option(o.nama, o.id)));
@@ -987,7 +1024,7 @@
            allItemsStr += `   └ ADU: ${adu}/hr | Est: ${lItem.daysLeft === 999 ? "Aman" : lItem.daysLeft + " hr"}\n\n`; 
         } else { allItemsStr += `➖ *${p.name}* 🔴\n   └ Stok: *KOSONG*\n\n`; }
       });
-      txt += allItemsStr + `_Ket: ✅ Aman | 📉 Kritis | 📈 Over | ⚠️ Dekat Exp | ⛔ Expired | 🔴 Kosong_\n\n_Generated via V33.0 Enterprise_`;
+      txt += allItemsStr + `_Ket: ✅ Aman | 📉 Kritis | 📈 Over | ⚠️ Dekat Exp | ⛔ Expired | 🔴 Kosong_\n\n_Generated via Ai-STOK V35 Enterprise_`;
       navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Laporan Tersalin!', showConfirmButton:false, timer:2000}));
     }
     
@@ -1011,7 +1048,7 @@
             });
             txt += `➖ *${p.name}*\n${detailStr}\n`;
         });
-        txt += `_Generated via V33.0 Enterprise_`;
+        txt += `_Generated via Ai-STOK V35 Enterprise_`;
         navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Laporan Konsolidasi Tersalin!', showConfirmButton:false, timer:3000}));
     }
 
