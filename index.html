@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Ai-STOK V41 Owner Workspace</title>
+  <title>Ai-STOK V42 Owner Workspace</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
@@ -233,6 +233,37 @@
     @media(max-width:760px) { .workspace{padding:4px 12px 22px}.workspace-hero{padding:20px;border-radius:20px}.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.metric-card{padding:13px;border-radius:15px}.quick-actions{grid-template-columns:1fr}.owner-tabs{margin-left:-2px;margin-right:-2px}.owner-tabs .btn{flex:0 0 auto} }
     @media(prefers-reduced-motion:reduce){.workspace,.metric-card,.quick-action{animation:none!important;transition:none!important}}
 
+  
+    /* V42 Owner command-center redesign */
+    #ownerView{max-width:1500px;margin:0 auto;padding:0 0 100px!important;color:var(--text)}
+    #ownerView .owner-section-head{position:relative;overflow:hidden;border:0;border-radius:24px;padding:24px;background:linear-gradient(125deg,#111c35 0%,#1d3766 60%,#2759a8 100%);color:#fff;box-shadow:0 16px 38px rgba(17,28,53,.18);align-items:center}
+    #ownerView .owner-section-head:after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;right:-65px;top:-100px;background:rgba(255,255,255,.07);pointer-events:none}
+    #ownerView .owner-section-head h2{color:#fff;font-size:clamp(1.25rem,2vw,1.8rem);letter-spacing:-.035em}
+    #ownerView .owner-section-head p{color:rgba(255,255,255,.78);max-width:640px;line-height:1.5}
+    #ownerView .owner-section-head .workspace-eyebrow{color:#bcd5ff!important;letter-spacing:.16em;font-weight:800;font-size:.68rem}
+    #ownerView .owner-section-head .btn{border-color:rgba(255,255,255,.28)!important;color:#fff!important;background:rgba(255,255,255,.09)!important;backdrop-filter:blur(8px)}
+    #ownerView .owner-kpi-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 0 18px}
+    #ownerView .owner-kpi{min-width:0;border:1px solid var(--border);border-radius:18px;padding:16px;background:var(--card-bg);box-shadow:var(--shadow-soft);transition:transform .18s,border-color .18s}
+    #ownerView .owner-kpi:hover{transform:translateY(-2px);border-color:rgba(49,87,213,.35)}
+    #ownerView .owner-kpi-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--gray);font-weight:800}
+    #ownerView .owner-kpi-value{font-size:clamp(1.05rem,1.8vw,1.5rem);font-weight:850;letter-spacing:-.04em;margin-top:6px;overflow-wrap:anywhere}
+    #ownerView .owner-kpi-note{font-size:.72rem;color:var(--gray);margin-top:4px}
+    #ownerView .owner-tabs{position:sticky;top:8px;z-index:30;display:flex;gap:6px!important;padding:7px!important;margin:0 0 18px!important;border:1px solid var(--border);border-radius:17px;background:var(--card-bg);box-shadow:0 8px 24px rgba(15,23,42,.08);overflow-x:auto;scrollbar-width:thin}
+    #ownerView .owner-tabs .btn{border:1px solid transparent!important;background:transparent!important;color:var(--gray)!important;min-height:44px;border-radius:12px!important;padding:0 15px!important;font-size:.82rem!important;font-weight:750!important}
+    #ownerView .owner-tabs .btn.owner-tab-active{background:var(--brand-ink)!important;color:white!important;box-shadow:0 5px 14px rgba(17,28,53,.18)}
+    #ownerView .owner-panel{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;padding:0 0 20px!important;animation:ownerIn .2s ease-out}
+    #ownerView .card-box{border-radius:18px!important;border:1px solid var(--border)!important;box-shadow:var(--shadow-soft)!important}
+    #ownerView .owner-panel-title{display:flex;align-items:center;gap:10px;margin:4px 0 14px;font-size:1rem;font-weight:850;color:var(--text)}
+    #ownerView .owner-panel-title .owner-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:rgba(49,87,213,.1);color:var(--primary)}
+    #ownerView .owner-context{padding:12px 14px;border-radius:14px;background:var(--input-bg);border:1px solid var(--border);font-size:.82rem;color:var(--gray);margin-bottom:14px}
+    #ownerView .owner-view-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+    #ownerView .owner-view-toolbar input,#ownerView .owner-view-toolbar select{max-width:100%;min-height:42px}
+    #ownerView .owner-empty{padding:28px 18px;text-align:center;border:1px dashed var(--border);border-radius:16px;color:var(--gray)}
+    @keyframes ownerIn{from{opacity:.55;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+    @media(max-width:1000px){#ownerView .owner-kpi-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media(max-width:650px){#ownerView .owner-section-head{padding:19px;border-radius:20px;gap:16px}#ownerView .owner-section-head .owner-toolbar-actions{width:100%}#ownerView .owner-section-head .owner-toolbar-actions button{flex:1;min-width:0;font-size:.75rem}#ownerView .owner-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#ownerView .owner-kpi{padding:12px;border-radius:15px}#ownerView .owner-tabs{top:4px;border-radius:14px}#ownerView .owner-tabs .btn{padding:0 12px!important;min-height:42px}#ownerView .owner-panel-title{font-size:.94rem}}
+    @media(prefers-reduced-motion:reduce){#ownerView *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
   </style>
 </head>
 <body>
@@ -351,49 +382,48 @@
 
   <div id="ownerView" style="display:none;" class="px-3">
     <div class="owner-section-head"><div><div class="workspace-eyebrow" style="color:var(--primary);opacity:1">OWNER WORKSPACE</div><h2 id="ownerPageTitle">Ikhtisar Persediaan</h2><p id="ownerPageSubtitle">Pantau aset, risiko stok, dan tindakan prioritas seluruh outlet.</p></div><div class="owner-toolbar-actions"><button class="btn btn-outline-primary fw-bold" onclick="nav('persediaan')"><i class="bi bi-box-seam me-1"></i>Kelola Stok</button><button class="btn btn-outline-secondary fw-bold" onclick="runOwnerDiagnostics()"><i class="bi bi-heart-pulse me-1"></i>Diagnostik</button></div></div>
-    <div class="row g-2 mb-3">
-        <div class="col-4"><div class="card-box text-center py-2 mb-0 border shadow-sm" onclick="showStatDetails('aktif')"><h5 id="qs-item" class="mb-0 fw-bolder" style="color:var(--text)">0</h5><small style="font-size:0.6rem; font-weight:700;" class="text-secondary">AKTIF</small></div></div>
-        <div class="col-4"><div class="card-box text-center py-2 mb-0 border border-danger shadow-sm" onclick="showStatDetails('kritis')"><h5 id="qs-kritis" class="mb-0 fw-bolder text-danger">0</h5><small style="font-size:0.6rem; font-weight:700;" class="text-secondary">KRITIS</small></div></div>
-        <div class="col-4"><div class="card-box text-center py-2 mb-0 border border-warning shadow-sm" onclick="showStatDetails('over')"><h5 id="qs-over" class="mb-0 fw-bolder text-warning">0</h5><small style="font-size:0.6rem; font-weight:700;" class="text-secondary">OVERSTOK</small></div></div>
+    <div class="owner-kpi-grid" aria-label="Ringkasan persediaan Owner">
+      <div class="owner-kpi"><div class="owner-kpi-label"><i class="bi bi-box-seam me-1"></i>SKU / Baris Stok</div><div id="qs-item" class="owner-kpi-value">0</div><div class="owner-kpi-note">Pada cakupan outlet aktif</div></div>
+      <div class="owner-kpi"><div class="owner-kpi-label"><i class="bi bi-exclamation-triangle me-1"></i>Stok Kritis</div><div id="qs-kritis" class="owner-kpi-value" style="color:#dc2626">0</div><div class="owner-kpi-note">Habis atau di bawah batas</div></div>
+      <div class="owner-kpi"><div class="owner-kpi-label"><i class="bi bi-layers me-1"></i>Overstok</div><div id="qs-over" class="owner-kpi-value" style="color:#d97706">0</div><div class="owner-kpi-note">Perlu tinjauan distribusi</div></div>
+      <div class="owner-kpi"><div class="owner-kpi-label"><i class="bi bi-wallet2 me-1"></i>Nilai Aset</div><div id="ownerAssetKpi" class="owner-kpi-value">Rp 0</div><div class="owner-kpi-note">Estimasi berdasarkan data stok</div></div>
+      <div class="owner-kpi"><div class="owner-kpi-label"><i class="bi bi-receipt me-1"></i>HPP Harian Est.</div><div id="hppVal" class="owner-kpi-value" style="color:#059669">Rp 0</div><div class="owner-kpi-note">Estimasi, bukan laporan akuntansi</div></div>
     </div>
-    <div class="row g-2 mb-3">
-        <div class="col-6"><div class="card-box bg-dark text-white text-center py-3 mb-0 border-0 h-100 d-flex flex-column justify-content-center"><small style="opacity:0.9; font-weight:700; font-size:0.6rem;">HPP HARIAN (EST)</small><h5 id="hppVal" style="margin:2px 0 0 0; font-weight:800; font-size:1.1rem; color:#6EE7B7;">Rp 0</h5></div></div>
-        <div class="col-6"><div class="card-box bg-danger text-white text-center py-3 mb-0 border-0 h-100 d-flex flex-column justify-content-center"><small style="opacity:0.9; font-weight:700; font-size:0.6rem;">COST OF WASTE</small><h5 id="wasteVal" style="margin:2px 0 0 0; font-weight:800; font-size:1.1rem;">Rp 0</h5></div></div>
-    </div>
-
-    <div class="d-flex gap-2 mb-3 flex-wrap">
-      <button class="btn btn-sm btn-outline-primary fw-bold" onclick="exportStockCSV()"><i class="bi bi-filetype-csv me-1"></i>Ekspor CSV</button>
-      <button class="btn btn-sm btn-outline-secondary fw-bold" onclick="printStockReport()"><i class="bi bi-printer me-1"></i>Cetak / PDF</button>
-    </div>
+    <div class="owner-view-toolbar"><div class="small text-secondary"><i class="bi bi-info-circle me-1"></i>Angka mengikuti outlet yang dipilih di bagian atas.</div><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-outline-primary fw-bold" onclick="exportStockCSV()"><i class="bi bi-filetype-csv me-1"></i>Ekspor CSV</button><button class="btn btn-sm btn-outline-secondary fw-bold" onclick="printStockReport()"><i class="bi bi-printer me-1"></i>Cetak / PDF</button></div></div>
     <div class="d-flex gap-2 mb-3 owner-tabs" style="overflow-x:auto; padding-bottom:5px;">
-       <button class="btn btn-dark fw-bold px-3" style="font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('aset', event)">Aset</button>
-       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('rank', event)">Ranking</button>
-       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('dist', event)">Distribusi</button>
-       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('trend', event)">Tren</button>
-       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('po', event)">PO Calc</button>
-       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('master', event)">Master</button>
+       <button class="btn btn-dark fw-bold px-3" style="font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('aset', event)"><i class="bi bi-wallet2 me-1"></i>Ikhtisar</button>
+       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('rank', event)"><i class="bi bi-trophy me-1"></i>Kinerja Outlet</button>
+       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('dist', event)"><i class="bi bi-arrow-left-right me-1"></i>Distribusi</button>
+       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('trend', event)"><i class="bi bi-graph-up me-1"></i>Tren</button>
+       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('po', event)"><i class="bi bi-calculator me-1"></i>Pembelian</button>
+       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('master', event)"><i class="bi bi-database me-1"></i>Master Barang</button>
     </div>
 
-    <div id="owner-aset" style="height:calc(100vh - 400px); overflow-y:auto;">
+    <div id="owner-aset" class="owner-panel">
+      <div class="owner-panel-title"><span class="owner-icon"><i class="bi bi-wallet2"></i></span>Ringkasan Aset Persediaan</div><div class="owner-context">Gunakan nilai ini untuk memantau eksposur persediaan. Nilai merupakan estimasi dari data master dan saldo stok.</div>
       <div class="card-box mb-3 d-flex justify-content-between align-items-center"><span class="fw-bold">TOTAL ASET</span><span class="text-primary fw-bolder fs-4" id="assetVal">Rp 0</span></div>
       <div id="assetList"></div>
     </div>
     
-    <div id="owner-rank" style="display:none; height:calc(100vh - 400px); overflow-y:auto;">
+    <div id="owner-rank" class="owner-panel" style="display:none;">
+      <div class="owner-panel-title"><span class="owner-icon"><i class="bi bi-trophy"></i></span>Kinerja Outlet</div><div class="owner-context">Bandingkan indikator yang tersedia. Ranking adalah alat pemantauan operasional, bukan penilaian kinerja keuangan yang diaudit.</div>
       <h6 class="fw-bold mt-1" style="color:var(--text)"><i class="bi bi-trophy-fill text-warning"></i> Leaderboard Outlet</h6><div id="leaderboardList" class="mb-4"></div>
       <button class="btn-act bg-primary mb-4" onclick="copyKonsolidasiWA()"><i class="bi bi-whatsapp"></i> Cetak Laporan Konsolidasi</button>
     </div>
     
-    <div id="owner-dist" style="display:none; height:calc(100vh - 400px); overflow-y:auto;">
+    <div id="owner-dist" class="owner-panel" style="display:none;">
+      <div class="owner-panel-title"><span class="owner-icon"><i class="bi bi-arrow-left-right"></i></span>Optimasi Distribusi</div><div class="owner-context">Periksa saldo outlet sumber dan tujuan sebelum melakukan mutasi. Rekomendasi tidak menggantikan validasi stok aktual.</div>
       <h6 class="fw-bold mt-1" style="color:var(--text)"><i class="bi bi-shuffle text-primary"></i> Rekomendasi Mutasi Otomatis</h6>
       <div id="mutationList"></div>
     </div>
 
-    <div id="owner-trend" style="display:none; height:calc(100vh - 400px); overflow-y:auto;">
+    <div id="owner-trend" class="owner-panel" style="display:none;">
+      <div class="owner-panel-title"><span class="owner-icon"><i class="bi bi-graph-up"></i></span>Tren Persediaan</div><div class="owner-context">Grafik bergantung pada histori yang tersedia. Jika histori belum cukup, jangan simpulkan tren dari data yang kosong.</div>
       <div class="card-box mb-3" style="height:250px;"><canvas id="trendChart"></canvas></div>
     </div>
 
-    <div id="owner-po" style="display:none; height:calc(100vh - 400px); overflow-y:auto;">
+    <div id="owner-po" class="owner-panel" style="display:none;">
+      <div class="owner-panel-title"><span class="owner-icon"><i class="bi bi-calculator"></i></span>Perencanaan Pembelian</div><div class="owner-context">Pastikan outlet spesifik dipilih sebelum membuat draft. Estimasi biaya mengikuti harga pada master barang.</div>
       <div class="card-box"><h6 class="fw-bold mb-3" style="color:var(--text)"><i class="bi bi-calculator text-primary"></i> Kalkulator Purchase Order</h6>
         <div class="small text-secondary mb-2">Pilih satu outlet spesifik sebelum menyimpan draft PO.</div>
         <label class="inp-lbl" for="poSupplier">Pemasok</label><select id="poSupplier" class="inp-field mb-3"><option value="">Tanpa pemasok terpilih</option></select>
@@ -404,7 +434,8 @@
       <div class="card-box mt-3"><h6 class="fw-bold mb-3">Riwayat Purchase Order</h6><div id="poHistory"><div class="small text-secondary">Belum ada PO.</div></div></div>
     </div>
 
-    <div id="owner-master" style="display:none; height:calc(100vh - 400px); overflow-y:auto;">
+    <div id="owner-master" class="owner-panel" style="display:none;">
+      <div class="owner-panel-title"><span class="owner-icon"><i class="bi bi-database"></i></span>Data Induk Barang</div><div class="owner-context">Perubahan master dapat memengaruhi konversi satuan dan perhitungan pembelian. Pastikan data benar sebelum menyimpan.</div>
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h6 class="fw-bold m-0" style="color:var(--text)"><i class="bi bi-database me-2"></i>Master Barang</h6>
         <button class="btn btn-sm btn-primary rounded-pill fw-bold px-3" onclick="openMasterModal()"><i class="bi bi-plus"></i> Baru</button>
@@ -772,7 +803,7 @@
         if(isOwner){ owner.style.display='block'; showOwnerTab('master'); renderMasterList(); }
         else { Swal.fire({icon:'info',title:'Pengaturan terbatas',text:'Hubungi Owner untuk perubahan master dan konfigurasi.'}); dash.style.display='block'; renderDashboardView(); }
       }
-      window.scrollTo({top:0,behavior:'auto'});
+      if(!isOwner) window.scrollTo({top:0,behavior:'auto'});
     }
     document.querySelectorAll('.nav-item[role="button"]').forEach(el => el.addEventListener('keydown', e => { if(e.key==='Enter' || e.key===' ') { e.preventDefault(); el.click(); } }));
     function showStok(){ document.getElementById('page-stok').style.display='block'; document.getElementById('page-transfer').style.display='none'; }
@@ -1211,7 +1242,7 @@
            allItemsStr += `   └ ADU: ${adu}/hr | Est: ${lItem.daysLeft === 999 ? "Aman" : lItem.daysLeft + " hr"}\n\n`; 
         } else { allItemsStr += `➖ *${p.name}* 🔴\n   └ Stok: *KOSONG*\n\n`; }
       });
-      txt += allItemsStr + `_Ket: ✅ Aman | 📉 Kritis | 📈 Over | ⚠️ Dekat Exp | ⛔ Expired | 🔴 Kosong_\n\n_Generated via Ai-STOK V41 Enterprise_`;
+      txt += allItemsStr + `_Ket: ✅ Aman | 📉 Kritis | 📈 Over | ⚠️ Dekat Exp | ⛔ Expired | 🔴 Kosong_\n\n_Generated via Ai-STOK V42 Enterprise_`;
       navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Laporan Tersalin!', showConfirmButton:false, timer:2000}));
     }
     
@@ -1235,7 +1266,7 @@
             });
             txt += `➖ *${p.name}*\n${detailStr}\n`;
         });
-        txt += `_Generated via Ai-STOK V41 Enterprise_`;
+        txt += `_Generated via Ai-STOK V42 Enterprise_`;
         navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Laporan Konsolidasi Tersalin!', showConfirmButton:false, timer:3000}));
     }
 
@@ -1263,7 +1294,7 @@
       const over=all.filter(x=>String(x.stockStatus||'').toUpperCase()==='OVERSTOK').length;
       const asset=all.reduce((a,x)=>a+(Number(x.assetVal)||0),0);
       const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
-      set('reportRows',all.length);set('reportRisk',risk);set('reportAsset',toIDR(asset));set('reportOver',over);set('reportCount',`${rows.length} item ditampilkan`);
+      set('ownerAssetKpi',toIDR(asset));set('reportRows',all.length);set('reportRisk',risk);set('reportAsset',toIDR(asset));set('reportOver',over);set('reportCount',`${rows.length} item ditampilkan`);
       const body=document.getElementById('reportTableBody'); if(!body)return;
       body.innerHTML=rows.slice(0,1000).map(x=>`<tr><td>${escapeHTML(x.outlet||'')}</td><td class="fw-bold">${escapeHTML(x.name||'')}</td><td>${escapeHTML(x.displayQty||'0')}</td><td><span class="status-pill">${escapeHTML(x.stockStatus||'—')}</span></td><td>${toIDR(Number(x.assetVal)||0)}</td><td>${escapeHTML(String(x.poNeed??'—'))} ${escapeHTML(x.uMain||'')}</td></tr>`).join('')||'<tr><td colspan="6" class="text-center text-secondary p-4">Tidak ada data yang cocok dengan filter.</td></tr>';
     }
@@ -1285,7 +1316,7 @@
       }
 
       document.getElementById('qs-item').innerText = totalAktif; document.getElementById('qs-kritis').innerText = totalKritis; document.getElementById('qs-over').innerText = totalOver;
-      document.getElementById('assetVal').innerText = toIDR(totAset); document.getElementById('hppVal').innerText = toIDR(totHPP); document.getElementById('wasteVal').innerText = toIDR(totWaste + totLoss); 
+      document.getElementById('assetVal').innerText = toIDR(totAset); const ownerAssetKpi=document.getElementById('ownerAssetKpi'); if(ownerAssetKpi) ownerAssetKpi.innerText=toIDR(totAset); document.getElementById('hppVal').innerText = toIDR(totHPP); document.getElementById('wasteVal').innerText = toIDR(totWaste + totLoss); 
 
       let h=''; 
       filteredStock.forEach(x => { h+=`<div class="card-box"><div class="d-flex justify-content-between mb-1"><div class="fw-bold" style="font-size:0.9rem; color:var(--text)">[${x.outlet}] ${x.name}</div><div class="text-success fw-bold">${toIDR(x.assetVal)}</div></div><div class="small text-muted mb-2">Stok: <b style="color:var(--text)">${x.displayQty}</b></div><div class="p-2 rounded small text-secondary d-flex justify-content-between" style="background:var(--input-bg);"><span>PO Target: ${x.poNeed} ${x.uMain}</span><span class="fw-bold text-primary"><i class="bi bi-graph-up-arrow"></i> ADU: ${globalData.inventoryStats[x.outlet+'_'+x.name]?.adu || '-'}</span></div></div>`; }); 
