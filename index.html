@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>Ai-STOK V33.0</title>
+  <title>Ai-STOK V34.0 Enterprise</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
@@ -35,24 +35,21 @@
       "theme_color": "#FF2E2E",
       "icons": [{"src": APP_LOGO, "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}]
     };
-    const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
-    document.write(`<link rel="manifest" href="${URL.createObjectURL(manifestBlob)}">`);
+    document.write('<link rel="manifest" href="./manifest.json">');
     document.write(`<link rel="apple-touch-icon" href="${APP_LOGO}">`);
     document.write(`<meta name="apple-mobile-web-app-title" content="${APP_NAME}">`);
-
-    if ('serviceWorker' in navigator) {
-        const swBlob = new Blob([`self.addEventListener('fetch', function(e) { });`], {type: 'application/javascript'});
-        navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(err => console.warn('PWA cache unavailable', err)));
     }
   </script>
 
   <style>
     :root { 
-      --primary: #FF2E2E; --bg: #F8F9FD; --text: #1E293B; --gray: #64748B; 
+      --primary: #E31E24; --primary-rgb: 227,30,36; --bg: #F8F9FD; --text: #1E293B; --gray: #64748B; 
       --card-bg: #FFFFFF; --border: #eeeeee; --input-bg: #fafafa; --radius: 16px; 
     }
     body.dark-mode { 
-      --bg: #0F172A; --text: #F8FAFC; --gray: #9CA3AF; 
+      --primary: #FF555A; --primary-rgb: 255,85,90; --bg: #0F172A; --text: #F8FAFC; --gray: #9CA3AF; 
       --card-bg: #1E293B; --border: #334155; --input-bg: #0F172A;
     }
 
@@ -61,7 +58,7 @@
     button, .card-box, .nav-item, .fab, select, input { touch-action: manipulation; }
     .swal2-popup { will-change: transform, opacity; background: var(--card-bg) !important; color: var(--text) !important; }
 
-    .glass-header { background: rgba(var(--card-bg), 0.95); backdrop-filter: blur(10px); padding: 15px 20px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .glass-header { background: var(--card-bg); backdrop-filter: blur(10px); padding: 15px 20px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .brand { font-weight: 800; font-size: 1.3rem; color: var(--primary); }
     .role-btn { font-size: 0.8rem; background: var(--input-bg); padding: 6px 14px; border-radius: 50px; font-weight: 700; cursor: pointer; border: 1px solid var(--border); color: var(--text); }
     .outlet-wrap { padding: 0 20px; }
@@ -107,6 +104,18 @@
     /* Efek hover/klik pada foto */
     .zoomable-img { transition: transform 0.2s; cursor: pointer; }
     .zoomable-img:active { transform: scale(0.9); }
+    /* V34: konsistensi visual, responsif, aksesibilitas */
+    :focus-visible { outline: 3px solid rgba(var(--primary-rgb),.42); outline-offset: 2px; }
+    .glass-header { background: var(--card-bg); box-shadow: 0 2px 12px rgba(15,23,42,.04); }
+    .inp-field, .outlet-sel { min-height: 44px; }
+    .btn-act { min-height: 46px; box-shadow: 0 5px 14px rgba(var(--primary-rgb),.15); }
+    .card-box { border: 1px solid var(--border); border-left-width: 4px; }
+    .nav-item { min-height: 48px; justify-content: center; }
+    .nav-item span { font-size: .72rem; font-weight: 700; }
+    .sync-badge { position: sticky; top: 64px; z-index: 95; }
+    @media (min-width: 992px) { body { max-width: 1440px; margin: 0 auto; } #managerView, #ownerView { padding-left: 28px !important; padding-right: 28px !important; } #scrollArea { max-height: calc(100vh - 300px); } }
+    @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:.01ms !important; transition-duration:.01ms !important; scroll-behavior:auto !important; } }
+    @media print { body { background:#fff !important; color:#111 !important; padding:0 !important; max-width:none !important; } .glass-header,.outlet-wrap,.nav-bot,.fab,#syncBadge,button,.btn,.history-btn,#loginScreen { display:none !important; } #ownerView,#managerView,#page-stok,#owner-aset,#owner-rank,#owner-dist,#owner-trend,#owner-po,#owner-master { display:block !important; height:auto !important; max-height:none !important; overflow:visible !important; } .card-box { break-inside:avoid; box-shadow:none !important; } }
   </style>
 </head>
 <body>
@@ -117,7 +126,11 @@
             <img id="loginLogoImg" src="" style="width:100%; height:100%; object-fit:contain;" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2890/2890580.png'">
         </div>
         <h1 class="text-white fw-bolder" id="loginTitleApp">APP V33</h1>
-        <p id="loginStatus" class="text-secondary small mt-1">Super App Initializing...</p>
+        <p id="loginStatus" class="text-secondary small mt-1">Menyiapkan keamanan...</p>
+        <label for="loginUsername" class="text-white small fw-bold mt-3 mb-1">PENGGUNA</label>
+        <select id="loginUsername" class="form-select text-center fw-bold" style="width:250px;border-radius:12px" aria-label="Pilih pengguna">
+          <option value="">Memuat pengguna...</option>
+        </select>
     </div>
     <div class="d-flex gap-3 mb-5" id="pinIndicators"><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div><div class="pin-dot" style="width:16px; height:16px; border-radius:50%; border:2px solid #4B5563;"></div></div>
     <div id="numpad" class="row g-4" style="max-width:280px; opacity:0.5; pointer-events:none;">
@@ -144,7 +157,7 @@
     </div>
   </div>
 
-  <div class="outlet-wrap"><select id="outlet" class="outlet-sel" onchange="fetchData()"></select></div>
+  <div class="outlet-wrap"><select id="outlet" class="outlet-sel" onchange="fetchData()" aria-label="Pilih outlet"></select><div id="connectionStatus" class="small text-muted mb-2" role="status">Ai-STOK V34 · memeriksa koneksi</div></div>
 
   <div id="skeletonTemplate" style="display:none;">
       <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-big"></div></div>
@@ -152,8 +165,8 @@
       <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-big"></div></div>
   </div>
 
-  <div id="syncBadge" class="sync-badge" style="display:none; justify-content:space-between; align-items:center; background:var(--card-bg); padding:10px 20px; border-bottom:1px solid var(--border);">
-    <div><i class="bi bi-cloud-arrow-up-fill text-warning me-1"></i><span class="fw-bold text-dark" id="queueCount">0 Antrean</span></div>
+  <div id="syncBadge" role="status" aria-live="polite" class="sync-badge" style="display:none; justify-content:space-between; align-items:center; background:var(--card-bg); padding:10px 20px; border-bottom:1px solid var(--border);">
+    <div><i class="bi bi-cloud-arrow-up-fill text-warning me-1"></i><span class="fw-bold" style="color:var(--text)" id="queueCount">0 Antrean</span></div>
     <button class="btn btn-sm btn-warning fw-bold text-white rounded-pill px-3" onclick="syncOfflineData()">Sync</button>
   </div>
 
@@ -213,13 +226,17 @@
         <div class="col-6"><div class="card-box bg-danger text-white text-center py-3 mb-0 border-0 h-100 d-flex flex-column justify-content-center"><small style="opacity:0.9; font-weight:700; font-size:0.6rem;">COST OF WASTE</small><h5 id="wasteVal" style="margin:2px 0 0 0; font-weight:800; font-size:1.1rem;">Rp 0</h5></div></div>
     </div>
 
+    <div class="d-flex gap-2 mb-3 flex-wrap">
+      <button class="btn btn-sm btn-outline-primary fw-bold" onclick="exportStockCSV()"><i class="bi bi-filetype-csv me-1"></i>Ekspor CSV</button>
+      <button class="btn btn-sm btn-outline-secondary fw-bold" onclick="printStockReport()"><i class="bi bi-printer me-1"></i>Cetak / PDF</button>
+    </div>
     <div class="d-flex gap-2 mb-3" style="overflow-x:auto; padding-bottom:5px;">
-       <button class="btn btn-dark fw-bold px-3" style="font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('aset')">Aset</button>
-       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('rank')">Ranking</button>
-       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('dist')">Distribusi</button>
-       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('trend')">Tren</button>
-       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('po')">PO Calc</button>
-       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('master')">Master</button>
+       <button class="btn btn-dark fw-bold px-3" style="font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('aset', event)">Aset</button>
+       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('rank', event)">Ranking</button>
+       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('dist', event)">Distribusi</button>
+       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('trend', event)">Tren</button>
+       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('po', event)">PO Calc</button>
+       <button class="btn border fw-bold px-3" style="background:var(--input-bg); color:var(--text); font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('master', event)">Master</button>
     </div>
 
     <div id="owner-aset" style="height:calc(100vh - 400px); overflow-y:auto;">
@@ -242,7 +259,14 @@
     </div>
 
     <div id="owner-po" style="display:none; height:calc(100vh - 400px); overflow-y:auto;">
-      <div class="card-box"><h6 class="fw-bold mb-3" style="color:var(--text)"><i class="bi bi-calculator text-primary"></i> Kalkulator Purchase Order</h6><div id="poList"></div><div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center"><span class="fw-bold text-secondary">Estimasi Tagihan:</span><span class="fw-bold text-danger fs-5" id="poGrandTotal">Rp 0</span></div><button class="btn-act mt-3" onclick="copyPOWA()"><i class="bi bi-whatsapp"></i> Copy Format PO</button></div>
+      <div class="card-box"><h6 class="fw-bold mb-3" style="color:var(--text)"><i class="bi bi-calculator text-primary"></i> Kalkulator Purchase Order</h6>
+        <div class="small text-secondary mb-2">Pilih satu outlet spesifik sebelum menyimpan draft PO.</div>
+        <label class="inp-lbl" for="poSupplier">Pemasok</label><select id="poSupplier" class="inp-field mb-3"><option value="">Tanpa pemasok terpilih</option></select>
+        <div id="poList"></div><div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center"><span class="fw-bold text-secondary">Estimasi Tagihan:</span><span class="fw-bold text-danger fs-5" id="poGrandTotal">Rp 0</span></div>
+        <button class="btn-act mt-3" onclick="savePODraft()"><i class="bi bi-save me-1"></i>Simpan Draft PO</button>
+        <button class="btn-act mt-2" style="background:var(--input-bg);color:var(--text);box-shadow:none;border:1px solid var(--border)" onclick="copyPOWA()"><i class="bi bi-whatsapp"></i> Copy Format PO</button>
+      </div>
+      <div class="card-box mt-3"><h6 class="fw-bold mb-3">Riwayat Purchase Order</h6><div id="poHistory"><div class="small text-secondary">Belum ada PO.</div></div></div>
     </div>
 
     <div id="owner-master" style="display:none; height:calc(100vh - 400px); overflow-y:auto;">
@@ -256,9 +280,12 @@
 
   <button class="fab" id="fabBtn" onclick="copyWA()"><i class="bi bi-whatsapp"></i></button>
 
-  <div class="nav-bot">
-    <div class="nav-item active" id="nav-gudang" onclick="nav('gudang')"><i class="bi bi-box-seam-fill"></i><span>Input</span></div>
-    <div class="nav-item" id="nav-lapor" onclick="nav('lapor')"><i class="bi bi-bar-chart-fill"></i><span>Dasbor</span></div>
+  <div class="nav-bot" aria-label="Navigasi utama">
+    <div class="nav-item" id="nav-beranda" onclick="nav('beranda')" role="button" tabindex="0"><i class="bi bi-house-door-fill"></i><span>Beranda</span></div>
+    <div class="nav-item active" id="nav-persediaan" onclick="nav('persediaan')" role="button" tabindex="0"><i class="bi bi-box-seam-fill"></i><span>Persediaan</span></div>
+    <div class="nav-item" id="nav-transaksi" onclick="nav('transaksi')" role="button" tabindex="0"><i class="bi bi-arrow-left-right"></i><span>Transaksi</span></div>
+    <div class="nav-item" id="nav-laporan" onclick="nav('laporan')" role="button" tabindex="0"><i class="bi bi-bar-chart-fill"></i><span>Laporan</span></div>
+    <div class="nav-item" id="nav-pengaturan" onclick="nav('pengaturan')" role="button" tabindex="0"><i class="bi bi-gear-fill"></i><span>Pengaturan</span></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -266,13 +293,33 @@
   <script>
     // MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzg-m_7Foz577fMEgFJ_FyOx3hGXgB_7a6HjvZuLef1CiDEpDM4zy0zdJ5uT9XUjsYbiA/exec";
+    // Token hanya dikirim ke backend. Jangan pernah menyimpan PIN dalam cache.
+    let authToken = null;
+    let offlineMode = false;
+    const nativeFetch = window.fetch.bind(window);
+    window.fetch = async function(url, options = {}) {
+      if (String(url) === GAS_API_URL && options && options.body) {
+        let payload;
+        try { payload = JSON.parse(options.body); } catch (_) { return nativeFetch(url, options); }
+        if (!['authenticate', 'getLoginOptions'].includes(payload.action)) payload.token = authToken;
+        const response = await nativeFetch(url, { ...options, body: JSON.stringify(payload) });
+        try {
+          const parsed = await response.clone().json();
+          if (parsed && parsed.status && parsed.status !== 'success') { const apiError = new Error(parsed.message || 'Permintaan gagal.'); apiError.apiRejected = true; throw apiError; }
+        } catch (err) {
+          if (err instanceof Error && !/Unexpected token|JSON|end of JSON/i.test(err.message)) throw err;
+        }
+        return response;
+      }
+      return nativeFetch(url, options);
+    };
     
     document.getElementById('loginLogoImg').src = APP_LOGO;
     document.getElementById('loginTitleApp').innerText = APP_NAME;
     document.getElementById('headerTitleApp').innerText = APP_NAME.split(" ")[0];
 
     let globalData = { users:[], outlets:[], products:[], liveStock:[], inventoryStats:{}, assetPerOutlet:{}, expiredAssetPerOutlet:{}, wastePerOutlet:{}, hppPerOutlet:{} };
-    let opnameQueue = []; let activeUser = null; let currentPin = ""; let chartInstance = null; let activePO = {}; let searchTimeout;
+    let opnameQueue = []; let activeUser = null; let currentPin = ""; let chartInstance = null; let activePO = {}; let searchTimeout; let pendingPORequestId = null;
     let clusterizeInstance = null; let isCompactView = false; window.hasShownFocus = false; 
     let deferredPrompt;
     
@@ -353,41 +400,92 @@
         applyTheme(newTheme);
     }
 
-    document.addEventListener("DOMContentLoaded", async () => { 
-        let savedTheme = localStorage.getItem('aicha_theme') || 'auto';
-        applyTheme(savedTheme);
-
-        opnameQueue = (await localforage.getItem('qAicha33')) || [];
-        activeUser = (await localforage.getItem('uAicha33')) || null;
-        let cache = await localforage.getItem('dAicha33');
-        
-        showSkeletonLoader();
-        if(cache) { globalData = cache; enableLogin(); }
-        
-        try {
-          const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: "ALL" }) });
-          const result = await res.json();
-          if(result.status === "success") { 
-              globalData = result.data; await localforage.setItem('dAicha33', globalData); 
-              document.getElementById('loginStatus').textContent = "Sistem Keamanan Aktif";
-              enableLogin(); if(activeUser) showMainApp(); 
-          }
-        } catch (e) { 
-            document.getElementById('loginStatus').innerHTML = `<span class="text-warning fw-bold">Koneksi Terputus (Offline)</span>`;
-            if(cache) enableLogin();
-        }
+    async function digestPin(salt, pin) {
+      const bytes = new TextEncoder().encode(`${salt}:${pin}`);
+      const digest = await crypto.subtle.digest('SHA-256', bytes);
+      return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+    function makeId() {
+      return (crypto.randomUUID ? crypto.randomUUID() : `tx-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    }
+    async function loadLoginOptions() {
+      const select = document.getElementById('loginUsername');
+      try {
+        const res = await nativeFetch(GAS_API_URL, { method:'POST', body:JSON.stringify({action:'getLoginOptions'}) });
+        const result = await res.json();
+        if (result.status !== 'success') throw new Error(result.message || 'Tidak dapat memuat pengguna');
+        select.innerHTML = '<option value="">Pilih pengguna...</option>';
+        (result.data.users || []).forEach(u => select.add(new Option(u.username, u.username)));
+        const last = await localforage.getItem('lastUserAicha34');
+        if (last && (result.data.users || []).some(u => u.username === last.username)) select.value = last.username;
+        document.getElementById('loginStatus').textContent = 'Masuk dengan pengguna dan PIN';
+        return true;
+      } catch (e) {
+        const last = await localforage.getItem('lastUserAicha34');
+        select.innerHTML = '';
+        if (last && last.username) select.add(new Option(`${last.username} (Mode Offline)`, last.username, true, true));
+        else select.add(new Option('Tidak tersedia saat offline', ''));
+        document.getElementById('loginStatus').innerHTML = '<span class="text-warning fw-bold">Offline — hanya perangkat yang pernah login</span>';
+        return false;
+      }
+    }
+    document.addEventListener("DOMContentLoaded", async () => {
+      applyTheme(localStorage.getItem('aicha_theme') || 'auto');
+      opnameQueue = (await localforage.getItem('qAicha33')) || [];
+      activeUser = null; authToken = null; offlineMode = false;
+      const cache = await localforage.getItem('dAicha33');
+      if (cache) globalData = cache;
+      showSkeletonLoader();
+      await loadLoginOptions();
+      enableLogin();
+      updateQueueUI();
+      window.addEventListener('online', () => { if (authToken && opnameQueue.length) syncOfflineData(); });
     });
 
-    function enterPin(n) { if(currentPin.length < 4) { currentPin += n; updatePinUI(); if(currentPin.length===4) validatePin(); } }
-    function deletePin() { if(currentPin.length > 0) { currentPin = currentPin.slice(0, -1); updatePinUI(); } }
+    function enterPin(n) {
+      if (currentPin.length < 4) { currentPin += n; updatePinUI(); if (currentPin.length === 4) validatePin(); }
+    }
+    function deletePin() { if (currentPin.length > 0) { currentPin = currentPin.slice(0, -1); updatePinUI(); } }
     function updatePinUI() { document.querySelectorAll('.pin-dot').forEach((d, i) => d.style.background = i < currentPin.length ? 'white' : 'transparent'); }
     async function validatePin() {
-        const u = globalData.users.find(u => u.pin === currentPin);
-        if(u) { activeUser = u; await localforage.setItem('uAicha33', u); showMainApp(); }
-        else { Swal.fire('PIN Salah','','error'); currentPin = ""; updatePinUI(); }
+      const username = document.getElementById('loginUsername').value;
+      if (!username) { currentPin = ''; updatePinUI(); return Swal.fire('Pilih pengguna terlebih dahulu','','warning'); }
+      try {
+        const res = await nativeFetch(GAS_API_URL, {method:'POST', body:JSON.stringify({action:'authenticate', username, pin:currentPin})});
+        const result = await res.json();
+        if (result.status !== 'success') throw new Error(result.message || 'PIN tidak valid');
+        authToken = result.data.token; activeUser = result.data.user; offlineMode = false; document.getElementById('connectionStatus').textContent = 'Online · data tersinkron';
+        await localforage.setItem('lastUserAicha34', {username:activeUser.username, role:activeUser.role, idOutlet:activeUser.idOutlet});
+        const salt = makeId();
+        await localforage.setItem('offlineAuthAicha34', {username, salt, verifier: await digestPin(salt, currentPin)});
+        currentPin = ''; updatePinUI();
+        await fetchData();
+        if (!globalData.outlets || !globalData.outlets.length) throw new Error('Data outlet tidak tersedia');
+        showMainApp();
+      } catch (err) {
+        // Fallback offline hanya untuk pengguna yang pernah berhasil login pada perangkat ini.
+        try {
+          const offline = await localforage.getItem('offlineAuthAicha34');
+          const last = await localforage.getItem('lastUserAicha34');
+          if (!navigator.onLine && offline && last && offline.username === username && await digestPin(offline.salt, currentPin) === offline.verifier && globalData && globalData.outlets) {
+            activeUser = last; authToken = null; offlineMode = true; document.getElementById('connectionStatus').textContent = 'Offline · data cache, transaksi akan mengantre'; currentPin = ''; updatePinUI();
+            Swal.fire({toast:true,position:'top',icon:'warning',title:'Mode offline: transaksi akan mengantre',showConfirmButton:false,timer:2200});
+            showMainApp(); return;
+          }
+        } catch (_) {}
+        currentPin = ''; updatePinUI();
+        Swal.fire('Gagal masuk', err.message || 'Periksa koneksi dan PIN.','error');
+      }
     }
-    function enableLogin() { document.getElementById('numpad').style.opacity = 1; document.getElementById('numpad').style.pointerEvents = 'auto'; if(activeUser) showMainApp(); }
-    async function doLogout() { activeUser = null; currentPin = ""; window.hasShownFocus = false; await localforage.removeItem('uAicha33'); updatePinUI(); document.getElementById('loginScreen').style.display='flex'; }
+    function enableLogin() {
+      document.getElementById('numpad').style.opacity = 1;
+      document.getElementById('numpad').style.pointerEvents = 'auto';
+    }
+    async function doLogout() {
+      try { if (authToken) await nativeFetch(GAS_API_URL, {method:'POST',body:JSON.stringify({action:'logout',token:authToken})}); } catch (_) {}
+      activeUser = null; authToken = null; offlineMode = false; currentPin = ''; window.hasShownFocus = false;
+      updatePinUI(); document.getElementById('loginScreen').style.display='flex';
+    }
     window.doLogout = doLogout;
 
     function showMainApp() {
@@ -398,6 +496,7 @@
         out.value = activeUser.role === "Owner" ? "ALL" : activeUser.idOutlet;
         if(activeUser.role !== "Owner") out.disabled = true;
         fetchData();
+        nav(activeUser.role === 'Owner' ? 'beranda' : 'persediaan');
     }
 
     function showSkeletonLoader() {
@@ -406,6 +505,7 @@
     }
 
     async function fetchData() {
+      if (!activeUser) return;
       const out = document.getElementById('outlet').value;
       showSkeletonLoader();
       try {
@@ -413,29 +513,75 @@
         const result = await res.json();
         if(result.status === "success") { 
             globalData = result.data; renderStockList(); 
+            populateTransferControls();
             if(activeUser && activeUser.role === "Owner") { renderOwner(); renderPO(); renderMasterList(); }
         } else { Swal.fire('Error', result.message, 'warning'); renderStockList(); }
-      } catch (e) { renderStockList(); }
+      } catch (e) {
+        if (globalData && globalData.liveStock) renderStockList();
+        if (!offlineMode && !globalData.liveStock) Swal.fire('Koneksi bermasalah','Data terbaru belum dapat dimuat.','warning');
+      }
+    }
+
+    function populateTransferControls() {
+      const from = document.getElementById('outlet').value;
+      const dest = document.getElementById('trfDest'); const itemSelect = document.getElementById('trfItem');
+      if (!dest || !itemSelect) return;
+      dest.innerHTML = ''; itemSelect.innerHTML = '';
+      if (!from || from === 'ALL') {
+        dest.add(new Option('Pilih outlet asal terlebih dahulu',''));
+        itemSelect.add(new Option('Pilih outlet asal terlebih dahulu',''));
+        document.getElementById('trfMax').textContent = '-'; return;
+      }
+      (globalData.outlets || []).filter(o => String(o.id) !== String(from)).forEach(o => dest.add(new Option(o.nama, o.id)));
+      const items = (globalData.liveStock || []).filter(x => String(x.outlet) === String(from) && Number(x.totalBase) > 0);
+      items.forEach(x => itemSelect.add(new Option(`${x.name} · ${x.displayQty}`, x.name)));
+      if (!dest.options.length) dest.add(new Option('Tidak ada outlet tujuan',''));
+      if (!itemSelect.options.length) itemSelect.add(new Option('Tidak ada stok tersedia',''));
+      updTrfLbl();
     }
 
     function nav(p) {
-      document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active')); document.getElementById('nav-'+p).classList.add('active');
-      document.getElementById('page-stok').style.display = 'none'; document.getElementById('page-transfer').style.display = 'none'; 
-      if(p==='lapor'){
-        if(activeUser.role==='Owner') { document.getElementById('managerView').style.display='none'; document.getElementById('ownerView').style.display='block'; document.getElementById('fabBtn').style.display='none'; renderOwner(); renderPO(); renderMasterList(); }
-        else { document.getElementById('managerView').style.display='block'; document.getElementById('page-stok').style.display='block'; document.getElementById('ownerView').style.display='none'; document.getElementById('fabBtn').style.display='flex'; }
-      } else {
-        document.getElementById('managerView').style.display='block'; document.getElementById('page-stok').style.display='block'; document.getElementById('ownerView').style.display='none'; document.getElementById('fabBtn').style.display='flex';
+      document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
+      const navEl = document.getElementById('nav-'+p); if (navEl) navEl.classList.add('active');
+      const manager = document.getElementById('managerView'), owner = document.getElementById('ownerView');
+      const stock = document.getElementById('page-stok'), transfer = document.getElementById('page-transfer'), fab = document.getElementById('fabBtn');
+      manager.style.display = 'none'; owner.style.display = 'none'; stock.style.display = 'none'; transfer.style.display = 'none';
+      fab.style.display = 'none';
+      if (p === 'beranda') {
+        if (activeUser && activeUser.role === 'Owner') {
+          owner.style.display='block'; showOwnerTab('aset'); renderOwner(); renderPO(); renderMasterList();
+        } else { manager.style.display='block'; stock.style.display='block'; fab.style.display='flex'; }
+      } else if (p === 'persediaan') {
+        manager.style.display='block'; stock.style.display='block';
+        if (activeUser && activeUser.role === 'Owner') document.getElementById('outlet').disabled = false;
+        fab.style.display = (activeUser && activeUser.role !== 'Owner') ? 'flex' : 'none';
+      } else if (p === 'transaksi') {
+        manager.style.display='block'; transfer.style.display='block';
+        if (document.getElementById('outlet').value === 'ALL' && activeUser && activeUser.role === 'Owner') {
+          Swal.fire({icon:'info',title:'Pilih outlet terlebih dahulu',text:'Pilih outlet spesifik pada pemilih outlet untuk membuat transfer.'});
+          stock.style.display='block'; transfer.style.display='none';
+        }
+      } else if (p === 'laporan') {
+        if (activeUser && activeUser.role === 'Owner') {
+          owner.style.display='block'; showOwnerTab('aset'); renderOwner(); renderPO(); renderMasterList();
+        } else { manager.style.display='block'; stock.style.display='block'; fab.style.display='flex'; }
+      } else if (p === 'pengaturan') {
+        if (activeUser && activeUser.role === 'Owner') {
+          owner.style.display='block'; showOwnerTab('master'); renderMasterList();
+        } else {
+          Swal.fire({icon:'info',title:'Pengaturan terbatas',text:'Hubungi Owner untuk perubahan master dan konfigurasi.'});
+          manager.style.display='block'; stock.style.display='block';
+        }
       }
     }
-    
+    document.querySelectorAll('.nav-item[role="button"]').forEach(el => el.addEventListener('keydown', e => { if(e.key==='Enter' || e.key===' ') { e.preventDefault(); el.click(); } }));
     function showStok(){ document.getElementById('page-stok').style.display='block'; document.getElementById('page-transfer').style.display='none'; }
     function showTransfer(){ document.getElementById('page-stok').style.display='none'; document.getElementById('page-transfer').style.display='block'; }
-    function showOwnerTab(tab){
-        let btnContainer = event.target.parentElement;
-        for(let i=0; i<btnContainer.children.length; i++) { btnContainer.children[i].className = 'btn border fw-bold px-3'; btnContainer.children[i].style.background = 'var(--input-bg)'; btnContainer.children[i].style.color = 'var(--text)'; }
-        event.target.className = 'btn btn-dark fw-bold px-3';
-        event.target.style.background = ''; event.target.style.color = '';
+    function showOwnerTab(tab, evt){
+        const btnContainer = document.querySelector('#ownerView > .d-flex.gap-2.mb-3');
+        const targetButton = (evt && evt.currentTarget) || (btnContainer && Array.from(btnContainer.children).find(btn => (btn.getAttribute('onclick') || '').includes(`showOwnerTab('${tab}')`)));
+        if (btnContainer) { for(let i=0; i<btnContainer.children.length; i++) { btnContainer.children[i].className = 'btn border fw-bold px-3'; btnContainer.children[i].style.background = 'var(--input-bg)'; btnContainer.children[i].style.color = 'var(--text)'; } }
+        if (targetButton) { targetButton.className = 'btn btn-dark fw-bold px-3'; targetButton.style.background = ''; targetButton.style.color = ''; }
 
         ['aset','rank','dist','trend','po','master'].forEach(t => { document.getElementById('owner-'+t).style.display = tab===t?'block':'none'; });
         if(tab==='trend') renderChart();
@@ -606,7 +752,8 @@
                     <div class="inp-grp"><label class="inp-lbl">Qty Kecil</label><input id="rcv-q2" type="number" class="inp-field" placeholder="0"></div>
                 </div>
                 <label class="inp-lbl">Tanggal Expired di Dus (Opsional)</label>
-                <input id="rcv-exp" type="date" class="inp-field">
+                <input id="rcv-exp" type="date" class="inp-field mb-3">
+                <label class="inp-lbl">No. nota / referensi pemasok (Opsional)</label><input id="rcv-ref" class="inp-field" maxlength="100" placeholder="Nomor nota / surat jalan">
             </div>`,
             confirmButtonColor: '#FF2E2E', confirmButtonText: 'Terima Barang',
             didOpen: () => { window.updateRcvInfo(); },
@@ -614,7 +761,7 @@
                 let name = document.getElementById('rcv-name').value; let p = globalData.products.find(x => x.name === name);
                 let q1 = document.getElementById('rcv-q1').value; let q2 = document.getElementById('rcv-q2').value;
                 if(!q1 && !q2) return Swal.showValidationMessage('Isi jumlah barang!');
-                return { user: activeUser.username, outletId: document.getElementById('outlet').value, barangId: name, qtyMain: q1||0, qtySub: q2||0, conversion: p.isi, expiredDate: document.getElementById('rcv-exp').value || "NoDate", keterangan: "Barang Masuk" };
+                return { user: activeUser.username, outletId: document.getElementById('outlet').value, barangId: name, qtyMain: q1||0, qtySub: q2||0, conversion: p.isi, expiredDate: document.getElementById('rcv-exp').value || "NoDate", keterangan: "Barang Masuk", catatan: document.getElementById('rcv-ref').value || '' };
             }
         }).then(r => { if(r.isConfirmed) submitSingle(r.value); });
     }
@@ -638,7 +785,10 @@
                     <div class="inp-grp"><label class="inp-lbl">Qty Kecil</label><input id="wst-q2" type="number" class="inp-field" placeholder="0"></div>
                 </div>
                 <label class="inp-lbl">Tanggal Expired Barang yg Rusak (Opsional)</label>
-                <input id="wst-exp" type="date" class="inp-field">
+                <input id="wst-exp" type="date" class="inp-field mb-3">
+                <label class="inp-lbl">Penyebab Waste</label>
+                <select id="wst-cause" class="inp-field mb-3"><option>Expired</option><option>Rusak kemasan</option><option>Tumpah / jatuh</option><option>Kesalahan produksi</option><option>Kontaminasi</option><option>Lainnya</option></select>
+                <label class="inp-lbl">Catatan tambahan</label><input id="wst-note" class="inp-field" maxlength="180" placeholder="Opsional">
             </div>`,
             confirmButtonColor: '#DC2626', confirmButtonText: 'Lapor Rusak',
             didOpen: () => { window.updateWstInfo(); },
@@ -646,7 +796,7 @@
                 let name = document.getElementById('wst-name').value; let p = globalData.products.find(x => x.name === name);
                 let q1 = document.getElementById('wst-q1').value; let q2 = document.getElementById('wst-q2').value;
                 if(!q1 && !q2) return Swal.showValidationMessage('Isi jumlah barang!');
-                return { user: activeUser.username, outletId: document.getElementById('outlet').value, barangId: name, qtyMain: q1||0, qtySub: q2||0, conversion: p.isi, expiredDate: document.getElementById('wst-exp').value || "NoDate", keterangan: "Barang Rusak" };
+                return { user: activeUser.username, outletId: document.getElementById('outlet').value, barangId: name, qtyMain: q1||0, qtySub: q2||0, conversion: p.isi, expiredDate: document.getElementById('wst-exp').value || "NoDate", keterangan: "Barang Rusak", catatan: `${document.getElementById('wst-cause').value}${document.getElementById('wst-note').value ? ' — '+document.getElementById('wst-note').value : ''}` };
             }
         }).then(r => { if(r.isConfirmed) submitSingle(r.value); });
     }
@@ -771,8 +921,42 @@
       } 
     }
 
-    async function submitSingle(payload) { showSkeletonLoader(); try { let res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: [payload] }) }); let result = await res.json(); if(result.status !== "success") throw new Error(result.message); fetchData(); } catch (e) { opnameQueue.push(payload); await localforage.setItem('qAicha33', opnameQueue); updateQueueUI(); renderStockList(); Swal.fire({title:'Tersimpan Offline', text:'Akan dikirim otomatis saat sinyal bagus', icon:'info', confirmButtonColor: '#FF2E2E'}); } }
-    async function syncOfflineData() { if(!navigator.onLine || opnameQueue.length === 0) return; showSkeletonLoader(); try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "submitOpnameBatch", data: opnameQueue }) }); opnameQueue = []; await localforage.setItem('qAicha33', []); updateQueueUI(); fetchData(); Swal.fire({toast:true, position:'top', icon:'success', title:'Sinkronisasi Berhasil', showConfirmButton:false, timer:1500}); } catch(e) { renderStockList(); } }
+    async function submitSingle(payload) {
+      if (!activeUser) return Swal.fire('Sesi berakhir','Silakan masuk kembali.','warning');
+      payload.transactionId = payload.transactionId || makeId();
+      payload.timestamp = payload.timestamp || new Date().toISOString();
+      payload.user = activeUser.username;
+      showSkeletonLoader();
+      try {
+        if (!authToken || !navigator.onLine) throw new Error('Offline');
+        const res = await fetch(GAS_API_URL, {method:'POST',body:JSON.stringify({action:'submitOpnameBatch',data:[payload]})});
+        const result = await res.json();
+        if (result.status !== 'success') throw new Error(result.message || 'Gagal menyimpan');
+        await fetchData();
+        Swal.fire({toast:true,position:'top',icon:'success',title:'Transaksi tersimpan',showConfirmButton:false,timer:1500});
+      } catch (e) {
+        if (e && e.apiRejected && !/sesi|login kembali|kedaluwarsa/i.test(e.message || '')) {
+          renderStockList();
+          return Swal.fire({title:'Transaksi ditolak server',text:e.message || 'Periksa data transaksi.',icon:'error'});
+        }
+        if (!opnameQueue.some(q => q.transactionId === payload.transactionId)) opnameQueue.push({...payload, syncStatus:'PENDING'});
+        await localforage.setItem('qAicha33', opnameQueue); updateQueueUI(); renderStockList();
+        Swal.fire({title:'Tersimpan di perangkat',text:'Transaksi belum masuk server. Jangan hapus data browser sebelum sinkronisasi berhasil.',icon:'warning',confirmButtonColor:'#E31E24'});
+      }
+    }
+    async function syncOfflineData() {
+      if (!navigator.onLine || !authToken || opnameQueue.length === 0) return;
+      const pending = [...opnameQueue]; showSkeletonLoader();
+      try {
+        const res = await fetch(GAS_API_URL,{method:'POST',body:JSON.stringify({action:'submitOpnameBatch',data:pending})});
+        const result = await res.json();
+        if (result.status !== 'success' || !result.data || Number(result.data.acceptedCount) !== pending.length) throw new Error(result.message || 'Server belum mengonfirmasi semua transaksi');
+        const sent = new Set(pending.map(q => q.transactionId));
+        opnameQueue = opnameQueue.filter(q => !sent.has(q.transactionId));
+        await localforage.setItem('qAicha33',opnameQueue); updateQueueUI(); await fetchData();
+        Swal.fire({toast:true,position:'top',icon:'success',title:`${pending.length} transaksi tersinkron`,showConfirmButton:false,timer:1800});
+      } catch(e) { renderStockList(); Swal.fire({toast:true,position:'top',icon:'error',title:'Sinkronisasi gagal — antrean dipertahankan',showConfirmButton:false,timer:2500}); }
+    }
     function updateQueueUI() { document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none'; document.getElementById('queueCount').innerText = `${opnameQueue.length} Antrean`; }
     
     // --- Laporan WA PWA Konsolidasi & Rekap ---
@@ -986,11 +1170,66 @@
         }
     }
 
-    function renderPO() { let poMap = {}; activePO = {}; let grandTotal = 0; let outFilter = document.getElementById('outlet').value; let filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter); filteredStock.forEach(x => { if(x.poNeed > 0) { if(!poMap[x.name]) poMap[x.name] = { name: x.name, uMain: x.uMain, pMain: x.pMain, qty: 0 }; poMap[x.name].qty += x.poNeed; } }); let h = ''; for(let key in poMap) { let item = poMap[key]; activePO[item.name] = { qty: item.qty, price: item.pMain, uMain: item.uMain }; let sub = item.qty * item.pMain; grandTotal += sub; h += `<div class="d-flex justify-content-between align-items-center border-bottom py-2"><div style="width:50%"><div class="fw-bold small" style="color:var(--text)">${item.name}</div><div class="text-muted" style="font-size:0.6rem;">${toIDR(item.pMain)} / ${item.uMain}</div></div><div><input type="number" class="po-input" value="${item.qty}" onchange="updatePO('${item.name}', this.value)"></div><div class="text-end fw-bold text-success" style="font-size:0.8rem; width:30%;" id="po_sub_${item.name.replace(/[^a-zA-Z0-9]/g, '')}">${toIDR(sub)}</div></div>`; } document.getElementById('poList').innerHTML = h || `<div class="text-muted text-center small py-3">Tidak ada rekomendasi order. Stok aman.</div>`; document.getElementById('poGrandTotal').innerText = toIDR(grandTotal); }
+    function renderPO() {
+      let poMap = {}; activePO = {}; let grandTotal = 0;
+      const outFilter = document.getElementById('outlet').value;
+      const filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter);
+      filteredStock.forEach(x => { if(x.poNeed > 0) { if(!poMap[x.name]) poMap[x.name] = { name:x.name,uMain:x.uMain,pMain:x.pMain,qty:0 }; poMap[x.name].qty += x.poNeed; } });
+      let h = '';
+      for (let key in poMap) {
+        const item=poMap[key]; activePO[item.name]={qty:item.qty,price:item.pMain,uMain:item.uMain};
+        const sub=item.qty*item.pMain; grandTotal+=sub;
+        h+=`<div class="d-flex justify-content-between align-items-center border-bottom py-2"><div style="width:48%"><div class="fw-bold small" style="color:var(--text)">${item.name}</div><div class="text-muted" style="font-size:.65rem">${toIDR(item.pMain)} / ${item.uMain}</div></div><div><input type="number" min="0" step="1" class="po-input" value="${item.qty}" onchange="updatePO('${item.name}', this.value)" aria-label="Jumlah ${item.name}"></div><div class="text-end fw-bold text-success" style="font-size:.8rem;width:30%" id="po_sub_${item.name.replace(/[^a-zA-Z0-9]/g,'')}">${toIDR(sub)}</div></div>`;
+      }
+      document.getElementById('poList').innerHTML = h || `<div class="text-muted text-center small py-3">Tidak ada rekomendasi order. Stok aman.</div>`;
+      document.getElementById('poGrandTotal').innerText=toIDR(grandTotal);
+      const supplier=document.getElementById('poSupplier');
+      if (supplier) {
+        const prior=supplier.value; supplier.innerHTML='<option value="">Tanpa pemasok terpilih</option>';
+        (globalData.suppliers||[]).filter(x=>x.active!==false).forEach(x=>supplier.add(new Option(`${x.name}${x.phone?' · '+x.phone:''}`,x.id)));
+        if (prior) supplier.value=prior;
+      }
+      const history=document.getElementById('poHistory');
+      if (history) {
+        const orders=(globalData.purchaseOrders||[]).slice().sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,30);
+        history.innerHTML=orders.length ? orders.map(po=>`<div class="border-bottom py-2"><div class="d-flex justify-content-between gap-2"><strong>${po.id}</strong><span class="badge ${po.status==='APPROVED'?'bg-success':po.status==='RECEIVED'?'bg-primary':po.status==='CANCELLED'?'bg-secondary':'bg-warning text-dark'}">${po.status}</span></div><div class="small text-secondary">${po.outlet} · ${po.supplierName||'Tanpa pemasok'} · ${toIDR(Number(po.total)||0)}</div><div class="small text-secondary">${po.createdAt||''} · ${po.createdBy||''}</div><div class="d-flex gap-2 mt-2">${po.status==='DRAFT'?`<button class="btn btn-sm btn-success" onclick="updatePOStatus('${po.id}','APPROVED')">Setujui</button><button class="btn btn-sm btn-outline-secondary" onclick="updatePOStatus('${po.id}','CANCELLED')">Batalkan</button>`:''}${po.status==='APPROVED'?`<button class="btn btn-sm btn-primary" onclick="updatePOStatus('${po.id}','RECEIVED')">Tandai Diterima</button>`:''}</div></div>`).join('') : '<div class="small text-secondary">Belum ada PO tersimpan.</div>';
+      }
+    }
+    async function savePODraft() {
+      const outlet=document.getElementById('outlet').value;
+      if (!outlet || outlet==='ALL') return Swal.fire('Pilih outlet','Pilih outlet spesifik sebelum membuat PO.','warning');
+      const items=Object.entries(activePO).filter(([name,item])=>Number(item.qty)>0).map(([name,item])=>({name,qty:Number(item.qty),unit:item.uMain,unitPrice:Number(item.price)||0,total:(Number(item.qty)||0)*(Number(item.price)||0)}));
+      if (!items.length) return Swal.fire('PO kosong','Tidak ada item dengan jumlah lebih dari nol.','warning');
+      const total=items.reduce((sum,x)=>sum+x.total,0);
+      if (!pendingPORequestId) pendingPORequestId = makeId();
+      try {
+        const res=await fetch(GAS_API_URL,{method:'POST',body:JSON.stringify({action:'createPurchaseOrder',data:{requestId:pendingPORequestId,outlet,supplierId:document.getElementById('poSupplier').value,items,total}})});
+        const result=await res.json(); if(result.status!=='success') throw new Error(result.message||'Gagal menyimpan draft');
+        pendingPORequestId = null; await fetchData(); renderPO(); Swal.fire({icon:'success',title:'Draft PO tersimpan',text:`Nomor ${result.data.id}`});
+      } catch(e) { Swal.fire('Gagal menyimpan PO',e.message||'Periksa koneksi dan sesi.','error'); }
+    }
+    async function updatePOStatus(id,status) {
+      const labels={APPROVED:'menyetujui',RECEIVED:'menandai diterima',CANCELLED:'membatalkan'};
+      const ok=await Swal.fire({title:`Konfirmasi ${labels[status]||'memperbarui'} PO?`,text:id,icon:'question',showCancelButton:true,confirmButtonText:'Ya, lanjutkan'});
+      if(!ok.isConfirmed)return;
+      try { const res=await fetch(GAS_API_URL,{method:'POST',body:JSON.stringify({action:'updatePurchaseOrderStatus',data:{id,status}})}); const result=await res.json(); if(result.status!=='success')throw new Error(result.message||'Gagal memperbarui status'); await fetchData(); renderPO(); }
+      catch(e){Swal.fire('Gagal memperbarui PO',e.message||'Periksa koneksi.','error');}
+    }
+    window.savePODraft=savePODraft; window.updatePOStatus=updatePOStatus;
+
+    function csvEscape(value) { const s=String(value ?? ''); return '"'+s.replace(/"/g,'""')+'"'; }
+    function exportStockCSV() {
+      const rows=[['Outlet','Barang','Stok Base','Tampilan Stok','Status','Estimasi Hari','Nilai Aset','Batch Expired','ADU']];
+      (globalData.liveStock||[]).forEach(x=>rows.push([x.outlet,x.name,x.totalBase,x.displayQty,x.stockStatus,x.daysLeft,x.assetVal,(x.batches||[]).map(b=>`${b.expKey}:${b.qtyBase}:${b.status}`).join(' | '),(globalData.inventoryStats[`${x.outlet}_${x.name}`]||{}).adu||'']));
+      const csv='\uFEFF'+rows.map(r=>r.map(csvEscape).join(',')).join('\r\n');
+      const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); const a=document.createElement('a'); a.href=url; a.download=`Ai-STOK_${new Date().toISOString().slice(0,10)}.csv`; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
+    function printStockReport() { window.print(); }
+    window.exportStockCSV=exportStockCSV; window.printStockReport=printStockReport;
     window.updatePO = function(name, newQty) { let qty = Number(newQty) || 0; activePO[name].qty = qty; let sub = qty * activePO[name].price; document.getElementById('po_sub_'+name.replace(/[^a-zA-Z0-9]/g, '')).innerText = toIDR(sub); let grand = 0; for(let k in activePO) grand += activePO[k].qty * activePO[k].price; document.getElementById('poGrandTotal').innerText = toIDR(grand); }
     window.copyPOWA = function() { let out = document.getElementById('outlet').value; let txt = `🛒 *FORM PURCHASE ORDER (PO) AI-CHA*\n🏢 Target: ${out==='ALL'?'SELURUH OUTLET':out}\n📅 ${new Date().toLocaleDateString('id-ID')}\n\n*Rincian Order:*\n`; let hasPO = false; let gTot = 0; for(let k in activePO) { if(activePO[k].qty > 0) { let sub = activePO[k].qty * activePO[k].price; gTot += sub; txt += `➖ ${k} : *${activePO[k].qty} ${activePO[k].uMain}*\n`; hasPO = true; } } if(!hasPO) return Swal.fire({icon:'warning', title:'Order Kosong'}); txt += `\n💰 *Total Estimasi Tagihan: ${toIDR(gTot)}*\n\nMohon diproses, terima kasih.`; navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Format PO Tersalin!', showConfirmButton:false, timer:2000})); }
     function updTrfLbl() { let s=document.getElementById('trfItem').value; let out=document.getElementById('outlet').value; let i=globalData.liveStock.find(x=>x.name===s && x.outlet===out); if(i) { document.getElementById('trfMax').innerText=i.displayQty; document.getElementById('lbl-trf-1').innerText=`QTY (${i.uMain})`; document.getElementById('lbl-trf-2').innerText=`QTY (${i.uSub})`; } }
-    async function processTransfer() { let d={ from: document.getElementById('outlet').value, to: document.getElementById('trfDest').value, item: document.getElementById('trfItem').value, q1: document.getElementById('trf-q1').value, q2: document.getElementById('trf-q2').value, user: activeUser.username }; if(!d.from||!d.to||!d.item||(!d.q1&&!d.q2)) return Swal.fire({icon:'error', title:'Lengkapi Data!'}); document.getElementById('loading').style.display='flex'; try { await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "processTransfer", data: d }) }); Swal.fire({toast:true, position:'top', icon:'success', title:'Transfer Sukses', showConfirmButton:false, timer:1500}); document.getElementById('trf-q1').value=''; document.getElementById('trf-q2').value=''; fetchData(); showStok(); } catch(e){} finally { document.getElementById('loading').style.display='none'; } }
+    async function processTransfer() { let d={ transactionId: makeId(), from: document.getElementById('outlet').value, to: document.getElementById('trfDest').value, item: document.getElementById('trfItem').value, q1: document.getElementById('trf-q1').value, q2: document.getElementById('trf-q2').value, user: activeUser.username }; if(!d.from||!d.to||!d.item||(!d.q1&&!d.q2)) return Swal.fire({icon:'error', title:'Lengkapi Data!'}); document.getElementById('loading').style.display='flex'; try { const trRes = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "processTransfer", data: d }) }); const trJson = await trRes.json(); if(trJson.status !== 'success') throw new Error(trJson.message || 'Transfer gagal'); Swal.fire({toast:true, position:'top', icon:'success', title:'Transfer Sukses', showConfirmButton:false, timer:1500}); document.getElementById('trf-q1').value=''; document.getElementById('trf-q2').value=''; fetchData(); showStok(); } catch(e){ Swal.fire({icon:'error',title:'Transfer gagal',text:e.message || 'Periksa stok, outlet tujuan, dan koneksi.'}); } finally { document.getElementById('loading').style.display='none'; } }
   </script>
 </body>
 </html>
