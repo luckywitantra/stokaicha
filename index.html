@@ -416,7 +416,7 @@
     <div id="owner-dist" class="owner-panel" style="display:none;">
       <div class="owner-panel-title"><span class="owner-icon"><i class="bi bi-arrow-left-right"></i></span>Optimasi Distribusi</div><div class="owner-context">Periksa saldo outlet sumber dan tujuan sebelum melakukan mutasi. Rekomendasi tidak menggantikan validasi stok aktual.</div>
       <h6 class="fw-bold mt-1" style="color:var(--text)"><i class="bi bi-shuffle text-primary"></i> Rekomendasi Mutasi Otomatis</h6>
-      <div id="mutationList"></div>
+      <div class="d-flex flex-wrap gap-2 mb-3"><button class="btn-act" onclick="shareMutationRecommendationsWA()"><i class="bi bi-whatsapp me-1"></i>Kirim Rekomendasi Mutasi ke WhatsApp</button><button class="btn-act" style="background:var(--input-bg);color:var(--text);box-shadow:none;border:1px solid var(--border)" onclick="shareAllOutletComparisonWA()"><i class="bi bi-bar-chart me-1"></i>Perbandingan Semua Outlet ke WhatsApp</button></div><div id="mutationList"></div>
     </div>
 
     <div id="owner-trend" class="owner-panel" style="display:none;">
@@ -1268,6 +1268,33 @@
       window.open(url,'_blank','noopener,noreferrer');
     };
 
+    function openWhatsAppDraft(text){
+      const url='https://wa.me/?text='+encodeURIComponent(text);
+      const w=window.open(url,'_blank','noopener,noreferrer');
+      if(!w && navigator.clipboard) navigator.clipboard.writeText(text).then(()=>Swal.fire({icon:'info',title:'Pesan disalin',text:'WhatsApp tidak dapat dibuka otomatis. Pesan sudah disalin; tempelkan ke grup tujuan.'}));
+    }
+    window.shareMutationRecommendationsWA=function(){
+      const rows=Array.isArray(globalData.liveStock)?globalData.liveStock:[];
+      const outlets=(globalData.outlets||[]).filter(o=>String(o.id)!=='ALL');
+      const products=[...new Set(rows.map(x=>x.name).filter(Boolean))]; const suggestions=[];
+      products.forEach(name=>{
+        const group=rows.filter(x=>String(x.name)===String(name));
+        const donors=group.filter(x=>String(x.stockStatus||'').toUpperCase()==='OVERSTOK').sort((a,b)=>(Number(b.totalBase)||0)-(Number(a.totalBase)||0));
+        const receivers=group.filter(x=>['KRITIS','HABIS'].includes(String(x.stockStatus||'').toUpperCase())).sort((a,b)=>(Number(a.totalBase)||0)-(Number(b.totalBase)||0));
+        if(donors.length&&receivers.length){const from=donors[0],to=receivers.find(t=>String(t.outlet)!==String(from.outlet)); if(to){const surplus=Math.max(0,Math.floor((Number(from.totalBase)||0)/2));const need=Math.max(1,Number(to.poNeed)||1);const qty=Math.min(surplus||1,need);if(qty>0)suggestions.push({name,from,to,qty});}}
+      });
+      const lines=['*REKOMENDASI MUTASI STOK — AI-STOK*','Tanggal: '+new Date().toLocaleDateString('id-ID'),`Rekomendasi: ${suggestions.length}`,''];
+      suggestions.slice(0,50).forEach((x,i)=>lines.push(`${i+1}. *${x.name}*`,`   Dari: ${x.from.outlet} (saldo ${x.from.displayQty||x.from.totalBase||0})`,`   Ke: ${x.to.outlet} (saldo ${x.to.displayQty||x.to.totalBase||0})`,`   Usulan jumlah: ${x.qty} base unit`,'   _Validasi stok fisik, satuan, batch/expired dan stok minimum sebelum mutasi._',''));
+      if(!suggestions.length) lines.push('Belum ada pasangan barang overstok dan kritis/habis antar-outlet pada data saat ini.');
+      lines.push('_Usulan otomatis untuk ditinjau, bukan transaksi mutasi yang sudah dijalankan._');openWhatsAppDraft(lines.join('\n'));
+    };
+    window.shareAllOutletComparisonWA=function(){
+      const rows=Array.isArray(globalData.liveStock)?globalData.liveStock:[];const outlets=(globalData.outlets||[]).filter(o=>String(o.id)!=='ALL');
+      const lines=['*PERBANDINGAN STOK SEMUA OUTLET — AI-STOK*','Tanggal: '+new Date().toLocaleDateString('id-ID'),''];
+      outlets.forEach(o=>{const data=rows.filter(x=>String(x.outlet)===String(o.id));const critical=data.filter(x=>['KRITIS','HABIS'].includes(String(x.stockStatus||'').toUpperCase()));const over=data.filter(x=>String(x.stockStatus||'').toUpperCase()==='OVERSTOK');const asset=data.reduce((a,x)=>a+(Number(x.assetVal)||0),0);const total=data.reduce((a,x)=>a+(Number(x.totalBase)||0),0);lines.push(`*${o.nama||o.id}*`,`• SKU: ${data.length}`,`• Base unit total: ${total}`,`• Kritis/habis: ${critical.length}`,`• Overstok: ${over.length}`,`• Estimasi nilai: ${toIDR(asset)}`,'');});
+      lines.push('_Nilai aset adalah estimasi aplikasi. Perbandingan ini bukan laporan akuntansi yang diaudit._');openWhatsAppDraft(lines.join('\n'));
+    };
+
     function renderOwnerAnalytics(){
       const rows=Array.isArray(globalData.liveStock)?globalData.liveStock:[];
       const outlets=(globalData.outlets||[]).filter(o=>String(o.id)!=='ALL');
@@ -1307,7 +1334,7 @@
         if(ownerTrendChart){ownerTrendChart.destroy();ownerTrendChart=null;}
         canvas.style.display='none';
         let msg=host.querySelector('.owner-trend-empty'); if(!msg){msg=document.createElement('div');msg.className='owner-trend-empty owner-empty';host.appendChild(msg);}
-        msg.innerHTML='<i class="bi bi-graph-up fs-3 d-block mb-2"></i><strong>Histori tren belum tersedia</strong><div class="small mt-1">Grafik memerlukan snapshot stok bertanggal. Data saldo saat ini saja tidak cukup untuk menyimpulkan tren. Aktifkan pencatatan snapshot harian pada backend agar tren akurat.</div>';
+        msg.innerHTML='<i class="bi bi-graph-up fs-3 d-block mb-2"></i><strong>Histori tren belum tersedia</strong><div class="small mt-1">Grafik memerlukan snapshot stok bertanggal. Data saldo saat ini saja tidak cukup untuk menyimpulkan tren. Backend V45 akan mencatat snapshot harian. Setelah trigger diaktifkan, grafik mulai terisi dari tanggal pencatatan pertama; histori lama tidak dibuat secara retroaktif.</div>';
         return;
       }
       const labels=data.map(x=>x.date||x.tanggal||x.label||''); const vals=data.map(x=>Number(x.totalAsset??x.asset??x.qty??x.totalStock)||0);
