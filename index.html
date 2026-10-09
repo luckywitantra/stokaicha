@@ -2,8 +2,8 @@
 <html lang="id">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>Ai-STOK V36.0 Enterprise</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ai-STOK V37.0 Enterprise</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
@@ -11,12 +11,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-material-ui/material-ui.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.18.0/clusterize.min.css" rel="stylesheet">
   
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.18.0/clusterize.min.js"></script>
 
   <script>
     // ==========================================
@@ -93,7 +91,12 @@
     .bg-danger-soft { border-left-color: #EF4444 !important; }
     
     .history-btn { position: absolute; top: 15px; right: 15px; background: var(--input-bg); color: var(--gray); border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid var(--border); }
-    #scrollArea { max-height: calc(100vh - 280px); overflow-y: auto; overflow-x: hidden; padding-bottom: 20px; }
+    /* V37: native scrolling replaces fragile virtualized scrolling on variable-height stock cards. */
+    #scrollArea { height: calc(100vh - 340px); height: calc(100dvh - 340px); min-height: 220px; max-height: none; overflow-y: auto; overflow-x: hidden; padding: 2px 2px 24px; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #CBD5E1 transparent; overflow-anchor: auto; }
+    #liveBody { min-height: 1px; }
+    #scrollArea:focus-visible { outline: 2px solid rgba(var(--primary-rgb),.35); outline-offset: 2px; }
+    .inventory-empty { padding: 32px 16px; text-align: center; color: var(--gray); background: var(--card-bg); border: 1px dashed var(--border); border-radius: var(--radius); }
+    .inventory-empty i { display:block; font-size:1.8rem; margin-bottom:8px; opacity:.65; }
     
     .skeleton { background: #e2e5e7; background-image: linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,0.5) 20px, rgba(255,255,255,0) 40px); background-size: 150px 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
     body.dark-mode .skeleton { background: #374151; background-image: linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,0.1) 20px, rgba(255,255,255,0) 40px); }
@@ -159,7 +162,7 @@
     .nav-item { gap:3px; }
     .nav-item i { font-size:1.15rem; }
     .sync-badge { backdrop-filter:blur(10px); }
-    @media(max-width:420px) { .login-panel { padding:23px 18px 19px;border-radius:24px; } .pin-key { height:54px; } }
+    @media(max-width:420px) { .login-panel { padding:23px 18px 19px;border-radius:24px; } .pin-key { height:54px; } #scrollArea { height: calc(100vh - 330px); height: calc(100dvh - 330px); min-height: 200px; } }
     @media(min-width:992px) { .glass-header { border-radius:0 0 16px 16px; } }
 
     /* V36: konsistensi visual, responsif, aksesibilitas, dan feedback aksi */
@@ -174,7 +177,7 @@
     .nav-item:focus-visible { border-radius:12px; outline-offset:-2px; }
     .nav-item span { font-size: .72rem; font-weight: 700; }
     .sync-badge { position: sticky; top: 64px; z-index: 95; }
-    @media (min-width: 992px) { body { max-width: 1440px; margin: 0 auto; } #managerView, #ownerView { padding-left: 28px !important; padding-right: 28px !important; } #scrollArea { max-height: calc(100vh - 300px); } }
+    @media (min-width: 992px) { body { max-width: 1440px; margin: 0 auto; } #managerView, #ownerView { padding-left: 28px !important; padding-right: 28px !important; } #scrollArea { height: calc(100vh - 340px); height: calc(100dvh - 340px); } }
     @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:.01ms !important; transition-duration:.01ms !important; scroll-behavior:auto !important; } }
     @media print { body { background:#fff !important; color:#111 !important; padding:0 !important; max-width:none !important; } .glass-header,.outlet-wrap,.nav-bot,.fab,#syncBadge,button,.btn,.history-btn,#loginScreen { display:none !important; } #ownerView,#managerView,#page-stok,#owner-aset,#owner-rank,#owner-dist,#owner-trend,#owner-po,#owner-master { display:block !important; height:auto !important; max-height:none !important; overflow:visible !important; } .card-box { break-inside:avoid; box-shadow:none !important; } }
   </style>
@@ -221,7 +224,7 @@
     </div>
   </div>
 
-  <div class="outlet-wrap"><select id="outlet" class="outlet-sel" onchange="fetchData()" aria-label="Pilih outlet"></select><div id="connectionStatus" class="small text-muted mb-2" role="status">Ai-STOK V35 · memeriksa koneksi</div></div>
+  <div class="outlet-wrap"><select id="outlet" class="outlet-sel" onchange="fetchData()" aria-label="Pilih outlet"></select><div id="connectionStatus" class="small text-muted mb-2" role="status">Ai-STOK V37 · memeriksa koneksi</div></div>
 
   <div id="skeletonTemplate" style="display:none;">
       <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-big"></div></div>
@@ -250,7 +253,7 @@
               <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary"></i>
               <input type="text" id="searchInput" class="inp-field ps-5" placeholder="Cari..." onkeyup="debounceSearch()">
           </div>
-          <select id="sortSelect" class="inp-field" style="width: 100px; font-size:0.75rem;" onchange="renderStockList()">
+          <select id="sortSelect" class="inp-field" style="width: 100px; font-size:0.75rem;" onchange="renderStockList({ resetScroll: true })">
               <option value="az">A - Z</option><option value="za">Z - A</option><option value="stok_desc">Terbanyak</option><option value="stok_asc">Sedikit</option>
           </select>
           <button class="btn border rounded-3 px-3" style="background:var(--input-bg); color:var(--text);" onclick="toggleCompactView()" title="Ubah Tampilan"><i class="bi bi-list-task"></i></button>
@@ -258,7 +261,7 @@
       
       <div class="small text-muted mb-2 text-center" style="font-size:0.7rem;"><i class="bi bi-arrows-collapse"></i> Geser kartu ke <b>Kanan (Masuk)</b> atau <b>Kiri (Waste)</b></div>
       
-      <div id="scrollArea" class="clusterize-scroll"><div id="liveBody" class="clusterize-content"></div></div>
+      <div id="scrollArea" class="inventory-scroll" role="region" aria-label="Daftar inventaris" tabindex="0"><div id="liveBody" class="inventory-list"></div></div>
     </div>
 
     <div class="px-3" id="page-transfer" style="display:none; height:calc(100vh - 220px); overflow-y:auto;">
@@ -384,7 +387,7 @@
 
     let globalData = { users:[], outlets:[], products:[], liveStock:[], inventoryStats:{}, assetPerOutlet:{}, expiredAssetPerOutlet:{}, wastePerOutlet:{}, hppPerOutlet:{} };
     let opnameQueue = []; let activeUser = null; let currentPin = ""; let chartInstance = null; let activePO = {}; let searchTimeout; let pendingPORequestId = null;
-    let clusterizeInstance = null; let isCompactView = false; window.hasShownFocus = false; 
+    let isCompactView = false; let dataRequestSeq = 0; window.hasShownFocus = false; 
     let deferredPrompt;
     
     const toIDR=(n)=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n);
@@ -626,29 +629,33 @@
     }
 
     function showSkeletonLoader() {
-        if(clusterizeInstance) { clusterizeInstance.destroy(); clusterizeInstance = null; }
-        document.getElementById('liveBody').innerHTML = document.getElementById('skeletonTemplate').innerHTML;
+        const body = document.getElementById('liveBody');
+        body.innerHTML = document.getElementById('skeletonTemplate').innerHTML;
+        body.setAttribute('aria-busy', 'true');
     }
 
     async function fetchData() {
       if (!activeUser) return;
       const out = document.getElementById('outlet').value;
+      const requestSeq = ++dataRequestSeq;
       const bar = document.getElementById('appLoadingBar');
       bar.classList.add('active'); bar.setAttribute('aria-valuetext','Memuat data stok');
       showSkeletonLoader();
       try {
         const res = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "getInitialData", outlet: out }) });
         const result = await res.json();
+        if (requestSeq !== dataRequestSeq) return; // Abaikan respons lama saat outlet berganti cepat.
         if(result.status === "success") { 
             globalData = result.data; renderStockList(); 
             populateTransferControls();
             if(activeUser && activeUser.role === "Owner") { renderOwner(); renderPO(); renderMasterList(); }
         } else { Swal.fire('Error', result.message, 'warning'); renderStockList(); }
       } catch (e) {
+        if (requestSeq !== dataRequestSeq) return;
         if (globalData && globalData.liveStock) renderStockList();
         if (!offlineMode && !globalData.liveStock) Swal.fire({icon:'warning',title:'Data belum termuat',text:'Periksa koneksi lalu coba muat ulang. Data yang tampil mungkin berasal dari cache.'});
       } finally {
-        bar.classList.remove('active'); bar.removeAttribute('aria-valuetext');
+        if (requestSeq === dataRequestSeq) { bar.classList.remove('active'); bar.removeAttribute('aria-valuetext'); }
       }
     }
 
@@ -717,8 +724,8 @@
         if(tab==='trend') renderChart();
     }
 
-    function debounceSearch() { clearTimeout(searchTimeout); searchTimeout = setTimeout(renderStockList, 300); }
-    window.toggleCompactView = function() { isCompactView = !isCompactView; renderStockList(); }
+    function debounceSearch() { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => renderStockList({ resetScroll: true }), 250); }
+    window.toggleCompactView = function() { isCompactView = !isCompactView; renderStockList({ resetScroll: true }); }
 
     function generateSparkline(history, isi) {
         if(!history || history.length < 2) return `<svg width="60" height="20"><line x1="0" y1="10" x2="60" y2="10" stroke="#ccc" stroke-width="2"/></svg>`;
@@ -749,9 +756,12 @@
         });
     }
 
-    function renderStockList() {
+    function renderStockList(options = {}) {
       let out = document.getElementById('outlet').value;
-      if(out === "ALL") { document.getElementById('liveBody').innerHTML = '<div class="text-center py-5 text-muted small">Pilih outlet spesifik di atas.</div>'; if(clusterizeInstance) { clusterizeInstance.destroy(); clusterizeInstance = null; } return; }
+      const scrollArea = document.getElementById('scrollArea');
+      const liveBody = document.getElementById('liveBody');
+      const previousScrollTop = scrollArea.scrollTop;
+      if(out === "ALL") { liveBody.innerHTML = '<div class="inventory-empty"><i class="bi bi-shop"></i><strong>Pilih outlet</strong><div class="small mt-1">Pilih outlet spesifik untuk melihat persediaan.</div></div>'; liveBody.removeAttribute('aria-busy'); scrollArea.scrollTop = 0; return; }
 
       let q = document.getElementById('searchInput').value.toLowerCase();
       let targetProducts = globalData.products;
@@ -770,7 +780,7 @@
       else if(sortVal === 'stok_asc') enrichedProducts.sort((a,b) => a.tBase - b.tBase);
 
       let rowsHTML = [];
-      if(enrichedProducts.length === 0) rowsHTML.push('<div class="text-center py-5 text-muted small">Barang tidak ditemukan.</div>');
+      if(enrichedProducts.length === 0) rowsHTML.push('<div class="inventory-empty"><i class="bi bi-search"></i><strong>Barang tidak ditemukan</strong><div class="small mt-1">Coba kata kunci lain atau hapus pencarian.</div></div>');
 
       enrichedProducts.forEach(ep => {
         let p = ep; let lItem = ep.lItem; let key = `${out}_${p.name}`; 
@@ -803,7 +813,7 @@
                 <button class="history-btn hide-compact" onclick="event.stopPropagation(); showHistory('${p.name}')"><i class="bi bi-clock-history"></i></button>
                 
                 <div class="d-flex align-items-center gap-3 mb-2">
-                    <img src="${fotoUrl}" onclick="zoomFoto(event, '${fotoUrl}', '${p.name}')" class="zoomable-img" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); background:white;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1170/1170577.png'">
+                    <img src="${fotoUrl}" loading="lazy" decoding="async" alt="${p.name}" onclick="zoomFoto(event, '${fotoUrl}', '${p.name}')" class="zoomable-img" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); background:white;" onerror="this.onerror=null;this.src='https://cdn-icons-png.flaticon.com/512/1170/1170577.png'">
                     
                     <div class="flex-grow-1">
                         <div class="d-flex justify-content-between align-items-center mb-1">
@@ -825,9 +835,12 @@
         </div>`);
       });
 
-      let parentBody = document.getElementById('liveBody');
-      if(!clusterizeInstance) clusterizeInstance = new Clusterize({ rows: rowsHTML, scrollId: 'scrollArea', contentId: 'liveBody' });
-      else clusterizeInstance.update(rowsHTML);
+      // V37: render to native DOM. Clusterize virtual scrolling occasionally produced a blank
+      // viewport on mobile when card heights changed during image loading / scroll gestures.
+      liveBody.innerHTML = rowsHTML.join('');
+      liveBody.removeAttribute('aria-busy');
+      if (options.resetScroll) scrollArea.scrollTop = 0;
+      else scrollArea.scrollTop = Math.min(previousScrollTop, Math.max(0, scrollArea.scrollHeight - scrollArea.clientHeight));
     }
 
     // --- SWIPE TO ACTION GESTURE LOGIC ---
