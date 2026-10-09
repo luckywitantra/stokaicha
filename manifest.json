@@ -1,0 +1,10 @@
+{
+  "name": "Ai-STOK Enterprise",
+  "short_name": "Ai-STOK",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F8F9FD",
+  "theme_color": "#E31E24",
+  "description": "Manajemen persediaan multi-outlet Ai-CHA"
+}
