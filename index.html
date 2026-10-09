@@ -264,7 +264,9 @@
     @media(max-width:650px){#ownerView .owner-section-head{padding:19px;border-radius:20px;gap:16px}#ownerView .owner-section-head .owner-toolbar-actions{width:100%}#ownerView .owner-section-head .owner-toolbar-actions button{flex:1;min-width:0;font-size:.75rem}#ownerView .owner-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#ownerView .owner-kpi{padding:12px;border-radius:15px}#ownerView .owner-tabs{top:4px;border-radius:14px}#ownerView .owner-tabs .btn{padding:0 12px!important;min-height:42px}#ownerView .owner-panel-title{font-size:.94rem}}
     @media(prefers-reduced-motion:reduce){#ownerView *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
-  </style>
+  
+    #owner-rank .table{font-size:.86rem;margin-bottom:.5rem}#owner-rank .table th{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--gray);white-space:nowrap}#owner-rank .progress{background:var(--input-bg)}#mutationList .card-box{transition:transform .15s,border-color .15s}#mutationList .card-box:hover{transform:translateY(-1px);border-color:rgba(49,87,213,.35)}.owner-trend-empty{margin:12px 0}
+</style>
 </head>
 <body>
 
@@ -1247,28 +1249,74 @@
     }
     
     window.copyKonsolidasiWA = function() {
-        let tgl = new Date().toLocaleDateString('id-ID', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
-        let txt = `🏢 *LAPORAN KONSOLIDASI AI-CHA*\n📅 ${tgl}\n\n`;
-        let sortedProducts = [...globalData.products].sort((a,b) => a.name.localeCompare(b.name));
-        let targetOutlets = globalData.outlets.filter(o => o.id !== "ALL");
-        
-        sortedProducts.forEach(p => {
-            let detailStr = "";
-            targetOutlets.forEach(o => {
-                let lItem = globalData.liveStock.find(x => x.name === p.name && x.outlet === o.id);
-                if(lItem && lItem.totalBase > 0) {
-                    let status = lItem.stockStatus === "KRITIS" ? "📉" : (lItem.stockStatus === "OVERSTOK" ? "📈" : "✅");
-                    let expInfo = [];
-                    if(lItem.batches && lItem.batches.length > 0) { lItem.batches.forEach(b => { if(b.expKey !== "NoDate" && b.expKey !== "Non-Expiry") expInfo.push(b.displayExp); }); }
-                    let expTxt = expInfo.length > 0 ? ` (Exp: ${expInfo.join(', ')})` : "";
-                    detailStr += `   📍 *${o.nama}*: ${lItem.displayQty}${expTxt} ${status}\n`;
-                } else { detailStr += `   📍 *${o.nama}*: KOSONG 🔴\n`; }
-            });
-            txt += `➖ *${p.name}*\n${detailStr}\n`;
+      const tgl = new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+      const outlets=(globalData.outlets||[]).filter(o=>String(o.id)!=='ALL');
+      const stock=globalData.liveStock||[];
+      const lines=[`*LAPORAN KONSOLIDASI AI-STOK*`,`Tanggal: ${tgl}`,`Outlet: ${outlets.length}`,`SKU tercatat: ${(globalData.products||[]).length}`,''];
+      outlets.forEach(o=>{
+        const rows=stock.filter(x=>String(x.outlet)===String(o.id));
+        const critical=rows.filter(x=>['KRITIS','HABIS'].includes(String(x.stockStatus||'').toUpperCase())).length;
+        const over=rows.filter(x=>String(x.stockStatus||'').toUpperCase()==='OVERSTOK').length;
+        const asset=rows.reduce((a,x)=>a+(Number(x.assetVal)||0),0);
+        lines.push(`*${o.nama||o.id}*`, `• Item: ${rows.length}`, `• Stok kritis/habis: ${critical}`, `• Overstok: ${over}`, `• Estimasi nilai stok: ${toIDR(asset)}`);
+        rows.filter(x=>['KRITIS','HABIS'].includes(String(x.stockStatus||'').toUpperCase())).slice(0,8).forEach(x=>lines.push(`  - ${x.name}: ${x.displayQty||0} (${x.stockStatus})`));
+        lines.push('');
+      });
+      lines.push('_Dibuat otomatis oleh Ai-STOK. Nilai aset merupakan estimasi berdasarkan data aplikasi._');
+      const txt=lines.join('\n');
+      const url='https://wa.me/?text='+encodeURIComponent(txt);
+      window.open(url,'_blank','noopener,noreferrer');
+    };
+
+    function renderOwnerAnalytics(){
+      const rows=Array.isArray(globalData.liveStock)?globalData.liveStock:[];
+      const outlets=(globalData.outlets||[]).filter(o=>String(o.id)!=='ALL');
+      const byOutlet=outlets.map(o=>{
+        const items=rows.filter(x=>String(x.outlet)===String(o.id));
+        const critical=items.filter(x=>['KRITIS','HABIS'].includes(String(x.stockStatus||'').toUpperCase())).length;
+        const over=items.filter(x=>String(x.stockStatus||'').toUpperCase()==='OVERSTOK').length;
+        const asset=items.reduce((a,x)=>a+(Number(x.assetVal)||0),0);
+        const coverage=items.length?Math.round((items.length-critical)/items.length*100):0;
+        return {id:o.id,name:o.nama||o.id,items,critical,over,asset,coverage};
+      });
+      const rankHost=document.getElementById('leaderboardList');
+      if(rankHost){
+        const sorted=byOutlet.slice().sort((a,b)=>b.coverage-a.coverage||a.critical-b.critical||b.items.length-a.items.length);
+        rankHost.innerHTML=sorted.length?`<div class="table-responsive"><table class="table align-middle"><thead><tr><th>#</th><th>Outlet</th><th>SKU</th><th>Kritis</th><th>Overstok</th><th>Nilai stok est.</th><th>Indeks ketersediaan</th></tr></thead><tbody>${sorted.map((o,i)=>`<tr><td><span class="badge ${i===0?'text-bg-warning':'text-bg-light'}">${i+1}</span></td><td class="fw-bold">${escapeHTML(o.name)}</td><td>${o.items.length}</td><td class="text-danger fw-bold">${o.critical}</td><td class="text-warning fw-bold">${o.over}</td><td>${toIDR(o.asset)}</td><td><div class="d-flex align-items-center gap-2"><div class="progress flex-grow-1" style="min-width:60px;height:7px"><div class="progress-bar" style="width:${o.coverage}%"></div></div><span>${o.coverage}%</span></div></td></tr>`).join('')}</tbody></table></div><div class="small text-secondary">Indeks ketersediaan = proporsi baris stok yang tidak berstatus kritis/habis. Ini bukan skor penjualan atau laba.</div>`:'<div class="owner-empty">Data outlet belum tersedia.</div>';
+      }
+      const distHost=document.getElementById('mutationList');
+      if(distHost){
+        const products=[...new Set(rows.map(x=>x.name).filter(Boolean))]; const suggestions=[];
+        products.forEach(name=>{
+          const group=rows.filter(x=>x.name===name);
+          const donors=group.filter(x=>String(x.stockStatus||'').toUpperCase()==='OVERSTOK').sort((a,b)=>(Number(b.totalBase)||0)-(Number(a.totalBase)||0));
+          const receivers=group.filter(x=>['KRITIS','HABIS'].includes(String(x.stockStatus||'').toUpperCase())).sort((a,b)=>(Number(a.totalBase)||0)-(Number(b.totalBase)||0));
+          if(donors.length&&receivers.length){
+            const from=donors[0],to=receivers[0]; if(String(from.outlet)!==String(to.outlet)) suggestions.push({name,from,to,qty:Math.max(0,Math.min(Number(from.poNeed)>0?Number(from.poNeed):Math.floor((Number(from.totalBase)||0)/2),Math.max(1,Number(to.poNeed)||1)))});
+          }
         });
-        txt += `_Generated via Ai-STOK V42 Enterprise_`;
-        navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Laporan Konsolidasi Tersalin!', showConfirmButton:false, timer:3000}));
+        distHost.innerHTML=suggestions.length?suggestions.slice(0,40).map(x=>`<div class="card-box p-3"><div class="d-flex justify-content-between gap-2 align-items-start"><div><div class="fw-bold">${escapeHTML(x.name)}</div><div class="small text-secondary mt-1">${escapeHTML(x.from.outlet)} → ${escapeHTML(x.to.outlet)}</div><div class="small mt-2">Sumber: ${escapeHTML(x.from.displayQty||'0')} · Tujuan: ${escapeHTML(x.to.displayQty||'0')}</div></div><span class="badge text-bg-primary">Perlu ditinjau</span></div><div class="small text-secondary mt-2">Kandidat mutasi indikatif: ${x.qty} ${escapeHTML(x.from.uMain||'unit')}. Validasi stok fisik, satuan, batch, dan batas minimum sebelum melakukan transfer.</div><button class="btn btn-sm btn-outline-primary mt-2" onclick="nav('persediaan');showTransfer()">Buka transfer</button></div>`).join(''):'<div class="owner-empty"><i class="bi bi-check2-circle fs-3 d-block mb-2"></i><strong>Belum ada rekomendasi mutasi</strong><div class="small mt-1">Rekomendasi hanya muncul bila barang yang sama berstatus overstok di satu outlet dan kritis/habis di outlet lain.</div></div>';
+      }
     }
+
+    let ownerTrendChart=null;
+    function renderChart(){
+      const canvas=document.getElementById('trendChart'); if(!canvas)return;
+      const host=canvas.parentElement; const data=globalData.stockTrend||globalData.inventoryTrend||globalData.historyByDate||[];
+      if(!Array.isArray(data)||data.length<2){
+        if(ownerTrendChart){ownerTrendChart.destroy();ownerTrendChart=null;}
+        canvas.style.display='none';
+        let msg=host.querySelector('.owner-trend-empty'); if(!msg){msg=document.createElement('div');msg.className='owner-trend-empty owner-empty';host.appendChild(msg);}
+        msg.innerHTML='<i class="bi bi-graph-up fs-3 d-block mb-2"></i><strong>Histori tren belum tersedia</strong><div class="small mt-1">Grafik memerlukan snapshot stok bertanggal. Data saldo saat ini saja tidak cukup untuk menyimpulkan tren. Aktifkan pencatatan snapshot harian pada backend agar tren akurat.</div>';
+        return;
+      }
+      const labels=data.map(x=>x.date||x.tanggal||x.label||''); const vals=data.map(x=>Number(x.totalAsset??x.asset??x.qty??x.totalStock)||0);
+      const msg=host.querySelector('.owner-trend-empty'); if(msg)msg.remove(); canvas.style.display='block';
+      if(typeof Chart==='undefined')return;
+      if(ownerTrendChart)ownerTrendChart.destroy();
+      ownerTrendChart=new Chart(canvas.getContext('2d'),{type:'line',data:{labels,datasets:[{label:'Indikator persediaan',data:vals,borderColor:'#3157d5',backgroundColor:'rgba(49,87,213,.12)',fill:true,tension:.28,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:'index'},plugins:{legend:{display:true}},scales:{y:{beginAtZero:true}}}});
+    }
+
 
     function renderDashboardView() {
       const rows=(globalData.liveStock||[]).filter(x=>!document.getElementById('outlet').value || document.getElementById('outlet').value==='ALL' || String(x.outlet)===String(document.getElementById('outlet').value));
@@ -1320,6 +1368,7 @@
       setOwnerText('qs-item', totalAktif); setOwnerText('qs-kritis', totalKritis); setOwnerText('qs-over', totalOver);
       setOwnerText('assetVal', toIDR(totAset)); setOwnerText('ownerAssetKpi', toIDR(totAset));
       setOwnerText('hppVal', toIDR(totHPP)); setOwnerText('wasteVal', toIDR(totWaste + totLoss));
+      renderOwnerAnalytics();
 
       let h=''; 
       filteredStock.forEach(x => { h+=`<div class="card-box"><div class="d-flex justify-content-between mb-1"><div class="fw-bold" style="font-size:0.9rem; color:var(--text)">[${x.outlet}] ${x.name}</div><div class="text-success fw-bold">${toIDR(x.assetVal)}</div></div><div class="small text-muted mb-2">Stok: <b style="color:var(--text)">${x.displayQty}</b></div><div class="p-2 rounded small text-secondary d-flex justify-content-between" style="background:var(--input-bg);"><span>PO Target: ${x.poNeed} ${x.uMain}</span><span class="fw-bold text-primary"><i class="bi bi-graph-up-arrow"></i> ADU: ${globalData.inventoryStats[x.outlet+'_'+x.name]?.adu || '-'}</span></div></div>`; }); 
@@ -1496,7 +1545,7 @@
       for (let key in poMap) {
         const item=poMap[key]; activePO[item.name]={qty:item.qty,price:item.pMain,uMain:item.uMain};
         const sub=item.qty*item.pMain; grandTotal+=sub;
-        h+=`<div class="d-flex justify-content-between align-items-center border-bottom py-2"><div style="width:48%"><div class="fw-bold small" style="color:var(--text)">${item.name}</div><div class="text-muted" style="font-size:.65rem">${toIDR(item.pMain)} / ${item.uMain}</div></div><div><input type="number" min="0" step="1" class="po-input" value="${item.qty}" onchange="updatePO('${item.name}', this.value)" aria-label="Jumlah ${item.name}"></div><div class="text-end fw-bold text-success" style="font-size:.8rem;width:30%" id="po_sub_${item.name.replace(/[^a-zA-Z0-9]/g,'')}">${toIDR(sub)}</div></div>`;
+        h+=`<div class="d-flex justify-content-between align-items-center border-bottom py-2"><div style="width:48%"><div class="fw-bold small" style="color:var(--text)">${escapeHTML(item.name)}</div><div class="text-muted" style="font-size:.65rem">${toIDR(item.pMain)} / ${item.uMain}</div></div><div><input type="number" min="0" step="1" class="po-input" value="${item.qty}" onchange="updatePO(${JSON.stringify(item.name).replace(/</g,'\\u003c')}, this.value)" aria-label="Jumlah ${item.name}"></div><div class="text-end fw-bold text-success" style="font-size:.8rem;width:30%" id="po_sub_${item.name.replace(/[^a-zA-Z0-9]/g,'')}">${toIDR(sub)}</div></div>`;
       }
       document.getElementById('poList').innerHTML = h || `<div class="text-muted text-center small py-3">Tidak ada rekomendasi order. Stok aman.</div>`;
       document.getElementById('poGrandTotal').innerText=toIDR(grandTotal);
