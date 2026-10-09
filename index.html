@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Ai-STOK V39.0 Enterprise</title>
+  <title>Ai-STOK V41 Owner Workspace</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
@@ -210,7 +210,16 @@
     .owner-tabs .btn.owner-tab-active {background:var(--brand-ink)!important;color:#fff!important;border-color:var(--brand-ink)!important;box-shadow:0 5px 14px rgba(17,28,53,.18)}
     #ownerView > .row .card-box {border-radius:16px!important;cursor:pointer;transition:transform .18s}
     #ownerView > .row .card-box:hover {transform:translateY(-2px)}
-    #owner-aset,#owner-rank,#owner-dist,#owner-trend,#owner-po,#owner-master {height:auto!important;max-height:calc(100dvh - 280px);min-height:320px;overflow-y:auto;overscroll-behavior:contain;padding-bottom:20px;scrollbar-width:thin;}
+    #owner-aset,#owner-rank,#owner-dist,#owner-trend,#owner-po,#owner-master {height:auto!important;max-height:none!important;min-height:0!important;overflow:visible!important;overscroll-behavior:auto;padding-bottom:20px;scrollbar-width:thin;}
+    #ownerView {max-width:1440px;margin:0 auto;padding-bottom:28px!important;}
+    .owner-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:8px 0 16px;padding:18px;border:1px solid var(--border);border-radius:18px;background:linear-gradient(135deg,var(--card-bg),var(--input-bg));}
+    .owner-section-head h2{font-size:1.25rem;font-weight:800;margin:0;color:var(--text)}
+    .owner-section-head p{margin:5px 0 0;color:var(--gray);font-size:.84rem}
+    .owner-toolbar-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .owner-tabs{position:sticky;top:72px;z-index:20;background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:8px!important;box-shadow:0 4px 16px rgba(15,23,42,.05);}
+    .owner-tabs .btn{flex:0 0 auto;}
+    .owner-tabs .btn:focus-visible{outline:3px solid rgba(49,87,213,.35);outline-offset:2px;}
+    @media(max-width:760px){.owner-tabs{top:68px}.owner-section-head{align-items:flex-start;flex-direction:column}.owner-section-head .owner-toolbar-actions{width:100%}.owner-section-head .owner-toolbar-actions button{flex:1}}
     #owner-aset .card-box,#owner-rank .card-box,#owner-dist .card-box,#owner-po .card-box,#owner-master .card-box {border:1px solid var(--border);box-shadow:var(--shadow-soft);border-radius:16px;margin-bottom:10px;}
     #owner-trend .card-box {border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow-soft)}
     #assetList,#leaderboardList,#mutationList,#masterList {display:grid;gap:10px;}
@@ -341,6 +350,7 @@
   </div>
 
   <div id="ownerView" style="display:none;" class="px-3">
+    <div class="owner-section-head"><div><div class="workspace-eyebrow" style="color:var(--primary);opacity:1">OWNER WORKSPACE</div><h2 id="ownerPageTitle">Ikhtisar Persediaan</h2><p id="ownerPageSubtitle">Pantau aset, risiko stok, dan tindakan prioritas seluruh outlet.</p></div><div class="owner-toolbar-actions"><button class="btn btn-outline-primary fw-bold" onclick="nav('persediaan')"><i class="bi bi-box-seam me-1"></i>Kelola Stok</button><button class="btn btn-outline-secondary fw-bold" onclick="runOwnerDiagnostics()"><i class="bi bi-heart-pulse me-1"></i>Diagnostik</button></div></div>
     <div class="row g-2 mb-3">
         <div class="col-4"><div class="card-box text-center py-2 mb-0 border shadow-sm" onclick="showStatDetails('aktif')"><h5 id="qs-item" class="mb-0 fw-bolder" style="color:var(--text)">0</h5><small style="font-size:0.6rem; font-weight:700;" class="text-secondary">AKTIF</small></div></div>
         <div class="col-4"><div class="card-box text-center py-2 mb-0 border border-danger shadow-sm" onclick="showStatDetails('kritis')"><h5 id="qs-kritis" class="mb-0 fw-bolder text-danger">0</h5><small style="font-size:0.6rem; font-weight:700;" class="text-secondary">KRITIS</small></div></div>
@@ -354,7 +364,6 @@
     <div class="d-flex gap-2 mb-3 flex-wrap">
       <button class="btn btn-sm btn-outline-primary fw-bold" onclick="exportStockCSV()"><i class="bi bi-filetype-csv me-1"></i>Ekspor CSV</button>
       <button class="btn btn-sm btn-outline-secondary fw-bold" onclick="printStockReport()"><i class="bi bi-printer me-1"></i>Cetak / PDF</button>
-      <button class="btn btn-sm btn-outline-success fw-bold" onclick="runOwnerDiagnostics()"><i class="bi bi-heart-pulse me-1"></i>Diagnostik Sistem</button>
     </div>
     <div class="d-flex gap-2 mb-3 owner-tabs" style="overflow-x:auto; padding-bottom:5px;">
        <button class="btn btn-dark fw-bold px-3" style="font-size:0.75rem; white-space:nowrap;" onclick="showOwnerTab('aset', event)">Aset</button>
@@ -745,36 +754,54 @@
       const dash=document.getElementById('dashboardView'), reports=document.getElementById('reportsView');
       [manager,owner,dash,reports].forEach(el=>{if(el)el.style.display='none';});
       if(stock)stock.style.display='none'; if(transfer)transfer.style.display='none'; if(fab)fab.style.display='none';
+      const isOwner=!!(activeUser && activeUser.role==='Owner');
       if (p==='beranda') {
-        if(activeUser && activeUser.role==='Owner') { owner.style.display='block'; showOwnerTab('aset'); renderOwner(); renderPO(); renderMasterList(); }
+        if(isOwner){ owner.style.display='block'; showOwnerTab('aset'); renderOwner(); renderPO(); renderMasterList(); }
         else { dash.style.display='block'; renderDashboardView(); }
       } else if (p==='persediaan') {
         manager.style.display='block'; stock.style.display='block';
-        if(activeUser && activeUser.role==='Owner') document.getElementById('outlet').disabled=false;
-        if(activeUser && activeUser.role!=='Owner') fab.style.display='flex';
+        if(isOwner) document.getElementById('outlet').disabled=false;
+        if(!isOwner) fab.style.display='flex';
       } else if (p==='transaksi') {
         manager.style.display='block'; transfer.style.display='block';
-        if(document.getElementById('outlet').value==='ALL' && activeUser && activeUser.role==='Owner') { Swal.fire({icon:'info',title:'Pilih outlet terlebih dahulu',text:'Pilih outlet spesifik pada pemilih outlet untuk membuat transfer.'}); stock.style.display='block'; transfer.style.display='none'; }
+        if(document.getElementById('outlet').value==='ALL' && isOwner) { Swal.fire({icon:'info',title:'Pilih outlet terlebih dahulu',text:'Pilih outlet spesifik pada pemilih outlet untuk membuat transfer.'}); stock.style.display='block'; transfer.style.display='none'; }
       } else if (p==='laporan') {
-        if(activeUser && activeUser.role==='Owner') { owner.style.display='block'; showOwnerTab('rank'); renderOwner(); renderChart(); }
+        if(isOwner){ owner.style.display='block'; showOwnerTab('rank'); renderOwner(); renderChart(); }
         else { reports.style.display='block'; renderReportsView(); }
       } else if (p==='pengaturan') {
-        if(activeUser && activeUser.role==='Owner') { owner.style.display='block'; showOwnerTab('master'); renderMasterList(); }
+        if(isOwner){ owner.style.display='block'; showOwnerTab('master'); renderMasterList(); }
         else { Swal.fire({icon:'info',title:'Pengaturan terbatas',text:'Hubungi Owner untuk perubahan master dan konfigurasi.'}); dash.style.display='block'; renderDashboardView(); }
       }
-      window.scrollTo({top:0,behavior:'smooth'});
+      window.scrollTo({top:0,behavior:'auto'});
     }
     document.querySelectorAll('.nav-item[role="button"]').forEach(el => el.addEventListener('keydown', e => { if(e.key==='Enter' || e.key===' ') { e.preventDefault(); el.click(); } }));
     function showStok(){ document.getElementById('page-stok').style.display='block'; document.getElementById('page-transfer').style.display='none'; }
     function showTransfer(){ document.getElementById('page-stok').style.display='none'; document.getElementById('page-transfer').style.display='block'; }
+    const OWNER_TAB_META={
+      aset:{title:'Ikhtisar Persediaan',subtitle:'Pantau aset, risiko stok, dan tindakan prioritas seluruh outlet.'},
+      rank:{title:'Kinerja Outlet',subtitle:'Bandingkan indikator outlet dan tinjau dasar pemeringkatan.'},
+      dist:{title:'Distribusi Antar-Outlet',subtitle:'Tinjau kebutuhan mutasi stok dan keseimbangan persediaan.'},
+      trend:{title:'Tren Persediaan',subtitle:'Amati perubahan persediaan berdasarkan histori yang tersedia.'},
+      po:{title:'Perencanaan Pembelian',subtitle:'Hitung kebutuhan PO dan periksa asumsi sebelum membuat pesanan.'},
+      master:{title:'Master Barang',subtitle:'Kelola identitas barang, satuan, harga, dan data pendukung.'}
+    };
     function showOwnerTab(tab, evt){
-        const btnContainer = document.querySelector('#ownerView > .d-flex.gap-2.mb-3');
-        const targetButton = (evt && evt.currentTarget) || (btnContainer && Array.from(btnContainer.children).find(btn => (btn.getAttribute('onclick') || '').includes(`showOwnerTab('${tab}')`)));
-        if (btnContainer) { for(let i=0; i<btnContainer.children.length; i++) { btnContainer.children[i].className = 'btn border fw-bold px-3'; btnContainer.children[i].style.background = 'var(--input-bg)'; btnContainer.children[i].style.color = 'var(--text)'; } }
-        if (targetButton) { targetButton.className = 'btn fw-bold px-3 owner-tab-active'; targetButton.style.background = ''; targetButton.style.color = ''; }
-
-        ['aset','rank','dist','trend','po','master'].forEach(t => { document.getElementById('owner-'+t).style.display = tab===t?'block':'none'; });
-        if(tab==='trend') renderChart();
+      if(!OWNER_TAB_META[tab]) tab='aset';
+      const btnContainer=document.querySelector('#ownerView .owner-tabs');
+      if(btnContainer){
+        Array.from(btnContainer.children).forEach(btn=>{
+          const active=(btn.getAttribute('onclick')||'').includes(`showOwnerTab('${tab}'`);
+          btn.classList.toggle('owner-tab-active',active);
+          btn.setAttribute('aria-selected',active?'true':'false');
+          btn.setAttribute('role','tab');
+          btn.setAttribute('tabindex',active?'0':'-1');
+        });
+      }
+      ['aset','rank','dist','trend','po','master'].forEach(t=>{const el=document.getElementById('owner-'+t);if(el)el.style.display=tab===t?'block':'none';});
+      const meta=OWNER_TAB_META[tab];
+      const title=document.getElementById('ownerPageTitle'),subtitle=document.getElementById('ownerPageSubtitle');
+      if(title)title.textContent=meta.title;if(subtitle)subtitle.textContent=meta.subtitle;
+      if(tab==='trend') renderChart();
     }
 
     function debounceSearch() { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => renderStockList({ resetScroll: true }), 250); }
@@ -1184,7 +1211,7 @@
            allItemsStr += `   └ ADU: ${adu}/hr | Est: ${lItem.daysLeft === 999 ? "Aman" : lItem.daysLeft + " hr"}\n\n`; 
         } else { allItemsStr += `➖ *${p.name}* 🔴\n   └ Stok: *KOSONG*\n\n`; }
       });
-      txt += allItemsStr + `_Ket: ✅ Aman | 📉 Kritis | 📈 Over | ⚠️ Dekat Exp | ⛔ Expired | 🔴 Kosong_\n\n_Generated via Ai-STOK V40 Enterprise_`;
+      txt += allItemsStr + `_Ket: ✅ Aman | 📉 Kritis | 📈 Over | ⚠️ Dekat Exp | ⛔ Expired | 🔴 Kosong_\n\n_Generated via Ai-STOK V41 Enterprise_`;
       navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Laporan Tersalin!', showConfirmButton:false, timer:2000}));
     }
     
@@ -1208,7 +1235,7 @@
             });
             txt += `➖ *${p.name}*\n${detailStr}\n`;
         });
-        txt += `_Generated via Ai-STOK V40 Enterprise_`;
+        txt += `_Generated via Ai-STOK V41 Enterprise_`;
         navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Laporan Konsolidasi Tersalin!', showConfirmButton:false, timer:3000}));
     }
 
