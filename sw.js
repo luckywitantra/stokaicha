@@ -1,5 +1,5 @@
-/* Ai-STOK V44 service worker: cache app shell and GET assets only; never cache API POSTs. */
-const CACHE_NAME = 'ai-stok-v44-shell';
+/* Ai-STOK V46 service worker: cache app shell and GET assets only; never cache API POSTs. */
+const CACHE_NAME = 'ai-stok-v46-shell';
 const CORE = ['./', './index.html', './manifest.json'];
 self.addEventListener('install', event => {
   event.waitUntil((async () => { const cache = await caches.open(CACHE_NAME); try { await cache.addAll(CORE); } catch (_) {} await self.skipWaiting(); })());
