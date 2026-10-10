@@ -224,6 +224,18 @@
     #owner-trend .card-box {border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow-soft)}
     #assetList,#leaderboardList,#mutationList,#masterList {display:grid;gap:10px;}
     #assetList .card-box,#masterList .card-box {margin-bottom:0!important}
+    /* V46: checkout-style PO and clickable asset cards */
+    .asset-detail-card{cursor:pointer;transition:transform .16s ease,box-shadow .16s ease;border:1px solid var(--border)!important}
+    .asset-detail-card:hover,.asset-detail-card:focus-visible{transform:translateY(-2px);box-shadow:var(--shadow-soft);outline:2px solid rgba(49,87,213,.25);outline-offset:1px}
+    .po-checkout-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(250px,.85fr);gap:16px;align-items:start}
+    .po-cart-card,.po-summary-card{border:1px solid var(--border);border-radius:18px;background:var(--card-bg, var(--surface));padding:16px;box-shadow:var(--shadow-soft)}
+    .po-cart-item{display:grid;grid-template-columns:minmax(0,1fr) 88px minmax(90px,auto);gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--border)}
+    .po-cart-item:last-child{border-bottom:0}.po-qty-control{width:88px!important;text-align:center!important;padding:8px!important;border-radius:10px!important}
+    .po-summary-card{position:sticky;top:14px}.po-summary-line{display:flex;justify-content:space-between;gap:12px;padding:9px 0;color:var(--text)}
+    .po-checkout-total{font-size:1.5rem;font-weight:850;color:var(--danger,#dc3545);letter-spacing:-.03em}
+    .po-step-label{font-size:.7rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted,#6b7280)}
+    @media(max-width:760px){.po-checkout-layout{grid-template-columns:1fr}.po-summary-card{position:static}.po-cart-item{grid-template-columns:minmax(0,1fr) 76px;gap:8px}.po-cart-item .po-line-total{grid-column:1/-1;text-align:right}.po-qty-control{width:76px!important}}
+
     .owner-toolbar {display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:12px}
     .owner-toolbar input,.owner-toolbar select {max-width:100%;}
     .report-table-wrap {overflow:auto;border:1px solid var(--border);border-radius:14px;}
@@ -426,14 +438,22 @@
 
     <div id="owner-po" class="owner-panel" style="display:none;">
       <div class="owner-panel-title"><span class="owner-icon"><i class="bi bi-calculator"></i></span>Perencanaan Pembelian</div><div class="owner-context">Pastikan outlet spesifik dipilih sebelum membuat draft. Estimasi biaya mengikuti harga pada master barang.</div>
-      <div class="card-box"><h6 class="fw-bold mb-3" style="color:var(--text)"><i class="bi bi-calculator text-primary"></i> Kalkulator Purchase Order</h6>
-        <div class="small text-secondary mb-2">Pilih satu outlet spesifik sebelum menyimpan draft PO.</div>
-        <label class="inp-lbl" for="poSupplier">Pemasok</label><select id="poSupplier" class="inp-field mb-3"><option value="">Tanpa pemasok terpilih</option></select>
-        <div id="poList"></div><div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center"><span class="fw-bold text-secondary">Estimasi Tagihan:</span><span class="fw-bold text-danger fs-5" id="poGrandTotal">Rp 0</span></div>
-        <button class="btn-act mt-3" onclick="savePODraft()"><i class="bi bi-save me-1"></i>Simpan Draft PO</button>
-        <button class="btn-act mt-2" style="background:var(--input-bg);color:var(--text);box-shadow:none;border:1px solid var(--border)" onclick="copyPOWA()"><i class="bi bi-whatsapp"></i> Copy Format PO</button>
+      <div class="po-checkout-layout">
+        <div class="po-cart-card"><div class="d-flex justify-content-between align-items-start gap-2 mb-3"><div><div class="po-step-label">01 · Keranjang pembelian</div><h5 class="fw-bold mt-1 mb-1" style="color:var(--text)">Susun pesanan stok</h5><div class="small text-secondary">Periksa kuantitas dan harga sebelum membuat draft.</div></div><span class="badge rounded-pill text-bg-primary" id="poCartCount">0 item</span></div>
+          <div id="poList"><div class="small text-secondary text-center py-4">Menyiapkan rekomendasi pembelian…</div></div>
+        </div>
+        <aside class="po-summary-card"><div class="po-step-label">02 · Checkout</div><h5 class="fw-bold mt-1 mb-3" style="color:var(--text)">Ringkasan pesanan</h5>
+          <label class="inp-lbl" for="poSupplier">Pemasok</label><select id="poSupplier" class="inp-field mb-3"><option value="">Pilih pemasok</option></select>
+          <div class="po-summary-line"><span class="text-secondary">Jumlah jenis barang</span><strong id="poSummaryCount">0</strong></div>
+          <div class="po-summary-line"><span class="text-secondary">Subtotal</span><strong id="poSummarySubtotal">Rp 0</strong></div>
+          <div class="po-summary-line"><span class="text-secondary">Biaya tambahan</span><span class="small text-secondary">Belum dihitung</span></div>
+          <div class="border-top mt-2 pt-3"><div class="small text-secondary mb-1">Estimasi total pesanan</div><div class="po-checkout-total" id="poGrandTotal">Rp 0</div><div class="small text-secondary mt-2">Total mengikuti harga master. Ongkir/pajak belum termasuk.</div></div>
+          <button class="btn-act mt-3 w-100" onclick="savePODraft()"><i class="bi bi-bag-check me-1"></i>Buat Draft Purchase Order</button>
+          <button class="btn-act mt-2 w-100" style="background:var(--input-bg);color:var(--text);box-shadow:none;border:1px solid var(--border)" onclick="copyPOWA()"><i class="bi bi-whatsapp me-1"></i>Bagikan Ringkasan PO</button>
+          <div class="small text-secondary mt-3"><i class="bi bi-info-circle me-1"></i>Pilih outlet spesifik pada pemilih outlet utama sebelum menyimpan.</div>
+        </aside>
       </div>
-      <div class="card-box mt-3"><h6 class="fw-bold mb-3">Riwayat Purchase Order</h6><div id="poHistory"><div class="small text-secondary">Belum ada PO.</div></div></div>
+      <div class="card-box mt-3"><h6 class="fw-bold mb-3"><i class="bi bi-receipt me-2"></i>Riwayat Purchase Order</h6><div id="poHistory"><div class="small text-secondary">Belum ada PO.</div></div></div>
     </div>
 
     <div id="owner-master" class="owner-panel" style="display:none;">
@@ -1289,10 +1309,27 @@
       lines.push('_Usulan otomatis untuk ditinjau, bukan transaksi mutasi yang sudah dijalankan._');openWhatsAppDraft(lines.join('\n'));
     };
     window.shareAllOutletComparisonWA=function(){
-      const rows=Array.isArray(globalData.liveStock)?globalData.liveStock:[];const outlets=(globalData.outlets||[]).filter(o=>String(o.id)!=='ALL');
-      const lines=['*PERBANDINGAN STOK SEMUA OUTLET — AI-STOK*','Tanggal: '+new Date().toLocaleDateString('id-ID'),''];
-      outlets.forEach(o=>{const data=rows.filter(x=>String(x.outlet)===String(o.id));const critical=data.filter(x=>['KRITIS','HABIS'].includes(String(x.stockStatus||'').toUpperCase()));const over=data.filter(x=>String(x.stockStatus||'').toUpperCase()==='OVERSTOK');const asset=data.reduce((a,x)=>a+(Number(x.assetVal)||0),0);const total=data.reduce((a,x)=>a+(Number(x.totalBase)||0),0);lines.push(`*${o.nama||o.id}*`,`• SKU: ${data.length}`,`• Base unit total: ${total}`,`• Kritis/habis: ${critical.length}`,`• Overstok: ${over.length}`,`• Estimasi nilai: ${toIDR(asset)}`,'');});
-      lines.push('_Nilai aset adalah estimasi aplikasi. Perbandingan ini bukan laporan akuntansi yang diaudit._');openWhatsAppDraft(lines.join('\n'));
+      const rows=Array.isArray(globalData.liveStock)?globalData.liveStock:[];
+      const outlets=(globalData.outlets||[]).filter(o=>String(o.id)!=='ALL');
+      if(!outlets.length || !rows.length){Swal.fire('Data belum tersedia','Muat ulang data stok seluruh outlet sebelum membuat perbandingan.','info');return;}
+      const labelOutlet=(id)=>{const o=outlets.find(z=>String(z.id)===String(id)||String(z.nama)===String(id));return o?(o.nama||o.id):String(id||'—');};
+      const names=[...new Set(rows.map(x=>String(x.name||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'id'));
+      const lines=['*PERBANDINGAN STOK PER BARANG — SELURUH OUTLET*','Tanggal: '+new Date().toLocaleDateString('id-ID'),'',`Outlet dibandingkan: ${outlets.map(o=>o.nama||o.id).join(' | ')}`,'','Format: *Nama barang* → Outlet: saldo',''];
+      names.forEach(name=>{
+        const itemRows=rows.filter(x=>String(x.name||'').trim()===name);
+        const first=itemRows[0]||{};
+        const unit=first.uMain||'unit';
+        lines.push(`*${name}*`);
+        outlets.forEach(o=>{
+          const match=itemRows.find(x=>String(x.outlet)===String(o.id)||String(x.outlet)===String(o.nama));
+          const qty=match?(match.displayQty!==undefined&&match.displayQty!==null?match.displayQty:(match.totalBase||0)):'0';
+          const status=match&&match.stockStatus?` · ${match.stockStatus}`:'';
+          lines.push(`• ${o.nama||o.id}: ${qty} ${unit}${status}`);
+        });
+        lines.push('');
+      });
+      lines.push('_Perbandingan per barang berdasarkan data aplikasi. Saldo 0 ditampilkan bila barang tidak tercatat pada outlet tersebut._');
+      openWhatsAppDraft(lines.join('\n'));
     };
 
     function renderOwnerAnalytics(){
@@ -1334,7 +1371,7 @@
         if(ownerTrendChart){ownerTrendChart.destroy();ownerTrendChart=null;}
         canvas.style.display='none';
         let msg=host.querySelector('.owner-trend-empty'); if(!msg){msg=document.createElement('div');msg.className='owner-trend-empty owner-empty';host.appendChild(msg);}
-        msg.innerHTML='<i class="bi bi-graph-up fs-3 d-block mb-2"></i><strong>Histori tren belum tersedia</strong><div class="small mt-1">Grafik memerlukan snapshot stok bertanggal. Data saldo saat ini saja tidak cukup untuk menyimpulkan tren. Backend V45 akan mencatat snapshot harian. Setelah trigger diaktifkan, grafik mulai terisi dari tanggal pencatatan pertama; histori lama tidak dibuat secara retroaktif.</div>';
+        msg.innerHTML='<i class="bi bi-graph-up fs-3 d-block mb-2"></i><strong>Histori tren belum tersedia</strong><div class="small mt-1">Grafik memerlukan snapshot stok bertanggal. Data saldo saat ini saja tidak cukup untuk menyimpulkan tren. Backend V46 akan mencatat snapshot harian. Setelah trigger diaktifkan, grafik mulai terisi dari tanggal pencatatan pertama; histori lama tidak dibuat secara retroaktif.</div>';
         return;
       }
       const labels=data.map(x=>x.date||x.tanggal||x.label||''); const vals=data.map(x=>Number(x.totalAsset??x.asset??x.qty??x.totalStock)||0);
@@ -1397,11 +1434,23 @@
       setOwnerText('hppVal', toIDR(totHPP)); setOwnerText('wasteVal', toIDR(totWaste + totLoss));
       renderOwnerAnalytics();
 
-      let h=''; 
-      filteredStock.forEach(x => { h+=`<div class="card-box"><div class="d-flex justify-content-between mb-1"><div class="fw-bold" style="font-size:0.9rem; color:var(--text)">[${x.outlet}] ${x.name}</div><div class="text-success fw-bold">${toIDR(x.assetVal)}</div></div><div class="small text-muted mb-2">Stok: <b style="color:var(--text)">${x.displayQty}</b></div><div class="p-2 rounded small text-secondary d-flex justify-content-between" style="background:var(--input-bg);"><span>PO Target: ${x.poNeed} ${x.uMain}</span><span class="fw-bold text-primary"><i class="bi bi-graph-up-arrow"></i> ADU: ${globalData.inventoryStats[x.outlet+'_'+x.name]?.adu || '-'}</span></div></div>`; }); 
-      const assetListHost = document.getElementById('assetList'); if (assetListHost) assetListHost.innerHTML = h; 
+      let h='';
+      filteredStock.forEach((x, i) => { h+=`<button type="button" class="card-box asset-detail-card text-start w-100" data-asset-index="${i}" aria-label="Lihat detail ${escapeHTML(x.name||'barang')}"><div class="d-flex justify-content-between gap-2 mb-1"><div class="fw-bold" style="font-size:0.9rem;color:var(--text)">${escapeHTML(x.name||'Barang')}</div><div class="text-success fw-bold text-nowrap">${toIDR(x.assetVal)}</div></div><div class="small text-secondary mb-2">${escapeHTML(x.outlet||'')} · Stok <b style="color:var(--text)">${escapeHTML(x.displayQty??'0')}</b> ${escapeHTML(x.uMain||'')}</div><div class="p-2 rounded small text-secondary d-flex justify-content-between gap-2" style="background:var(--input-bg);"><span>PO target: ${Number(x.poNeed)||0} ${escapeHTML(x.uMain||'')}</span><span class="fw-bold text-primary"><i class="bi bi-graph-up-arrow"></i> ADU: ${escapeHTML(globalData.inventoryStats?.[x.outlet+'_'+x.name]?.adu ?? '-')}</span></div><div class="small text-primary fw-semibold mt-2">Lihat detail <i class="bi bi-chevron-right"></i></div></button>`; });
+      const assetListHost = document.getElementById('assetList');
+      if (assetListHost) { assetListHost.innerHTML = h || '<div class="owner-empty">Belum ada data persediaan untuk ditampilkan.</div>'; assetListHost.querySelectorAll('[data-asset-index]').forEach(btn=>btn.addEventListener('click',()=>showAssetDetail(filteredStock[Number(btn.dataset.assetIndex)]))); }
     }
     
+    function showAssetDetail(item){
+      if(!item)return;
+      const same=(globalData.liveStock||[]).filter(x=>String(x.name||'')===String(item.name||''));
+      const status=String(item.stockStatus||'').toUpperCase();
+      const badge=status==='HABIS'?'danger':status==='KRITIS'?'warning':status==='OVERSTOK'?'info':'success';
+      const outletRows=same.map(x=>`<div class="d-flex justify-content-between align-items-center gap-3 py-2 border-bottom"><div><div class="fw-semibold">${escapeHTML(x.outlet||'—')}</div><div class="small text-secondary">${escapeHTML(x.stockStatus||'—')}</div></div><div class="text-end fw-bold">${escapeHTML(x.displayQty??x.totalBase??0)} ${escapeHTML(x.uMain||item.uMain||'')}</div></div>`).join('');
+      const adu=globalData.inventoryStats?.[item.outlet+'_'+item.name]?.adu;
+      const body=`<div class="text-start"><div class="d-flex flex-wrap gap-2 mb-3"><span class="badge text-bg-${badge}">${escapeHTML(item.stockStatus||'Status tidak tersedia')}</span><span class="badge text-bg-light">${escapeHTML(item.outlet||'')}</span></div><div class="row g-2 mb-3"><div class="col-6"><div class="p-3 rounded-3" style="background:var(--input-bg)"><div class="small text-secondary">Saldo saat ini</div><div class="fs-5 fw-bold">${escapeHTML(item.displayQty??item.totalBase??0)} ${escapeHTML(item.uMain||'')}</div></div></div><div class="col-6"><div class="p-3 rounded-3" style="background:var(--input-bg)"><div class="small text-secondary">Estimasi nilai</div><div class="fs-5 fw-bold">${toIDR(item.assetVal)}</div></div></div><div class="col-6"><div class="p-3 rounded-3" style="background:var(--input-bg)"><div class="small text-secondary">Target pembelian</div><div class="fw-bold">${Number(item.poNeed)||0} ${escapeHTML(item.uMain||'')}</div></div></div><div class="col-6"><div class="p-3 rounded-3" style="background:var(--input-bg)"><div class="small text-secondary">Rata-rata pemakaian</div><div class="fw-bold">${adu==null?'Belum tersedia':escapeHTML(adu)+' / hari'}</div></div></div></div><h6 class="fw-bold mt-3">Perbandingan barang ini di seluruh outlet</h6>${outletRows||'<div class="small text-secondary">Belum ada saldo outlet lain.</div>'}<div class="alert alert-info small mt-3 mb-0"><strong>Rekomendasi:</strong> ${status==='HABIS'?'Prioritaskan pemenuhan stok dan cek kebutuhan outlet.':status==='KRITIS'?'Periksa kebutuhan pembelian atau kemungkinan mutasi dari outlet surplus.':status==='OVERSTOK'?'Tinjau peluang redistribusi sebelum melakukan pembelian baru.':'Pantau pergerakan dan lakukan opname berkala.'} Rekomendasi berbasis data yang tersedia, bukan pengganti verifikasi fisik.</div></div>`;
+      Swal.fire({title:escapeHTML(item.name||'Detail barang'),html:body,width:640,showCancelButton:true,showDenyButton:true,confirmButtonText:'Buka Distribusi',denyButtonText:'Ke Pembelian',cancelButtonText:'Tutup',focusConfirm:false}).then(r=>{if(r.isConfirmed)showOwnerTab('dist');else if(r.isDenied)showOwnerTab('po');});
+    }
+
     function renderMasterList() {
         const host = document.getElementById('masterList');
         if (!host) return;
@@ -1566,28 +1615,34 @@
     function renderPO() {
       let poMap = {}; activePO = {}; let grandTotal = 0;
       const outFilter = document.getElementById('outlet').value;
-      const filteredStock = (outFilter === "ALL") ? globalData.liveStock : globalData.liveStock.filter(x => x.outlet === outFilter);
-      filteredStock.forEach(x => { if(x.poNeed > 0) { if(!poMap[x.name]) poMap[x.name] = { name:x.name,uMain:x.uMain,pMain:x.pMain,qty:0 }; poMap[x.name].qty += x.poNeed; } });
-      let h = '';
+      const filteredStock = (outFilter === "ALL") ? (globalData.liveStock||[]) : (globalData.liveStock||[]).filter(x => String(x.outlet) === String(outFilter));
+      filteredStock.forEach(x => { if(Number(x.poNeed)>0) { if(!poMap[x.name]) poMap[x.name] = { name:x.name,uMain:x.uMain,pMain:Number(x.pMain)||0,qty:0 }; poMap[x.name].qty += Number(x.poNeed)||0; } });
+      let h = ''; let itemCount=0;
       for (let key in poMap) {
         const item=poMap[key]; activePO[item.name]={qty:item.qty,price:item.pMain,uMain:item.uMain};
-        const sub=item.qty*item.pMain; grandTotal+=sub;
-        h+=`<div class="d-flex justify-content-between align-items-center border-bottom py-2"><div style="width:48%"><div class="fw-bold small" style="color:var(--text)">${escapeHTML(item.name)}</div><div class="text-muted" style="font-size:.65rem">${toIDR(item.pMain)} / ${item.uMain}</div></div><div><input type="number" min="0" step="1" class="po-input" value="${item.qty}" onchange="updatePO(${JSON.stringify(item.name).replace(/</g,'\\u003c')}, this.value)" aria-label="Jumlah ${item.name}"></div><div class="text-end fw-bold text-success" style="font-size:.8rem;width:30%" id="po_sub_${item.name.replace(/[^a-zA-Z0-9]/g,'')}">${toIDR(sub)}</div></div>`;
+        const sub=item.qty*item.pMain; grandTotal+=sub; itemCount++;
+        const safeKey=String(item.name).replace(/[^a-zA-Z0-9]/g,'');
+        h+=`<div class="po-cart-item"><div><div class="fw-bold" style="color:var(--text)">${escapeHTML(item.name)}</div><div class="small text-secondary">${toIDR(item.pMain)} / ${escapeHTML(item.uMain||'unit')}</div></div><input type="number" min="0" step="1" class="inp-field po-qty-control" value="${item.qty}" onchange="updatePO(${JSON.stringify(item.name).replace(/</g,'\\u003c')}, this.value)" aria-label="Jumlah ${escapeHTML(item.name)}"><div class="po-line-total text-end"><div class="small text-secondary">Subtotal</div><div class="fw-bold" id="po_sub_${safeKey}">${toIDR(sub)}</div></div></div>`;
       }
-      document.getElementById('poList').innerHTML = h || `<div class="text-muted text-center small py-3">Tidak ada rekomendasi order. Stok aman.</div>`;
-      document.getElementById('poGrandTotal').innerText=toIDR(grandTotal);
+      const poList=document.getElementById('poList'); if(poList)poList.innerHTML=h||`<div class="text-center py-5"><i class="bi bi-bag-check fs-1 text-secondary"></i><div class="fw-bold mt-2">Tidak ada rekomendasi pembelian</div><div class="small text-secondary">Stok saat ini tidak menghasilkan target PO. Anda dapat meninjau kebutuhan stok terlebih dahulu.</div></div>`;
+      const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+      set('poGrandTotal',toIDR(grandTotal));set('poSummarySubtotal',toIDR(grandTotal));set('poSummaryCount',itemCount);set('poCartCount',`${itemCount} item`);
       const supplier=document.getElementById('poSupplier');
-      if (supplier) {
-        const prior=supplier.value; supplier.innerHTML='<option value="">Tanpa pemasok terpilih</option>';
-        (globalData.suppliers||[]).filter(x=>x.active!==false).forEach(x=>supplier.add(new Option(`${x.name}${x.phone?' · '+x.phone:''}`,x.id)));
-        if (prior) supplier.value=prior;
-      }
+      if (supplier) { const prior=supplier.value; supplier.innerHTML='<option value="">Pilih pemasok</option>'; (globalData.suppliers||[]).filter(x=>x.active!==false).forEach(x=>supplier.add(new Option(`${x.name}${x.phone?' · '+x.phone:''}`,x.id))); if(prior)supplier.value=prior; }
       const history=document.getElementById('poHistory');
-      if (history) {
-        const orders=(globalData.purchaseOrders||[]).slice().sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,30);
-        history.innerHTML=orders.length ? orders.map(po=>`<div class="border-bottom py-2"><div class="d-flex justify-content-between gap-2"><strong>${po.id}</strong><span class="badge ${po.status==='APPROVED'?'bg-success':po.status==='RECEIVED'?'bg-primary':po.status==='CANCELLED'?'bg-secondary':'bg-warning text-dark'}">${po.status}</span></div><div class="small text-secondary">${po.outlet} · ${po.supplierName||'Tanpa pemasok'} · ${toIDR(Number(po.total)||0)}</div><div class="small text-secondary">${po.createdAt||''} · ${po.createdBy||''}</div><div class="d-flex gap-2 mt-2">${po.status==='DRAFT'?`<button class="btn btn-sm btn-success" onclick="updatePOStatus('${po.id}','APPROVED')">Setujui</button><button class="btn btn-sm btn-outline-secondary" onclick="updatePOStatus('${po.id}','CANCELLED')">Batalkan</button>`:''}${po.status==='APPROVED'?`<button class="btn btn-sm btn-primary" onclick="receivePO('${po.id}')">Terima Barang</button>`:''}</div></div>`).join('') : '<div class="small text-secondary">Belum ada PO tersimpan.</div>';
-      }
+      if (history) { const orders=(globalData.purchaseOrders||[]).slice().sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,30); history.innerHTML=orders.length ? orders.map(po=>`<div class="border-bottom py-3"><div class="d-flex justify-content-between gap-2"><strong>${escapeHTML(po.id)}</strong><span class="badge ${po.status==='APPROVED'?'bg-success':po.status==='RECEIVED'?'bg-primary':po.status==='CANCELLED'?'bg-secondary':'bg-warning text-dark'}">${escapeHTML(po.status)}</span></div><div class="small text-secondary mt-1">${escapeHTML(po.outlet)} · ${escapeHTML(po.supplierName||'Tanpa pemasok')} · ${toIDR(Number(po.total)||0)}</div><div class="small text-secondary">${escapeHTML(po.createdAt||'')} · ${escapeHTML(po.createdBy||'')}</div><div class="d-flex flex-wrap gap-2 mt-2">${po.status==='DRAFT'?`<button class="btn btn-sm btn-success" onclick="updatePOStatus('${String(po.id).replace(/'/g,"\\'")}','APPROVED')">Setujui</button><button class="btn btn-sm btn-outline-secondary" onclick="updatePOStatus('${String(po.id).replace(/'/g,"\\'")}','CANCELLED')">Batalkan</button>`:''}${po.status==='APPROVED'?`<button class="btn btn-sm btn-primary" onclick="receivePO('${String(po.id).replace(/'/g,"\\'")}')">Terima Barang</button>`:''}</div></div>`).join('') : '<div class="small text-secondary">Belum ada PO tersimpan.</div>'; }
     }
+    function updatePO(name,value){
+      const item=activePO[name]; if(!item)return;
+      const qty=Math.max(0,Math.floor(Number(value)||0)); item.qty=qty;
+      const sub=qty*(Number(item.price)||0); const key=String(name).replace(/[^a-zA-Z0-9]/g,'');
+      const el=document.getElementById('po_sub_'+key); if(el)el.textContent=toIDR(sub);
+      const total=Object.values(activePO).reduce((a,x)=>a+(Math.max(0,Number(x.qty)||0)*(Number(x.price)||0)),0);
+      const count=Object.values(activePO).filter(x=>Number(x.qty)>0).length;
+      const set=(id,val)=>{const n=document.getElementById(id);if(n)n.textContent=val;};set('poGrandTotal',toIDR(total));set('poSummarySubtotal',toIDR(total));set('poSummaryCount',count);set('poCartCount',`${count} item`);
+    }
+    window.updatePO=updatePO;
+
     async function savePODraft() {
       const outlet=document.getElementById('outlet').value;
       if (!outlet || outlet==='ALL') return Swal.fire('Pilih outlet','Pilih outlet spesifik sebelum membuat PO.','warning');
