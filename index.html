@@ -1308,18 +1308,28 @@
       if(!suggestions.length) lines.push('Belum ada pasangan barang overstok dan kritis/habis antar-outlet pada data saat ini.');
       lines.push('_Usulan otomatis untuk ditinjau, bukan transaksi mutasi yang sudah dijalankan._');openWhatsAppDraft(lines.join('\n'));
     };
-    // Normalize quantities before appending a unit. Some displayQty values already contain uMain.
+    // Safe stock formatter: displayQty may already contain mixed large + small units,
+    // e.g. "6 DUS 19 BUNGKUS". Never append the large unit to a formatted mixed-unit value.
     function formatQtyWithUnit(qty, unit){
       const u=String(unit||'').trim();
-      let q=String(qty===undefined||qty===null||qty===''?'0':qty).trim();
-      if(u){
-        const escaped=u.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-        // Remove one or more trailing copies of the unit, regardless of case.
-        q=q.replace(new RegExp('(?:\\s+'+escaped+'){1,}\\s*$','i'),'').trim();
+      let q=String(qty===undefined||qty===null||qty===''?'0':qty).trim().replace(/\s+/g,' ');
+      if(!q) q='0';
+      if(!u) return q;
+      const esc=u.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      const unitRe=new RegExp('(?:^|\\s)'+esc+'(?:$|\\s)','i');
+      // If quantity contains unit words, treat it as a preformatted quantity.
+      // Remove a duplicated trailing main unit only when that same unit already occurs earlier.
+      if(/[\p{L}]/u.test(q)){
+        const trailingMain=new RegExp('\\s+'+esc+'\\s*$','i');
+        if(trailingMain.test(q)){
+          const withoutTrailing=q.replace(trailingMain,'').trim();
+          if(unitRe.test(withoutTrailing)) q=withoutTrailing;
+        }
+        // Collapse adjacent duplicate unit words ("DUS DUS") without changing distinct subunits.
+        q=q.replace(/\b([\p{L}]+)(?:\s+\1)+\s*$/giu,'$1').trim();
+        return q||`0 ${u}`;
       }
-      // Collapse accidental adjacent duplicate words (e.g. "DUS DUS") in legacy display values.
-      q=q.replace(/\b([\p{L}]+)(?:\s+\1)+\s*$/giu,'$1').trim();
-      return u ? `${q||'0'} ${u}` : (q||'0');
+      return `${q} ${u}`;
     }
 
     window.shareAllOutletComparisonWA=function(){
