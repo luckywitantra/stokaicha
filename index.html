@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Ai-STOK V43 Owner Login Fix</title>
+  <title>Ai-STOK V52 Enterprise UI/UX</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
@@ -293,6 +293,108 @@
     @media(max-width:650px){body{padding-bottom:calc(82px + env(safe-area-inset-bottom))}.btn-act{min-height:46px}.glass-header{padding:12px 15px}.swal2-popup{padding:1rem!important}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 
+
+    .network-ribbon{position:sticky;top:0;z-index:1040;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 16px;border-bottom:1px solid var(--border);background:var(--card-bg);color:var(--text);font-size:.86rem;box-shadow:0 3px 12px rgba(15,23,42,.05)}
+    .network-ribbon[hidden]{display:none!important}.network-ribbon[data-state="offline"]{background:#fff7ed;color:#9a3412;border-color:#fed7aa}.network-ribbon[data-state="error"]{background:#fef2f2;color:#991b1b;border-color:#fecaca}.network-ribbon[data-state="online"]{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}.network-ribbon button{border:1px solid currentColor;border-radius:999px;padding:5px 11px;background:transparent;color:inherit;font-weight:700;white-space:nowrap}
+    .wa-segment-list{display:grid;gap:8px;text-align:left}.wa-segment{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--card-bg);color:var(--text)}.wa-segment small{display:block;color:var(--muted,#64748b)}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+
+    /* V52 Enterprise UI/UX: global visual consistency and mobile ergonomics */
+    :root{color-scheme:light;--ui-radius-sm:10px;--ui-radius-md:15px;--ui-radius-lg:22px;--ui-shadow:0 8px 28px rgba(15,23,42,.075);--ui-ring:rgba(49,87,213,.28)}
+    body.dark-mode{color-scheme:dark;--surface-soft:#172338;--ui-shadow:0 10px 30px rgba(0,0,0,.22)}
+    html{scroll-behavior:smooth;scroll-padding-top:90px;-webkit-text-size-adjust:100%}
+    body{min-height:100dvh;line-height:1.45;background:var(--bg);}
+    button,.btn,input,select,textarea{font:inherit}
+    button,.btn{ -webkit-tap-highlight-color:transparent }
+    button:disabled,.btn:disabled{opacity:.55;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+    .glass-header{padding:12px clamp(14px,2.4vw,28px);gap:12px;min-height:66px;padding-top:max(12px,env(safe-area-inset-top));background:color-mix(in srgb,var(--card-bg) 94%,transparent);backdrop-filter:blur(16px);}
+    .brand{display:flex;align-items:center;gap:9px;letter-spacing:-.035em;font-size:clamp(1.08rem,2vw,1.35rem);white-space:nowrap}
+    .role-btn{display:inline-flex;align-items:center;min-height:38px;white-space:nowrap}
+    #themeToggleBtn,#headerInstallBtn{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0;border-radius:13px!important}
+    .outlet-wrap{max-width:1500px;margin:0 auto;padding:0 clamp(12px,2vw,28px)}
+    .outlet-sel{box-shadow:0 3px 12px rgba(15,23,42,.035);min-height:48px;margin:12px 0 8px}
+    #connectionStatus{display:flex;align-items:center;gap:7px;min-height:22px;font-size:.76rem!important;line-height:1.4}
+    #managerView{max-width:1500px;margin:0 auto;padding-bottom:26px!important}
+    #page-stok> .d-flex h6,#page-transfer> .d-flex h6{font-size:1rem!important;letter-spacing:-.02em}
+    .card-box,.metric-card,.workspace-panel,.owner-kpi,.po-cart-card,.po-summary-card{box-shadow:var(--ui-shadow);}
+    .card-box{border:1px solid var(--border);border-radius:var(--ui-radius-md);}
+    .metric-card,.workspace-panel{border-radius:var(--ui-radius-lg)}
+    .inp-field,.form-control,.form-select,input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{min-height:44px;border:1px solid var(--border);background-color:var(--input-bg);color:var(--text);box-shadow:none;}
+    textarea{min-height:100px}
+    .inp-field:focus,.form-control:focus,.form-select:focus,input:focus,select:focus,textarea:focus{border-color:var(--brand-blue,#3157D5)!important;box-shadow:0 0 0 3px var(--ui-ring)!important;outline:0}
+    .btn,.btn-act,.quick-action,.pin-key,.nav-item{user-select:none}
+    .btn{min-height:38px;font-weight:700;border-radius:11px}
+    .btn-sm{min-height:34px}
+    .btn-primary{--bs-btn-bg:#3157D5;--bs-btn-border-color:#3157D5;--bs-btn-hover-bg:#2647b8;--bs-btn-hover-border-color:#2647b8}
+    .btn-act{box-shadow:0 5px 13px rgba(var(--primary-rgb),.16)}
+    .table{--bs-table-color:var(--text);--bs-table-bg:transparent;--bs-table-hover-bg:rgba(49,87,213,.045);--bs-table-border-color:var(--border)}
+    .table thead th{font-weight:800;white-space:nowrap}
+    .table td,.table th{vertical-align:middle}
+    .report-table-wrap,.table-responsive{max-width:100%;overscroll-behavior-x:contain}
+    .nav-bot{height:calc(72px + env(safe-area-inset-bottom));padding:8px 6px calc(8px + env(safe-area-inset-bottom));gap:2px;background:color-mix(in srgb,var(--card-bg) 96%,transparent);backdrop-filter:blur(18px);box-shadow:0 -8px 28px rgba(15,23,42,.06);border-top:1px solid var(--border)}
+    .nav-item{width:auto;flex:1;min-width:0;min-height:48px;justify-content:center;gap:4px;border-radius:13px;font-size:.68rem;font-weight:750;white-space:nowrap}
+    .nav-item i{font-size:1.15rem;line-height:1.1}
+    .nav-item.active{background:rgba(var(--primary-rgb),.08);font-weight:850}
+    .nav-item:focus-visible{outline:3px solid var(--ui-ring);outline-offset:-2px}
+    .fab{width:54px;height:54px;right:max(16px,env(safe-area-inset-right));bottom:calc(86px + env(safe-area-inset-bottom));box-shadow:0 10px 24px rgba(37,211,102,.28)}
+    .app-loading-bar{z-index:12000}
+    .network-ribbon{top:0;min-height:44px;box-shadow:0 4px 14px rgba(15,23,42,.06);padding:9px 14px}
+    .network-ribbon button{min-height:34px}
+    .login-screen{padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));}
+    .login-panel{max-width:420px;width:100%;max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain}
+    .pin-key{min-height:54px;border-radius:15px;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+    .swal2-container{padding:12px!important;z-index:20000!important}
+    .swal2-popup{width:min(94vw,620px)!important;padding:clamp(16px,3vw,26px)!important;border:1px solid var(--border)!important;box-shadow:0 24px 80px rgba(15,23,42,.24)!important}
+    .swal2-title{font-size:clamp(1.15rem,3vw,1.5rem)!important;line-height:1.25!important;color:var(--text)!important}
+    .swal2-html-container{color:var(--text)!important;font-size:.92rem!important;overflow-wrap:anywhere}
+    .swal2-actions{gap:8px!important;flex-wrap:wrap}
+    .swal2-actions button{min-height:42px;border-radius:11px!important;font-weight:750!important;margin:0!important}
+    body.dark-mode .swal2-input,body.dark-mode .swal2-select,body.dark-mode .swal2-textarea{background:var(--input-bg)!important;color:var(--text)!important;border-color:var(--border)!important}
+    body.dark-mode .table-light,body.dark-mode .bg-light{--bs-bg-opacity:1;background-color:var(--surface-soft)!important;color:var(--text)!important}
+    body.dark-mode .text-dark{color:var(--text)!important}
+    .inventory-empty{margin:10px 0;border-radius:18px;background:var(--card-bg)}
+    .skeleton-card{box-shadow:0 5px 18px rgba(15,23,42,.035)}
+    #ownerView,#dashboardView,#reportsView{width:100%;min-width:0}
+    #ownerView .owner-tabs{max-width:100%;overscroll-behavior-x:contain}
+    #ownerView .owner-tabs .btn{white-space:nowrap}
+    .owner-toolbar,.owner-view-toolbar{min-width:0}
+    .owner-toolbar>*{min-width:0}
+    .owner-toolbar .d-flex{flex-wrap:wrap;min-width:0}
+    .owner-toolbar input,.owner-toolbar select{min-width:0}
+    .po-checkout-layout>*{min-width:0}
+    @media(min-width:1200px){#managerView{padding-left:28px!important;padding-right:28px!important}.workspace{padding-left:28px;padding-right:28px}.glass-header{padding-left:28px;padding-right:28px}}
+    @media(max-width:760px){
+      body{padding-bottom:calc(82px + env(safe-area-inset-bottom))}
+      .glass-header{min-height:60px;padding-left:12px;padding-right:12px;gap:7px}
+      .brand{font-size:1.08rem}
+      .role-btn{padding:6px 9px;font-size:.72rem}
+      #themeToggleBtn,#headerInstallBtn{width:36px;height:36px;border-radius:12px!important}
+      .outlet-wrap{padding:0 12px}
+      #managerView{padding-left:12px!important;padding-right:12px!important}
+      #scrollArea{height:auto!important;max-height:none;min-height:0;overflow:visible;padding-bottom:12px}
+      .nav-bot{height:calc(68px + env(safe-area-inset-bottom));padding-left:3px;padding-right:3px}
+      .nav-item{font-size:.63rem;gap:3px}
+      .nav-item i{font-size:1.08rem}
+      .fab{width:48px;height:48px;font-size:1.45rem;right:14px;bottom:calc(80px + env(safe-area-inset-bottom))}
+      .dual-input{gap:8px}
+      .inp-field{padding:10px!important}
+      .workspace-panel{padding:13px}
+      .owner-toolbar{align-items:stretch}
+      .owner-toolbar>.d-flex{width:100%}
+      .owner-toolbar .btn{flex:1}
+      .report-table-wrap table{min-width:560px}
+      .swal2-container{padding:8px!important}
+      .swal2-popup{width:calc(100vw - 16px)!important;max-height:calc(100dvh - 16px);overflow-y:auto;padding:16px!important;border-radius:18px!important}
+      .swal2-actions{width:100%}
+      .swal2-actions button{flex:1;min-width:100px}
+      .login-panel{padding:22px 18px 18px;border-radius:24px}
+      .pin-key{min-height:50px}
+    }
+    @media(max-width:380px){.brand{font-size:1rem}.role-btn{font-size:.66rem;padding:5px 7px}.nav-item span{font-size:.59rem}.metric-grid{gap:7px}.metric-card{padding:10px}.workspace-title{font-size:1.38rem}}
+    @media(hover:none){.metric-card:hover,.quick-action:hover,#ownerView .owner-kpi:hover{transform:none}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
 </style>
 </head>
 <body>
@@ -337,7 +439,7 @@
     </div>
   </div>
 
-  <div class="outlet-wrap"><select id="outlet" class="outlet-sel" onchange="fetchData()" aria-label="Pilih outlet"></select><div id="connectionStatus" class="small text-muted mb-2" role="status">Ai-STOK V39 · memeriksa koneksi</div></div>
+  <div class="outlet-wrap"><select id="outlet" class="outlet-sel" onchange="fetchData()" aria-label="Pilih outlet"></select><div id="connectionStatus" class="small text-muted mb-2" role="status">Ai-STOK V52 · memeriksa koneksi</div></div>
 
   <div id="skeletonTemplate" style="display:none;">
       <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-big"></div></div>
@@ -350,6 +452,8 @@
     <button class="btn btn-sm btn-warning fw-bold text-white rounded-pill px-3" onclick="syncOfflineData()">Sync</button>
   </div>
 
+
+  <div id="networkRibbon" class="network-ribbon" role="status" aria-live="polite" hidden><span id="networkRibbonText">Memeriksa koneksi…</span><button type="button" id="networkRetryBtn" onclick="retryPendingSync()">Coba lagi</button></div>
 
   <section id="dashboardView" class="workspace" style="display:none" aria-labelledby="dashboardTitle">
     <div class="workspace-hero"><div class="workspace-eyebrow">Ai-STOK · Operational overview</div><h1 class="workspace-title" id="dashboardTitle">Selamat datang kembali</h1><div class="workspace-subtitle" id="dashboardSubtitle">Ringkasan operasional outlet Anda dalam satu tampilan.</div><div class="mt-3 d-flex flex-wrap gap-2"><span class="status-pill" style="background:rgba(255,255,255,.13);color:#fff"><i class="bi bi-clock-history"></i><span id="dashboardUpdated">Menunggu data</span></span><span class="status-pill" style="background:rgba(255,255,255,.13);color:#fff"><i class="bi bi-shield-check"></i>Ringkasan operasional</span></div></div>
@@ -505,7 +609,12 @@
         let payload;
         try { payload = JSON.parse(options.body); } catch (_) { return nativeFetch(url, options); }
         if (payload.action !== 'authenticate') payload.token = authToken;
-        const response = await nativeFetch(url, { ...options, body: JSON.stringify(payload) });
+        const controller = new AbortController();
+        const upstreamSignal = options.signal;
+        const timeoutId = setTimeout(() => controller.abort(new DOMException('Permintaan melewati batas waktu 30 detik.','TimeoutError')), 30000);
+        let response;
+        try { response = await nativeFetch(url, { ...options, signal: controller.signal, body: JSON.stringify(payload) }); }
+        finally { clearTimeout(timeoutId); }
         try {
           const parsed = await response.clone().json();
           if (parsed && parsed.status && parsed.status !== 'success') { const apiError = new Error(parsed.message || 'Permintaan gagal.'); apiError.apiRejected = true; throw apiError; }
@@ -664,6 +773,7 @@
       loadLoginOptions(); // sengaja tidak di-await agar input PIN langsung responsif
       await bootTasks;
       updateQueueUI();
+      updateNetworkRibbon(navigator.onLine?'online':'offline');
       window.addEventListener('online', () => {
         if (authToken && opnameQueue.length) syncOfflineData();
         if (!loginBusy && !activeUser) loadLoginOptions();
@@ -1252,7 +1362,19 @@
         Swal.fire({toast:true,position:'top',icon:'success',title:`${pending.length} transaksi tersinkron`,showConfirmButton:false,timer:1800});
       } catch(e) { renderStockList(); Swal.fire({toast:true,position:'top',icon:'error',title:'Sinkronisasi gagal — antrean dipertahankan',showConfirmButton:false,timer:2500}); }
     }
-    function updateQueueUI() { document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none'; document.getElementById('queueCount').innerText = `${opnameQueue.length} Antrean`; }
+    function updateQueueUI() { document.getElementById('syncBadge').style.display = opnameQueue.length > 0 ? 'flex' : 'none'; document.getElementById('queueCount').innerText = `${opnameQueue.length} Antrean`; updateNetworkRibbon(navigator.onLine?'online':'offline'); }
+    function updateNetworkRibbon(state, message){
+      const el=document.getElementById('networkRibbon'); if(!el)return;
+      const offline=!navigator.onLine; const pending=Array.isArray(opnameQueue)?opnameQueue.length:0;
+      if(offline){el.hidden=false;el.dataset.state='offline';document.getElementById('networkRibbonText').textContent=`Offline · ${pending} transaksi menunggu sinkronisasi. Data hanya tersimpan di perangkat ini.`;document.getElementById('networkRetryBtn').hidden=true;return;}
+      if(state==='error'){el.hidden=false;el.dataset.state='error';document.getElementById('networkRibbonText').textContent=message||'Sinkronisasi belum berhasil. Antrean tetap disimpan.';document.getElementById('networkRetryBtn').hidden=false;return;}
+      if(pending>0){el.hidden=false;el.dataset.state='online';document.getElementById('networkRibbonText').textContent=`Online · ${pending} transaksi menunggu sinkronisasi.`;document.getElementById('networkRetryBtn').hidden=false;return;}
+      el.hidden=true;
+    }
+    async function retryPendingSync(){ if(!navigator.onLine){updateNetworkRibbon('offline');return;} if(opnameQueue.length) await syncOfflineData(); else {updateNetworkRibbon('online');await fetchData();} }
+    window.addEventListener('online',()=>{updateNetworkRibbon('online');if(authToken&&opnameQueue.length)syncOfflineData();});
+    window.addEventListener('offline',()=>updateNetworkRibbon('offline'));
+
     
     // --- Laporan WA PWA Konsolidasi & Rekap ---
     function copyWA() {
@@ -1309,24 +1431,33 @@
     // Satu jalur berbagi WhatsApp untuk seluruh tombol WA aplikasi.
     // Browser tidak mengizinkan web memilih/mengirim ke grup tertentu secara diam-diam;
     // WhatsApp akan meminta pengguna memilih chat/grup dan menekan Kirim.
-    function openWhatsAppDraft(message){
-      const text = String(message || '').trim();
-      if(!text){ Swal.fire({icon:'info',title:'Pesan kosong',text:'Tidak ada data yang dapat dibagikan.'}); return false; }
-      const url = 'https://wa.me/?text=' + encodeURIComponent(text);
-      let opened = null;
-      try { opened = window.open(url, '_blank'); if(opened) opened.opener = null; } catch(_) {}
-      if(opened){
-        Swal.fire({toast:true,position:'top',icon:'success',title:'WhatsApp dibuka — pilih grup tujuan',showConfirmButton:false,timer:2200});
-        return true;
+    function splitWhatsAppMessage(message, maxChars=3200){
+      const lines=String(message||'').split('\n'); const chunks=[]; let current='';
+      for(const line of lines){
+        if(line.length>maxChars){
+          if(current){chunks.push(current);current='';}
+          for(let i=0;i<line.length;i+=maxChars) chunks.push(line.slice(i,i+maxChars));
+          continue;
+        }
+        if(current && (current+'\n'+line).length>maxChars){chunks.push(current);current=line;}else current=current?(current+'\n'+line):line;
       }
-      // Fallback saat popup diblokir atau WhatsApp tidak dapat dibuka.
-      const copyFallback = () => {
-        if(navigator.clipboard && navigator.clipboard.writeText){
-          navigator.clipboard.writeText(text).then(()=>Swal.fire({icon:'info',title:'Pesan disalin',text:'WhatsApp tidak dapat dibuka otomatis. Buka grup tujuan lalu tempel pesan.'})).catch(()=>showManualCopy(text));
-        } else showManualCopy(text);
-      };
-      copyFallback();
-      return false;
+      if(current)chunks.push(current); return chunks;
+    }
+    function openWhatsAppDraft(message){
+      const text=String(message||'').trim();
+      if(!text){Swal.fire({icon:'info',title:'Pesan kosong',text:'Tidak ada data yang dapat dibagikan.'});return false;}
+      const chunks=splitWhatsAppMessage(text,3200);
+      if(chunks.length>1){
+        const rows=chunks.map((chunk,i)=>`<button type="button" class="wa-segment" data-wa-segment="${i}"><span><strong>Bagian ${i+1} dari ${chunks.length}</strong><small>${chunk.length.toLocaleString('id-ID')} karakter · berurutan</small></span><i class="bi bi-whatsapp"></i></button>`).join('');
+        Swal.fire({title:'Laporan dibagi menjadi beberapa bagian',html:`<p class="small text-muted">Pilih bagian, kirim ke grup WhatsApp, lalu ulangi untuk bagian berikutnya agar pesan tidak terpotong.</p><div class="wa-segment-list">${rows}</div>`,showConfirmButton:false,showCloseButton:true,width:560,didOpen:()=>{document.querySelectorAll('[data-wa-segment]').forEach(btn=>btn.addEventListener('click',()=>{const i=Number(btn.dataset.waSegment);Swal.close();openWhatsAppSingle_(chunks[i]);}));}});return true;
+      }
+      return openWhatsAppSingle_(text);
+    }
+    function openWhatsAppSingle_(text){
+      const url='https://wa.me/?text='+encodeURIComponent(text);let opened=null;
+      try{opened=window.open(url,'_blank','noopener,noreferrer');if(opened)opened.opener=null;}catch(_){}
+      if(opened){Swal.fire({toast:true,position:'top',icon:'success',title:'WhatsApp dibuka — pilih grup tujuan',showConfirmButton:false,timer:2200});return true;}
+      const copyFallback=()=>{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>Swal.fire({icon:'info',title:'Pesan disalin',text:'Buka grup tujuan lalu tempel pesan.'})).catch(()=>showManualCopy(text));}else showManualCopy(text);};copyFallback();return false;
     }
     function showManualCopy(text){
       const escaped = String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
