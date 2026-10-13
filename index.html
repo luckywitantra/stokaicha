@@ -278,6 +278,21 @@
 
   
     #owner-rank .table{font-size:.86rem;margin-bottom:.5rem}#owner-rank .table th{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--gray);white-space:nowrap}#owner-rank .progress{background:var(--input-bg)}#mutationList .card-box{transition:transform .15s,border-color .15s}#mutationList .card-box:hover{transform:translateY(-1px);border-color:rgba(49,87,213,.35)}.owner-trend-empty{margin:12px 0}
+
+    /* V50 UX polish: consistent touch targets, hierarchy, focus and feedback */
+    :root{--shadow-soft:0 8px 26px rgba(15,23,42,.07);--brand-ink:#172554}
+    button,.btn,.btn-act,.nav-item,.fab{transition:transform .16s ease,box-shadow .16s ease,background-color .16s ease,border-color .16s ease}
+    button:focus-visible,.btn:focus-visible,.btn-act:focus-visible,.nav-item:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid rgba(59,130,246,.45);outline-offset:2px}
+    .card-box{box-shadow:var(--shadow-soft);border:1px solid var(--border);border-radius:18px;background:var(--card-bg)}
+    .btn-act{min-height:44px;border-radius:12px;font-weight:750;letter-spacing:.005em}
+    .btn-act:active,.fab:active,.nav-item:active{transform:scale(.985)}
+    .glass-header{box-shadow:0 3px 18px rgba(15,23,42,.035)}
+    .form-control,.form-select,input,select,textarea{border-radius:11px!important}
+    .table-responsive{border-radius:14px;overscroll-behavior-x:contain}
+    .swal2-popup{border-radius:20px!important;max-width:min(94vw,620px)}
+    @media(max-width:650px){body{padding-bottom:calc(82px + env(safe-area-inset-bottom))}.btn-act{min-height:46px}.glass-header{padding:12px 15px}.swal2-popup{padding:1rem!important}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
 </style>
 </head>
 <body>
@@ -422,7 +437,7 @@
     <div id="owner-rank" class="owner-panel" style="display:none;">
       <div class="owner-panel-title"><span class="owner-icon"><i class="bi bi-trophy"></i></span>Kinerja Outlet</div><div class="owner-context">Bandingkan indikator yang tersedia. Ranking adalah alat pemantauan operasional, bukan penilaian kinerja keuangan yang diaudit.</div>
       <h6 class="fw-bold mt-1" style="color:var(--text)"><i class="bi bi-trophy-fill text-warning"></i> Leaderboard Outlet</h6><div id="leaderboardList" class="mb-4"></div>
-      <button class="btn-act bg-primary mb-4" onclick="copyKonsolidasiWA()"><i class="bi bi-whatsapp"></i> Cetak Laporan Konsolidasi</button>
+      <button class="btn-act bg-primary mb-4" onclick="copyKonsolidasiWA()"><i class="bi bi-whatsapp"></i> Kirim Laporan Konsolidasi ke WhatsApp</button>
     </div>
     
     <div id="owner-dist" class="owner-panel" style="display:none;">
@@ -1268,7 +1283,7 @@
         } else { allItemsStr += `➖ *${p.name}* 🔴\n   └ Stok: *KOSONG*\n\n`; }
       });
       txt += allItemsStr + `_Ket: ✅ Aman | 📉 Kritis | 📈 Over | ⚠️ Dekat Exp | ⛔ Expired | 🔴 Kosong_\n\n_Generated via Ai-STOK V42 Enterprise_`;
-      navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Laporan Tersalin!', showConfirmButton:false, timer:2000}));
+      openWhatsAppDraft(txt);
     }
     
     window.copyKonsolidasiWA = function() {
@@ -1291,10 +1306,31 @@
       window.open(url,'_blank','noopener,noreferrer');
     };
 
-    function openWhatsAppDraft(text){
-      const url='https://wa.me/?text='+encodeURIComponent(text);
-      const w=window.open(url,'_blank','noopener,noreferrer');
-      if(!w && navigator.clipboard) navigator.clipboard.writeText(text).then(()=>Swal.fire({icon:'info',title:'Pesan disalin',text:'WhatsApp tidak dapat dibuka otomatis. Pesan sudah disalin; tempelkan ke grup tujuan.'}));
+    // Satu jalur berbagi WhatsApp untuk seluruh tombol WA aplikasi.
+    // Browser tidak mengizinkan web memilih/mengirim ke grup tertentu secara diam-diam;
+    // WhatsApp akan meminta pengguna memilih chat/grup dan menekan Kirim.
+    function openWhatsAppDraft(message){
+      const text = String(message || '').trim();
+      if(!text){ Swal.fire({icon:'info',title:'Pesan kosong',text:'Tidak ada data yang dapat dibagikan.'}); return false; }
+      const url = 'https://wa.me/?text=' + encodeURIComponent(text);
+      let opened = null;
+      try { opened = window.open(url, '_blank'); if(opened) opened.opener = null; } catch(_) {}
+      if(opened){
+        Swal.fire({toast:true,position:'top',icon:'success',title:'WhatsApp dibuka — pilih grup tujuan',showConfirmButton:false,timer:2200});
+        return true;
+      }
+      // Fallback saat popup diblokir atau WhatsApp tidak dapat dibuka.
+      const copyFallback = () => {
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(text).then(()=>Swal.fire({icon:'info',title:'Pesan disalin',text:'WhatsApp tidak dapat dibuka otomatis. Buka grup tujuan lalu tempel pesan.'})).catch(()=>showManualCopy(text));
+        } else showManualCopy(text);
+      };
+      copyFallback();
+      return false;
+    }
+    function showManualCopy(text){
+      const escaped = String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      Swal.fire({icon:'info',title:'Salin pesan WhatsApp',html:`<textarea id="waManualText" class="swal2-textarea" readonly style="width:100%;height:180px;font-size:12px">${escaped}</textarea>`,confirmButtonText:'Selesai',didOpen:()=>{const el=document.getElementById('waManualText');if(el){el.focus();el.select();}}});
     }
     window.shareMutationRecommendationsWA=function(){
       const rows=Array.isArray(globalData.liveStock)?globalData.liveStock:[];
@@ -1723,7 +1759,18 @@
     function printStockReport() { window.print(); }
     window.exportStockCSV=exportStockCSV; window.printStockReport=printStockReport;
     window.updatePO = function(name, newQty) { let qty = Number(newQty) || 0; activePO[name].qty = qty; let sub = qty * activePO[name].price; document.getElementById('po_sub_'+name.replace(/[^a-zA-Z0-9]/g, '')).innerText = toIDR(sub); let grand = 0; for(let k in activePO) grand += activePO[k].qty * activePO[k].price; document.getElementById('poGrandTotal').innerText = toIDR(grand); }
-    window.copyPOWA = function() { let out = document.getElementById('outlet').value; let txt = `🛒 *FORM PURCHASE ORDER (PO) AI-CHA*\n🏢 Target: ${out==='ALL'?'SELURUH OUTLET':out}\n📅 ${new Date().toLocaleDateString('id-ID')}\n\n*Rincian Order:*\n`; let hasPO = false; let gTot = 0; for(let k in activePO) { if(activePO[k].qty > 0) { let sub = activePO[k].qty * activePO[k].price; gTot += sub; txt += `➖ ${k} : *${activePO[k].qty} ${activePO[k].uMain}*\n`; hasPO = true; } } if(!hasPO) return Swal.fire({icon:'warning', title:'Order Kosong'}); txt += `\n💰 *Total Estimasi Tagihan: ${toIDR(gTot)}*\n\nMohon diproses, terima kasih.`; navigator.clipboard.writeText(txt).then(() => Swal.fire({toast:true, position:'top', icon:'success', title:'Format PO Tersalin!', showConfirmButton:false, timer:2000})); }
+    window.copyPOWA = function() {
+      const out = document.getElementById('outlet')?.value || 'ALL';
+      const txt = [`🛒 *PURCHASE ORDER — AI-STOK*`,`🏢 Target: ${out==='ALL'?'SELURUH OUTLET':out}`,`📅 ${new Date().toLocaleDateString('id-ID')}`,'','*RINCIAN KERANJANG:*'];
+      let hasPO = false, grandTotal = 0;
+      Object.entries(activePO || {}).forEach(([name,item])=>{
+        const qty = Number(item?.qty)||0, price = Number(item?.price)||0;
+        if(qty>0){ const subtotal=qty*price; grandTotal+=subtotal; hasPO=true; txt.push(`• ${name}`,`  ${qty} ${item.uMain||'unit'} × ${toIDR(price)} = *${toIDR(subtotal)}*`); }
+      });
+      if(!hasPO) return Swal.fire({icon:'warning',title:'Keranjang PO kosong',text:'Tambahkan barang dan jumlah sebelum membagikan PO.'});
+      txt.push('',`🧾 *ESTIMASI TOTAL: ${toIDR(grandTotal)}*`,'','Mohon ditinjau dan diproses.','_Ringkasan ini merupakan draft, bukan bukti PO telah disetujui._');
+      openWhatsAppDraft(txt.join('\n'));
+    };
     function updTrfLbl() { let s=document.getElementById('trfItem').value; let out=document.getElementById('outlet').value; let i=globalData.liveStock.find(x=>x.name===s && x.outlet===out); if(i) { document.getElementById('trfMax').innerText=i.displayQty; document.getElementById('lbl-trf-1').innerText=`QTY (${i.uMain})`; document.getElementById('lbl-trf-2').innerText=`QTY (${i.uSub})`; } }
     async function processTransfer() { let d={ transactionId: makeId(), from: document.getElementById('outlet').value, to: document.getElementById('trfDest').value, item: document.getElementById('trfItem').value, q1: document.getElementById('trf-q1').value, q2: document.getElementById('trf-q2').value, user: activeUser.username }; if(!d.from||!d.to||!d.item||(!d.q1&&!d.q2)) return Swal.fire({icon:'error', title:'Lengkapi Data!'}); document.getElementById('loading').style.display='flex'; try { const trRes = await fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "processTransfer", data: d }) }); const trJson = await trRes.json(); if(trJson.status !== 'success') throw new Error(trJson.message || 'Transfer gagal'); Swal.fire({toast:true, position:'top', icon:'success', title:'Transfer Sukses', showConfirmButton:false, timer:1500}); document.getElementById('trf-q1').value=''; document.getElementById('trf-q2').value=''; fetchData(); showStok(); } catch(e){ Swal.fire({icon:'error',title:'Transfer gagal',text:e.message || 'Periksa stok, outlet tujuan, dan koneksi.'}); } finally { document.getElementById('loading').style.display='none'; } }
   </script>
