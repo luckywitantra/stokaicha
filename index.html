@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Ai-STOK V55 Enterprise Control Center</title>
+  <title>Ai-STOK V56 Smooth Operations</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
@@ -55,6 +55,17 @@
     
     button, .card-box, .nav-item, .fab, select, input { touch-action: manipulation; }
     .swal2-popup { will-change: transform, opacity; background: var(--card-bg) !important; color: var(--text) !important; }
+    /* V56: popup riwayat nyaman di HP, area daftar dapat digulir tanpa memotong tombol aksi. */
+    .swal2-container { padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)) !important; }
+    .swal2-popup { max-width: min(94vw, 680px) !important; max-height: calc(100dvh - 24px) !important; overflow: hidden !important; border-radius: 22px !important; }
+    .swal2-html-container { overflow: auto !important; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+    .history-list-v56 { max-height: min(52dvh, 440px); overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding: 0 3px; }
+    .history-row-v56 { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 2px; border-bottom:1px solid var(--border); }
+    .history-row-v56:last-child { border-bottom:0; }
+    .history-delete-v56 { min-width:42px; min-height:42px; border:1px solid #fecaca; border-radius:12px; background:#fff1f2; color:#be123c; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .history-delete-v56:disabled { opacity:.55; cursor:wait; }
+    body.dark-mode .history-delete-v56 { background:#3b1720; border-color:#7f1d1d; color:#fda4af; }
+    @media(max-width:480px) { .swal2-title { font-size:1.18rem !important; } .swal2-html-container { margin: .6em .7em !important; } .history-row-v56 { gap:8px; } .history-row-v56 .history-meta { min-width:0; overflow-wrap:anywhere; } .history-row-v56 .history-qty { text-align:right; } .swal2-actions { width:calc(100% - 24px); } .swal2-actions button { min-height:48px; } }
 
     .glass-header { background: var(--card-bg); backdrop-filter: blur(10px); padding: 15px 20px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .brand { font-weight: 800; font-size: 1.3rem; color: var(--primary); }
@@ -465,7 +476,7 @@
     </div>
   </div>
 
-  <div class="outlet-wrap"><select id="outlet" class="outlet-sel" onchange="fetchData()" aria-label="Pilih outlet"></select><div id="connectionStatus" class="small text-muted mb-2" role="status">Ai-STOK V55 · memeriksa koneksi</div></div>
+  <div class="outlet-wrap"><select id="outlet" class="outlet-sel" onchange="fetchData()" aria-label="Pilih outlet"></select><div id="connectionStatus" class="small text-muted mb-2" role="status">Ai-STOK V56 · memeriksa koneksi</div></div>
 
   <div id="skeletonTemplate" style="display:none;">
       <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-big"></div></div>
@@ -1282,29 +1293,31 @@
         }).then((result) => { if (result.isConfirmed) { setTimeout(() => openOpnameModal(itemName), 300); } else if (result.isDenied) { setTimeout(() => showHistory(itemName), 300); } });
     }
 
-    window.showHistory = function(itemName) { 
-        let out = document.getElementById('outlet').value; 
-        let lItem = globalData.liveStock.find(x => x.name === itemName && x.outlet === out); 
-        if(!lItem || !lItem.history || lItem.history.length === 0) return Swal.fire({toast:true, position:'top', icon:'info', title:'Belum ada riwayat transaksi.', showConfirmButton:false, timer:2000}); 
-        
-        let histHTML = `<div style="text-align:left; font-size:0.8rem; max-height: 300px; overflow-y:auto; overflow-x:hidden;">`; 
-        lItem.history.forEach(h => { 
-            let dateStr = new Date(h.date).toLocaleString('id-ID', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}); 
-            let qtyStr = ""; let big = Math.floor(Math.abs(h.qtyBase) / lItem.isi); let small = Math.abs(h.qtyBase) % lItem.isi; 
-            if(big>0) qtyStr += `${big} ${lItem.uMain} `; if(small>0) qtyStr += `${small} ${lItem.uSub}`; 
-            
-            let color = "text-success"; let sign = "+"; 
-            if(h.type === "Opname Rutin") { color = "text-primary"; sign = "•"; } 
-            else if(h.type === "Barang Rusak" || h.type.includes("Kirim")) { color = "text-danger"; sign = "-"; } 
-            
-            let undoHtml = ""; 
-            if(h.type === "Opname Rutin") undoHtml = `<span class="text-danger ms-2" style="cursor:pointer;" onclick="delStock(${h.rowIndex})"><i class="bi bi-trash"></i></span>`; 
-            
-            histHTML += `<div class="border-bottom py-2"><div class="d-flex justify-content-between fw-bold" style="color:var(--text)"><span>${dateStr}</span><span class="${color}">${sign}${qtyStr} ${undoHtml}</span></div><div class="text-muted d-flex justify-content-between"><span>${h.type}</span><span>${h.user}</span></div></div>`; 
-        }); 
-        histHTML += `</div>`; 
-        Swal.fire({ title: `<div style="font-size:1.1rem; color:#E31E24; font-weight:bold;">Riwayat ${itemName}</div>`, html: histHTML, confirmButtonColor: '#1E293B', confirmButtonText: 'Tutup' }); 
-    }
+    window.showHistory = function(itemName) {
+      const out = document.getElementById('outlet').value;
+      const lItem = globalData.liveStock.find(x => x.name === itemName && x.outlet === out);
+      if (!lItem || !Array.isArray(lItem.history) || lItem.history.length === 0) {
+        return Swal.fire({toast:true,position:'top',icon:'info',title:'Belum ada riwayat transaksi.',showConfirmButton:false,timer:2000});
+      }
+      const rows = lItem.history.map((h, index) => {
+        const dateStr = new Date(h.date).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+        const abs = Math.abs(Number(h.qtyBase)||0); const big = Math.floor(abs / (Number(lItem.isi)||1)); const small = abs % (Number(lItem.isi)||1);
+        let qtyStr = ''; if(big>0) qtyStr += `${big} ${lItem.uMain} `; if(small>0) qtyStr += `${small} ${lItem.uSub}`; if(!qtyStr) qtyStr='0';
+        let color='text-success', sign='+';
+        if(h.type==='Opname Rutin'){color='text-primary';sign='•';}
+        else if(h.type==='Barang Rusak' || String(h.type).includes('Kirim')){color='text-danger';sign='−';}
+        const canDelete = h.type === 'Opname Rutin' && Number(h.rowIndex) >= 2;
+        const deleteButton = canDelete ? `<button type="button" class="history-delete-v56" aria-label="Batalkan opname ${dateStr}" title="Batalkan input opname" onclick="delStock(${Number(h.rowIndex)}, '${encodeURIComponent(String(itemName)).replace(/'/g,'%27')}')"><i class="bi bi-trash3"></i></button>` : '';
+        return `<div class="history-row-v56"><div class="history-meta text-start"><div class="fw-bold" style="color:var(--text)">${dateStr}</div><div class="text-secondary">${escapeHTML(h.type||'Transaksi')} · ${escapeHTML(h.user||'-')}</div></div><div class="history-qty d-flex align-items-center gap-2"><span class="${color} fw-bold">${sign}${escapeHTML(qtyStr)}</span>${deleteButton}</div></div>`;
+      }).join('');
+      Swal.fire({
+        title:`<div style="font-size:1.08rem;color:var(--primary);font-weight:800;overflow-wrap:anywhere">Riwayat ${escapeHTML(itemName)}</div>`,
+        html:`<div class="history-list-v56" role="list" aria-label="Riwayat opname ${escapeHTML(itemName)}">${rows}</div><div class="small text-secondary mt-2 text-start"><i class="bi bi-info-circle me-1"></i>Menghapus riwayat berarti membatalkan input opname; catatan tetap tersimpan untuk audit.</div>`,
+        confirmButtonColor:'#1E293B',confirmButtonText:'Tutup',width:'min(94vw, 680px)',
+        customClass:{popup:'history-popup-v56'},
+        didOpen:()=>{ const list=document.querySelector('.history-list-v56'); if(list)list.scrollTop=0; }
+      });
+    };
 
     // --- AUTO-FILL STOCK OPNAME ---
     window.openOpnameModal = function(itemName) {
@@ -1357,11 +1370,28 @@
          await localforage.setItem('qAicha33', opnameQueue); updateQueueUI(); renderStockList();
       }
     }
-    window.delStock = async function(id) { 
-      if(await Swal.fire({title:'Batalkan Input?', icon:'warning', showCancelButton:true, confirmButtonColor:'#FF2E2E'}).then(r=>r.isConfirmed)) { 
-        showSkeletonLoader(); fetch(GAS_API_URL, { method: "POST", body: JSON.stringify({ action: "deleteStock", data: {rowIndex: id, user: activeUser.username} }) }).then(()=>fetchData()); 
-      } 
-    }
+    window.delStock = async function(id, itemName) {
+      if (!activeUser) return Swal.fire('Sesi berakhir','Silakan login kembali.','warning');
+      if (!navigator.onLine) return Swal.fire({icon:'warning',title:'Tidak dapat membatalkan saat offline',text:'Hubungkan perangkat ke internet agar pembatalan tercatat di server.'});
+      const rowIndex = Number(id);
+      if (!Number.isInteger(rowIndex) || rowIndex < 2) return Swal.fire('Riwayat tidak valid','Baris transaksi tidak dikenali. Muat ulang data lalu coba lagi.','error');
+      itemName = itemName ? decodeURIComponent(String(itemName)) : '';
+      const confirm = await Swal.fire({title:'Batalkan input opname?',text:'Saldo stok akan dihitung ulang setelah server mengonfirmasi pembatalan. Catatan audit tetap dipertahankan.',icon:'warning',showCancelButton:true,confirmButtonText:'Ya, batalkan',cancelButtonText:'Kembali',confirmButtonColor:'#dc2626',reverseButtons:true,focusCancel:true});
+      if (!confirm.isConfirmed) return;
+      const btn = [...document.querySelectorAll('.history-delete-v56')].find(el => (el.getAttribute('onclick')||'').includes(`delStock(${rowIndex},`));
+      if (btn) { btn.disabled=true; btn.innerHTML='<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>'; }
+      try {
+        const res = await fetch(GAS_API_URL,{method:'POST',body:JSON.stringify({action:'deleteStock',data:{rowIndex,user:activeUser.username}})});
+        const result = await res.json();
+        if (!res.ok || result.status !== 'success') throw new Error(result.message || 'Server tidak mengonfirmasi pembatalan.');
+        await fetchData();
+        Swal.fire({toast:true,position:'top',icon:'success',title:'Opname berhasil dibatalkan',text:'Saldo dan riwayat telah diperbarui.',showConfirmButton:false,timer:1800});
+        if (itemName) setTimeout(()=>showHistory(itemName),250);
+      } catch (e) {
+        if (btn) { btn.disabled=false; btn.innerHTML='<i class="bi bi-trash3"></i>'; }
+        Swal.fire({icon:'error',title:'Pembatalan gagal',text:e.message||'Periksa koneksi, sesi, dan hak akses lalu coba lagi.'});
+      }
+    };
 
     async function submitSingle(payload) {
       if (!activeUser) return Swal.fire('Sesi berakhir','Silakan masuk kembali.','warning');
