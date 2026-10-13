@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Ai-STOK V52 Enterprise UI/UX</title>
+  <title>Ai-STOK V53 Unified WhatsApp & Enterprise UX</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
@@ -296,11 +296,11 @@
 
     .network-ribbon{position:sticky;top:0;z-index:1040;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 16px;border-bottom:1px solid var(--border);background:var(--card-bg);color:var(--text);font-size:.86rem;box-shadow:0 3px 12px rgba(15,23,42,.05)}
     .network-ribbon[hidden]{display:none!important}.network-ribbon[data-state="offline"]{background:#fff7ed;color:#9a3412;border-color:#fed7aa}.network-ribbon[data-state="error"]{background:#fef2f2;color:#991b1b;border-color:#fecaca}.network-ribbon[data-state="online"]{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}.network-ribbon button{border:1px solid currentColor;border-radius:999px;padding:5px 11px;background:transparent;color:inherit;font-weight:700;white-space:nowrap}
-    .wa-segment-list{display:grid;gap:8px;text-align:left}.wa-segment{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--card-bg);color:var(--text)}.wa-segment small{display:block;color:var(--muted,#64748b)}
+    .wa-center-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;text-align:left}.wa-center-action{display:flex;align-items:center;gap:11px;padding:14px 12px;border:1px solid var(--border);border-radius:15px;background:var(--card-bg);color:var(--text);text-align:left;min-height:74px;box-shadow:0 4px 14px rgba(15,23,42,.045)}.wa-center-action i{font-size:1.35rem;color:#25D366;flex:0 0 auto}.wa-center-action strong{display:block;font-size:.9rem}.wa-center-action small{display:block;color:var(--gray);font-size:.72rem;margin-top:2px}.wa-preview{width:100%;min-height:220px;max-height:48dvh;resize:vertical;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--input-bg);color:var(--text);font:500 .82rem/1.5 ui-monospace,SFMono-Regular,monospace}.wa-preview-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.wa-preview-actions button{flex:1;min-width:120px;min-height:44px;border:0;border-radius:11px;padding:10px;font-weight:800}.wa-action-send{background:#25D366;color:#063b1c}.wa-action-copy{background:var(--input-bg);color:var(--text);border:1px solid var(--border)!important}.wa-length-note{font-size:.76rem;color:var(--gray);margin:8px 0 0;text-align:left}@media(max-width:420px){.wa-center-grid{grid-template-columns:1fr}.wa-center-action{min-height:64px}.wa-preview{min-height:180px}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
 
-    /* V52 Enterprise UI/UX: global visual consistency and mobile ergonomics */
+    /* V53 Enterprise UI/UX: unified WhatsApp sharing and mobile ergonomics */
     :root{color-scheme:light;--ui-radius-sm:10px;--ui-radius-md:15px;--ui-radius-lg:22px;--ui-shadow:0 8px 28px rgba(15,23,42,.075);--ui-ring:rgba(49,87,213,.28)}
     body.dark-mode{color-scheme:dark;--surface-soft:#172338;--ui-shadow:0 10px 30px rgba(0,0,0,.22)}
     html{scroll-behavior:smooth;scroll-padding-top:90px;-webkit-text-size-adjust:100%}
@@ -439,7 +439,7 @@
     </div>
   </div>
 
-  <div class="outlet-wrap"><select id="outlet" class="outlet-sel" onchange="fetchData()" aria-label="Pilih outlet"></select><div id="connectionStatus" class="small text-muted mb-2" role="status">Ai-STOK V52 · memeriksa koneksi</div></div>
+  <div class="outlet-wrap"><select id="outlet" class="outlet-sel" onchange="fetchData()" aria-label="Pilih outlet"></select><div id="connectionStatus" class="small text-muted mb-2" role="status">Ai-STOK V53 · memeriksa koneksi</div></div>
 
   <div id="skeletonTemplate" style="display:none;">
       <div class="skeleton-card"><div class="skeleton sk-title"></div><div class="skeleton sk-big"></div></div>
@@ -585,7 +585,7 @@
     </div>
   </div>
 
-  <button class="fab" id="fabBtn" onclick="copyWA()"><i class="bi bi-whatsapp"></i></button>
+  <button class="fab" id="fabBtn" onclick="openWhatsAppCenter()" aria-label="Pusat berbagi WhatsApp" title="Pusat WhatsApp"><i class="bi bi-whatsapp"></i></button>
 
   <div class="nav-bot" aria-label="Navigasi utama">
     <div class="nav-item" id="nav-beranda" onclick="nav('beranda')" role="button" tabindex="0"><i class="bi bi-house-door-fill"></i><span>Beranda</span></div>
@@ -1424,44 +1424,43 @@
       });
       lines.push('_Dibuat otomatis oleh Ai-STOK. Nilai aset merupakan estimasi berdasarkan data aplikasi._');
       const txt=lines.join('\n');
-      const url='https://wa.me/?text='+encodeURIComponent(txt);
-      window.open(url,'_blank','noopener,noreferrer');
+      openWhatsAppDraft(txt);
     };
 
-    // Satu jalur berbagi WhatsApp untuk seluruh tombol WA aplikasi.
-    // Browser tidak mengizinkan web memilih/mengirim ke grup tertentu secara diam-diam;
-    // WhatsApp akan meminta pengguna memilih chat/grup dan menekan Kirim.
-    function splitWhatsAppMessage(message, maxChars=3200){
-      const lines=String(message||'').split('\n'); const chunks=[]; let current='';
-      for(const line of lines){
-        if(line.length>maxChars){
-          if(current){chunks.push(current);current='';}
-          for(let i=0;i<line.length;i+=maxChars) chunks.push(line.slice(i,i+maxChars));
-          continue;
-        }
-        if(current && (current+'\n'+line).length>maxChars){chunks.push(current);current=line;}else current=current?(current+'\n'+line):line;
-      }
-      if(current)chunks.push(current); return chunks;
+    // V53: seluruh fitur berbagi menggunakan satu panel pratinjau dan satu pesan utuh.
+    // Pesan tidak dipecah otomatis menjadi beberapa bagian. Pengguna tetap memilih chat/grup dan menekan Kirim di WhatsApp.
+    function openWhatsAppCenter(){
+      const html=`<p class="small text-secondary text-start mb-3">Pilih laporan yang ingin dibagikan. Semua laporan akan dibuka melalui panel pratinjau yang sama dan dikirim sebagai satu pesan utuh.</p><div class="wa-center-grid"><button type="button" class="wa-center-action" data-wa-action="stock"><i class="bi bi-box-seam"></i><span><strong>Opname outlet</strong><small>Rincian stok, HPP, dan waste</small></span></button><button type="button" class="wa-center-action" data-wa-action="consolidation"><i class="bi bi-buildings"></i><span><strong>Konsolidasi</strong><small>Ringkasan semua outlet</small></span></button><button type="button" class="wa-center-action" data-wa-action="mutation"><i class="bi bi-arrow-left-right"></i><span><strong>Rekomendasi mutasi</strong><small>Stok lebih dan stok kritis</small></span></button><button type="button" class="wa-center-action" data-wa-action="comparison"><i class="bi bi-bar-chart-line"></i><span><strong>Perbandingan stok</strong><small>Barang antar-outlet</small></span></button><button type="button" class="wa-center-action" data-wa-action="po"><i class="bi bi-receipt"></i><span><strong>Ringkasan PO</strong><small>Isi keranjang pembelian</small></span></button></div>`;
+      Swal.fire({title:'Pusat WhatsApp',html,width:600,showConfirmButton:false,showCloseButton:true,focusConfirm:false,didOpen:()=>{
+        document.querySelectorAll('[data-wa-action]').forEach(btn=>btn.addEventListener('click',()=>{
+          const action=btn.dataset.waAction;Swal.close();
+          if(action==='stock')copyWA();else if(action==='consolidation')copyKonsolidasiWA();else if(action==='mutation')shareMutationRecommendationsWA();else if(action==='comparison')shareAllOutletComparisonWA();else if(action==='po')copyPOWA();
+        }));
+      }});
     }
+    window.openWhatsAppCenter=openWhatsAppCenter;
     function openWhatsAppDraft(message){
       const text=String(message||'').trim();
       if(!text){Swal.fire({icon:'info',title:'Pesan kosong',text:'Tidak ada data yang dapat dibagikan.'});return false;}
-      const chunks=splitWhatsAppMessage(text,3200);
-      if(chunks.length>1){
-        const rows=chunks.map((chunk,i)=>`<button type="button" class="wa-segment" data-wa-segment="${i}"><span><strong>Bagian ${i+1} dari ${chunks.length}</strong><small>${chunk.length.toLocaleString('id-ID')} karakter · berurutan</small></span><i class="bi bi-whatsapp"></i></button>`).join('');
-        Swal.fire({title:'Laporan dibagi menjadi beberapa bagian',html:`<p class="small text-muted">Pilih bagian, kirim ke grup WhatsApp, lalu ulangi untuk bagian berikutnya agar pesan tidak terpotong.</p><div class="wa-segment-list">${rows}</div>`,showConfirmButton:false,showCloseButton:true,width:560,didOpen:()=>{document.querySelectorAll('[data-wa-segment]').forEach(btn=>btn.addEventListener('click',()=>{const i=Number(btn.dataset.waSegment);Swal.close();openWhatsAppSingle_(chunks[i]);}));}});return true;
-      }
-      return openWhatsAppSingle_(text);
+      const escaped=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const tooLong=text.length>18000;
+      const html=`<div class="text-start"><div class="d-flex align-items-center justify-content-between gap-2 mb-2"><span class="small text-secondary">Pratinjau pesan</span><span class="badge rounded-pill text-bg-success">Satu pesan utuh</span></div><textarea id="waUnifiedPreview" class="wa-preview" readonly aria-label="Pratinjau isi pesan WhatsApp">${escaped}</textarea><p class="wa-length-note">${text.length.toLocaleString('id-ID')} karakter · Pesan tidak dipisah otomatis. Pilih grup tujuan di WhatsApp lalu tekan Kirim.${tooLong?' <strong>Catatan:</strong> pesan sangat panjang; jika WhatsApp gagal membuka tautan, gunakan tombol Salin pesan lalu tempel di grup.':''}</p><div class="wa-preview-actions"><button type="button" class="wa-action-send" id="waUnifiedSend"><i class="bi bi-whatsapp me-1"></i>Buka WhatsApp</button><button type="button" class="wa-action-copy" id="waUnifiedCopy"><i class="bi bi-clipboard me-1"></i>Salin pesan</button></div></div>`;
+      Swal.fire({title:'Bagikan melalui WhatsApp',html,width:620,showConfirmButton:false,showCloseButton:true,focusConfirm:false,didOpen:()=>{
+        const send=document.getElementById('waUnifiedSend');const copy=document.getElementById('waUnifiedCopy');
+        send?.addEventListener('click',()=>{openWhatsAppSingle_(text);});
+        copy?.addEventListener('click',async()=>{try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(text);Swal.fire({toast:true,position:'top',icon:'success',title:'Pesan disalin',showConfirmButton:false,timer:1800});}else showManualCopy(text);}catch(_){showManualCopy(text);}});
+      }});
+      return true;
     }
     function openWhatsAppSingle_(text){
       const url='https://wa.me/?text='+encodeURIComponent(text);let opened=null;
       try{opened=window.open(url,'_blank','noopener,noreferrer');if(opened)opened.opener=null;}catch(_){}
-      if(opened){Swal.fire({toast:true,position:'top',icon:'success',title:'WhatsApp dibuka — pilih grup tujuan',showConfirmButton:false,timer:2200});return true;}
-      const copyFallback=()=>{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>Swal.fire({icon:'info',title:'Pesan disalin',text:'Buka grup tujuan lalu tempel pesan.'})).catch(()=>showManualCopy(text));}else showManualCopy(text);};copyFallback();return false;
+      if(opened){Swal.close();Swal.fire({toast:true,position:'top',icon:'success',title:'WhatsApp dibuka — pilih grup lalu tekan Kirim',showConfirmButton:false,timer:2200});return true;}
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>Swal.fire({icon:'info',title:'Pesan disalin',text:'WhatsApp tidak dapat dibuka otomatis. Buka grup tujuan lalu tempel satu pesan utuh.'})).catch(()=>showManualCopy(text));}else showManualCopy(text);return false;
     }
     function showManualCopy(text){
-      const escaped = String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      Swal.fire({icon:'info',title:'Salin pesan WhatsApp',html:`<textarea id="waManualText" class="swal2-textarea" readonly style="width:100%;height:180px;font-size:12px">${escaped}</textarea>`,confirmButtonText:'Selesai',didOpen:()=>{const el=document.getElementById('waManualText');if(el){el.focus();el.select();}}});
+      const escaped=String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      Swal.fire({icon:'info',title:'Salin pesan WhatsApp',html:`<textarea id="waManualText" class="wa-preview" readonly aria-label="Pesan WhatsApp">${escaped}</textarea>`,confirmButtonText:'Selesai',didOpen:()=>{const el=document.getElementById('waManualText');if(el){el.focus();el.select();}}});
     }
     window.shareMutationRecommendationsWA=function(){
       const rows=Array.isArray(globalData.liveStock)?globalData.liveStock:[];
